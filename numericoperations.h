@@ -24,7 +24,7 @@ namespace NumericOperations
 {
 
 template<typename T>
-static void clip(T& value, const T& lowerLimit, const T& upperLimit)
+void clip(T& value, const T& lowerLimit, const T& upperLimit)
 {
     if (value < lowerLimit)
     {
@@ -37,7 +37,7 @@ static void clip(T& value, const T& lowerLimit, const T& upperLimit)
 }
 
 template<typename T>
-static void clipLow(T& value, const T& lowerLimit)
+void clipLow(T& value, const T& lowerLimit)
 {
     if (value < lowerLimit)
     {
@@ -46,7 +46,7 @@ static void clipLow(T& value, const T& lowerLimit)
 }
 
 template<typename T>
-static void clipHigh(T& value, const T& upperLimit)
+void clipHigh(T& value, const T& upperLimit)
 {
     if (value > upperLimit)
     {
@@ -55,7 +55,7 @@ static void clipHigh(T& value, const T& upperLimit)
 }
 
 template<typename T>
-static void toString(T value, std::string& aString)
+void toString(T value, std::string& aString)
 {
     std::stringstream ss;
     ss << value;
@@ -63,7 +63,7 @@ static void toString(T value, std::string& aString)
 }
 
 template<typename T>
-static std::string toString(T value)
+std::string toString(T value)
 {
     std::string result;
     toString(value, result);
