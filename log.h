@@ -1,4 +1,4 @@
-//    Copyright (C) 2009 Dirk Vanden Boer <dirk.vdb@gmail.com>
+//    Copyright (C) 2012 Dirk Vanden Boer <dirk.vdb@gmail.com>
 //
 //    This program is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -17,300 +17,95 @@
 #ifndef UTILS_LOG_H
 #define UTILS_LOG_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef WIN32
+#include "winconfig.h"
+#endif
+
+#include <sstream>
 #include <string>
 #include <iostream>
-#include <sstream>
 
-class Log
+namespace Log
 {
-public:
-    template<typename T1>
-	static void info(const T1& t1)
-	{
-		std::stringstream ss;
-		ss << t1;
-
-		outputInfo(ss.str());
-	}
-
-	template<typename T1, typename T2>
-	static void info(const T1& t1, const T2& t2)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2;
-
-		outputInfo(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3>
-	static void info(const T1& t1, const T2& t2, const T3& t3)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3;
-
-		outputInfo(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4>
-	static void info(const T1& t1, const T2& t2, const T3& t3, const T4& t4)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4;
-
-		outputInfo(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5>
-	static void info(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5;
-
-		outputInfo(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-	static void info(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5 << " " << t6;
-
-		outputInfo(ss.str());
-	}
-
-
-
-	template<typename T1>
-	static void warn(const T1& t1)
-	{
-		std::stringstream ss;
-		ss << t1;
-
-		outputWarn(ss.str());
-	}
-
-	template<typename T1, typename T2>
-	static void warn(const T1& t1, const T2& t2)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2;
-
-		outputWarn(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3>
-	static void warn(const T1& t1, const T2& t2, const T3& t3)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3;
-
-		outputWarn(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4>
-	static void warn(const T1& t1, const T2& t2, const T3& t3, const T4& t4)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4;
-
-		outputWarn(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5>
-	static void warn(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5;
-
-		outputWarn(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-	static void warn(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5 << " " << t6;
-
-		outputWarn(ss.str());
-	}
-
-	template<typename T1>
-	static void critical(const T1& t1)
-	{
-		std::stringstream ss;
-		ss << t1;
-
-		outputCritical(ss.str());
-	}
-
-	template<typename T1, typename T2>
-	static void critical(const T1& t1, const T2& t2)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2;
-
-		outputCritical(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3>
-	static void critical(const T1& t1, const T2& t2, const T3& t3)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3;
-
-		outputCritical(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4>
-	static void critical(const T1& t1, const T2& t2, const T3& t3, const T4& t4)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4;
-
-		outputCritical(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5>
-	static void critical(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5;
-
-		outputCritical(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-	static void critical(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5 << " " << t6;
-
-		outputCritical(ss.str());
-	}
-
-	template<typename T1>
-	static void error(const T1& t1)
-	{
-		std::stringstream ss;
-		ss << t1;
-
-		outputError(ss.str());
-	}
-
-	template<typename T1, typename T2>
-	static void error(const T1& t1, const T2& t2)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2;
-
-		outputError(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3>
-	static void error(const T1& t1, const T2& t2, const T3& t3)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3;
-
-		outputError(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4>
-	static void error(const T1& t1, const T2& t2, const T3& t3, const T4& t4)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4;
-
-		outputError(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5>
-	static void error(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5;
-
-		outputError(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-	static void error(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5 << " " << t6;
-
-		outputError(ss.str());
-	}
-
-	template<typename T1>
-	static void debug(const T1& t1)
-	{
-		std::stringstream ss;
-		ss << t1;
-
-		outputDebug(ss.str());
-	}
-
-	template<typename T1, typename T2>
-	static void debug(const T1& t1, const T2& t2)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2;
-
-		outputDebug(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3>
-	static void debug(const T1& t1, const T2& t2, const T3& t3)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3;
-
-		outputDebug(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4>
-	static void debug(const T1& t1, const T2& t2, const T3& t3, const T4& t4)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4;
-
-		outputDebug(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5>
-	static void debug(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5;
-
-		outputDebug(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-	static void debug(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5 << " " << t6;
-
-		outputDebug(ss.str());
-	}
-
-	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-	static void debug(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6, const T7& t7)
-	{
-		std::stringstream ss;
-		ss << t1 << " " << t2 << " " << t3 << " " << t4 << " " << t5 << " " << t6 << " " << t7;
-
-		outputDebug(ss.str());
-	}
-
-private:
-	static void outputInfo(const std::string& message);
-	static void outputWarn(const std::string& message);
-	static void outputError(const std::string& message);
-	static void outputCritical(const std::string& message);
-	static void outputDebug(const std::string& message);
-};
+    namespace // Inaccessible implementation details
+    {
+#ifdef CONSOLE_SUPPORTS_COLOR
+        const std::string red         = "\033[31m";
+        const std::string green       = "\033[32m";
+        const std::string yellow      = "\033[33m";
+        const std::string purple      = "\033[35m";
+        const std::string standard    = "\033[39m";
+#else
+        const std::string red;
+        const std::string green;
+        const std::string yellow;
+        const std::string purple;
+        const std::string standard;
+#endif
+        
+        inline void traceImpl(std::stringstream& ss)
+        {
+            std::cout << ss.str() << standard << std::endl;
+        }
+
+        template<typename TFirst, typename... TRest>
+        inline void traceImpl(std::stringstream& ss, const TFirst& first, const TRest&... rest)
+        {
+            ss << " " << first;
+            traceImpl(ss, rest...);
+        }  
+    }
+
+    template<typename TFirst, typename... TRest>
+    inline void info(const TFirst& first, const TRest&... rest)
+    {
+        std::stringstream ss;
+        ss << green << "INFO:  " << first;
+        
+        traceImpl(ss, rest...);
+    }
+    
+    template<typename TFirst, typename... TRest>
+    inline void warn(const TFirst& first, const TRest&... rest)
+    {
+        std::stringstream ss;
+        ss << yellow << "WARN:  " << first;
+        
+        traceImpl(ss, rest...);
+    }
+    
+    template<typename TFirst, typename... TRest>
+    inline void critical(const TFirst& first, const TRest&... rest)
+    {
+        std::stringstream ss;
+        ss << purple << "CRIT:  " << first;
+        
+        traceImpl(ss, rest...);
+    }
+    
+    template<typename TFirst, typename... TRest>
+    inline void error(const TFirst& first, const TRest&... rest)
+    {
+        std::stringstream ss;
+        ss << red << "ERROR: " << first;
+        
+        traceImpl(ss, rest...);
+    }
+        
+    template<typename TFirst, typename... TRest>
+    inline void debug(const TFirst& first, const TRest&... rest)
+    {
+#ifdef DEBUG
+        std::stringstream ss;
+        ss << "DEBUG: " << first;
+        
+        traceImpl(ss, rest...);
+#endif
+    }
+}
 
 #endif
