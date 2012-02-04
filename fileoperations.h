@@ -122,7 +122,7 @@ namespace FileOperations
         }
         else
         {
-            throw logic_error("Failed to obtain size for file: " + filepath);
+            throw std::logic_error("Failed to obtain size for file: " + filepath);
         }
     }
 
@@ -141,7 +141,7 @@ namespace FileOperations
         }
         else
         {
-            throw logic_error("Failed to obtain file info for file: " + filepath);
+            throw std::logic_error("Failed to obtain file info for file: " + filepath);
         }
     }
 
@@ -163,7 +163,7 @@ namespace FileOperations
         if (DeleteFile(filepath.c_str()) == FALSE)
     #endif
         {
-            throw logic_error("Failed to remove file: " + filepath);
+            throw std::logic_error("Failed to remove file: " + filepath);
         }
     }
 
@@ -171,7 +171,7 @@ namespace FileOperations
     {
         if (!filepath.empty() && filepath[filepath.length() - 1] == '/')
         {
-            throw logic_error("Path is not a filename: " + filepath);
+            throw std::logic_error("Path is not a filename: " + filepath);
         }
         
         std::string::size_type pos = filepath.find_last_of('/');
@@ -193,7 +193,7 @@ namespace FileOperations
     {
         if (left.empty())
         {
-            throw logic_error("Left part of combination is empty");
+            throw std::logic_error("Left part of combination is empty");
         }
         
         std::string path = left;
@@ -222,7 +222,7 @@ namespace FileOperations
         if (CreateDirectory(path.c_str(), nullptr) == 0)
     #endif
         {
-            throw logic_error("Failed to create directory: " + path);
+            throw std::logic_error("Failed to create directory: " + path);
         }
     }
 
@@ -232,7 +232,7 @@ namespace FileOperations
         DIR* pDir = opendir(path.c_str());
         if (pDir == nullptr)
         {
-            throw logic_error("Failed to delete directory: " + path);
+            throw std::logic_error("Failed to delete directory: " + path);
         }
         
         std::string file;
@@ -259,7 +259,7 @@ namespace FileOperations
 
         if (remove(path.c_str()))
         {
-            throw logic_error("Failed to delete directory: " + path);
+            throw std::logic_error("Failed to delete directory: " + path);
         }
     #else
         std::string targetDir;
@@ -306,7 +306,7 @@ namespace FileOperations
 
         if (dp == nullptr)
         {
-            throw logic_error("Failed to open directory for iteration: " + path);
+            throw std::logic_error("Failed to open directory for iteration: " + path);
         }
 
         dirent* pDirEntry;
@@ -419,7 +419,7 @@ namespace FileOperations
 
         if (dp == nullptr)
         {
-            throw logic_error("Failed to open directory for iteration: " + path);
+            throw std::logic_error("Failed to open directory for iteration: " + path);
         }
 
         dirent* pDirEntry;
@@ -524,7 +524,7 @@ namespace FileOperations
         const char* home = getenv("HOME");
         if (home == nullptr)
         {
-            throw logic_error("Failed to get home environment variable");
+            throw std::logic_error("Failed to get home environment variable");
         }
 
         return home;
@@ -539,7 +539,7 @@ namespace FileOperations
         xdgHandle handle;
         if (!xdgInitHandle(&handle))
         {
-            throw logic_error("Failed to get config directory");
+            throw std::logic_error("Failed to get config directory");
         }
         
         std::string dir = xdgConfigHome(&handle);
@@ -557,7 +557,7 @@ namespace FileOperations
         xdgHandle handle;
         if (!xdgInitHandle(&handle))
         {
-            throw logic_error("Failed to get config directory");
+            throw std::logic_error("Failed to get config directory");
         }
         
         std::string dir = xdgDataHome(&handle);
@@ -569,7 +569,7 @@ namespace FileOperations
 
         if (SHGetSpecialFolderPath(0, path, CSIDL_LOCAL_APPDATA, TRUE) == FALSE)
         {
-            throw logic_error("Failed to get config directory");
+            throw std::logic_error("Failed to get config directory");
         }
 
         return path;
