@@ -1,4 +1,4 @@
-//    Copyright (C) 2009 Dirk Vanden Boer <dirk.vdb@gmail.com>
+//    Copyright (C) 2012 Dirk Vanden Boer <dirk.vdb@gmail.com>
 //
 //    This program is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -14,12 +14,40 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef TRACE_H
-#define TRACE_H
+#ifndef UTILS_TRACE_H
+#define UTILS_TRACE_H
+
+#ifdef HAVE_CONFIG_H
+	#include "config.h"
+#endif
+
+#ifdef ENABLE_TRACE
+	#include <glib.h>
+	#include <glib/gprintf.h>
+	#include <cstdarg>
+	#include <unistd.h>
+#endif
 
 namespace Utils
 {
-    void trace(const char *format, ...);
+    void trace(const char *format, ...)
+    {
+	#ifdef ENABLE_TRACE
+	    va_list args;
+	    char* formatted;
+	    char* str;
+
+	    va_start(args, format);
+	    formatted = g_strdup_vprintf (format, args);
+	    va_end(args);
+
+	    str = g_strdup_printf ("MARK: %s: %s", g_get_prgname(), formatted);
+	    g_free (formatted);
+
+	    access(str, F_OK);
+	    g_free(str);
+	#endif
+	}
 }
 
 #endif

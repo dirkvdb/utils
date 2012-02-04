@@ -1,4 +1,4 @@
-//    Copyright (C) 2009 Dirk Vanden Boer <dirk.vdb@gmail.com>
+//    Copyright (C) 2012 Dirk Vanden Boer <dirk.vdb@gmail.com>
 //
 //    This program is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -14,30 +14,176 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef STRING_OPERATIONS_H
-#define STRING_OPERATIONS_H
+#ifndef UTILS_STRING_OPERATIONS_H
+#define UTILS_STRING_OPERATIONS_H
 
 #include <string>
 #include <vector>
 #include <sstream>
 #include <algorithm>
-#include <wchar.h>
+#include <cwchar>
 #include <stdexcept>
 
 namespace StringOperations
 {
-    void lowercase(std::string& aString);
-    std::string lowercase(const std::string& aString);
-    
-    void trim(std::string& aString);
-    std::string trim(const std::string& aString);
-    void replace(std::string& aString, const std::string& toSearch, const std::string& toReplace);
-    void dos2unix(std::string& aString);
-    std::string urlEncode(const std::string& aString);
-    std::vector<std::string> tokenize(const std::string& str, const std::string& delimiter);
-    void wideCharToUtf8(const std::wstring& wideString, std::string& utf8String);
-    void utf8ToWideChar(const std::string& utf8String, std::wstring& wideString);
+    namespace
+    {
+        class ToLower
+        {
+        public:
+            char operator() (char c) const { return std::tolower(c); }
+        };
+    }
 
+    void lowercase(std::string& aString)
+    {
+        //std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return tolower(c); }); //just have some patience
+        std::transform(aString.begin(), aString.end(), aString.begin(), ToLower());
+    }
+
+    std::string lowercase(const std::string& aString)
+    {
+        string lower = aString;
+        lowercase(lower);
+        return lower;
+    }
+    
+    void trim(std::string& aString)
+    {
+        if (aString.empty())
+        {
+            return;
+        }
+
+        size_t begin    = 0;
+        size_t end      = aString.size() - 1;
+
+        while ( aString[begin] == ' '  || aString[begin] == '\t'
+             || aString[begin] == '\r' || aString[begin] == '\n')
+        {
+            ++begin;
+
+            if (begin == aString.size())
+                break;
+        }
+
+        if (begin == aString.size())
+            aString = "";
+
+        while ( aString[end] == ' '  || aString[end] == '\t'
+             || aString[end] == '\r' || aString[end] == '\n')
+        {
+            --end;
+        }
+
+        aString = begin > end ? "" : aString.substr(begin, ++end - begin);
+    }
+
+    std::string trim(const std::string& aString)
+    {
+        string trimmed = aString;
+        trim(trimmed);
+        return trimmed;
+    }
+
+    void replace(std::string& aString, const std::string& toSearch, const std::string& toReplace)
+    {
+        size_t startPos = 0;
+        size_t foundPos;
+
+        while (std::string::npos != (foundPos = aString.find(toSearch, startPos)))
+        {
+            aString.replace(foundPos, toSearch.length(), toReplace);
+            startPos = foundPos + toReplace.size();
+        }
+    }
+
+    void dos2unix(std::string& aString)
+    {
+        replace(aString, "\r\n", "\n");
+    }
+
+    std::string urlEncode(const std::string& aString)
+    {
+        std::stringstream result;
+
+        for (size_t i = 0; i < aString.size(); ++i)
+        {
+            int curChar = static_cast<int>(static_cast<unsigned char>(aString[i]));
+            if ((curChar >= 48 && curChar <= 57) ||
+                (curChar >= 65 && curChar <= 90) ||
+                (curChar >= 97 && curChar <= 122) ||
+                aString[i] == '-' || aString[i] == '_' ||
+                aString[i] == '.' || aString[i] == '!' ||
+                aString[i] == '~' || aString[i] == '*' ||
+                aString[i] == '\'' || aString[i] == '(' ||
+                aString[i] == ')')
+            {
+                result << aString[i];
+            }
+            else if (aString[i] == ' ')
+            {
+                result << '+';
+            }
+            else
+            {
+                result << '%' << hex << curChar;
+            }
+        }
+
+        return result.str();
+    }
+
+    std::vector<string> tokenize(const std::string& str, const std::string& delimiter)
+    {
+        std::vector<std::string>    tokens;
+        size_t                      pos = 0;
+        size_t                      index = 0;
+
+        while ((pos = str.find(delimiter, index)) != std::string::npos)
+        {
+            tokens.push_back(str.substr(index, pos - index));
+            index = pos + delimiter.size();
+        }
+
+        if (index < str.size())
+        {
+            tokens.push_back(str.substr(index));
+        }
+
+        return tokens;
+    }
+
+    std::string wideCharToUtf8(const std::wstring& wideString)
+    {
+        size_t stringLength = wcstombs(nullptr, wideString.c_str(), 0);
+        std::string utf8String(stringLength + 1, '\0');
+
+        size_t len = wcstombs(&utf8String[0], wideString.c_str(), stringLength + 1);
+        if (len == static_cast<size_t>(-1))
+        {
+            throw logic_error("Failed to convert wideString to UTF-8");
+        }
+
+        utf8String.resize(stringLength);
+        return utf8String;
+    }
+
+    std::wstring wideString utf8ToWideChar(const std::string& utf8String)
+    {
+        size_t stringLength = mbstowcs(nullptr, utf8String.c_str(), 0);
+        std::string wideString(stringLength + 1, '\0');
+
+        size_t len = mbstowcs(&wideString[0], utf8String.c_str(), stringLength + 1);
+        if (len == static_cast<size_t>(-1))
+        {
+            throw logic_error("Failed to convert wideString to UTF-8");
+        }
+
+        wideString.resize(stringLength);
+        return wideString;
+    }
+    
     template<typename T>
     inline void toNumeric(const std::string& aString, T& numeric)
     {
