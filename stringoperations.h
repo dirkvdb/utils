@@ -41,7 +41,7 @@ namespace StringOperations
         std::transform(aString.begin(), aString.end(), aString.begin(), ToLower());
     }
 
-    std::string lowercase(const std::string& aString)
+    inline std::string lowercase(const std::string& aString)
     {
         std::string lower = aString;
         lowercase(lower);
@@ -169,7 +169,7 @@ namespace StringOperations
         return utf8String;
     }
 
-    std::wstring utf8ToWideChar(const std::string& utf8String)
+    inline std::wstring utf8ToWideChar(const std::string& utf8String)
     {
         size_t stringLength = mbstowcs(nullptr, utf8String.c_str(), 0);
         std::wstring wideString(stringLength + 1, '\0');
