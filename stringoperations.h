@@ -43,7 +43,7 @@ namespace StringOperations
 
     std::string lowercase(const std::string& aString)
     {
-        string lower = aString;
+        std::string lower = aString;
         lowercase(lower);
         return lower;
     }
@@ -81,7 +81,7 @@ namespace StringOperations
 
     std::string trim(const std::string& aString)
     {
-        string trimmed = aString;
+        std::string trimmed = aString;
         trim(trimmed);
         return trimmed;
     }
@@ -127,14 +127,14 @@ namespace StringOperations
             }
             else
             {
-                result << '%' << hex << curChar;
+                result << '%' << std::hex << curChar;
             }
         }
 
         return result.str();
     }
 
-    std::vector<string> tokenize(const std::string& str, const std::string& delimiter)
+    std::vector<std::string> tokenize(const std::string& str, const std::string& delimiter)
     {
         std::vector<std::string>    tokens;
         size_t                      pos = 0;
@@ -162,22 +162,22 @@ namespace StringOperations
         size_t len = wcstombs(&utf8String[0], wideString.c_str(), stringLength + 1);
         if (len == static_cast<size_t>(-1))
         {
-            throw  std::logic_erroror("Failed to convert wideString to UTF-8");
+            throw std::logic_error("Failed to convert wideString to UTF-8");
         }
 
         utf8String.resize(stringLength);
         return utf8String;
     }
 
-    std::wstring wideString utf8ToWideChar(const std::string& utf8String)
+    std::wstring utf8ToWideChar(const std::string& utf8String)
     {
         size_t stringLength = mbstowcs(nullptr, utf8String.c_str(), 0);
-        std::string wideString(stringLength + 1, '\0');
+        std::wstring wideString(stringLength + 1, '\0');
 
         size_t len = mbstowcs(&wideString[0], utf8String.c_str(), stringLength + 1);
         if (len == static_cast<size_t>(-1))
         {
-            throw  std::logic_erroror("Failed to convert wideString to UTF-8");
+            throw std::logic_error("Failed to convert wideString to UTF-8");
         }
 
         wideString.resize(stringLength);
@@ -185,10 +185,14 @@ namespace StringOperations
     }
     
     template<typename T>
-    inline void toNumeric(const std::string& aString, T& numeric)
+    inline T toNumeric(const std::string& aString)
     {
+        T numeric;
+    
         std::stringstream ss(aString);
         ss >> numeric;
+        
+        return numeric;
     }
 
     template<typename T>
@@ -200,7 +204,7 @@ namespace StringOperations
     }
 
     template<typename T>
-    inline std::string toWstring(T& numeric)
+    inline std::wstring toWstring(T& numeric)
     {
         std::wstringstream ss;
         ss << numeric;
