@@ -35,7 +35,7 @@ namespace StringOperations
         };
     }
 
-    void lowercase(std::string& aString)
+    inline void lowercase(std::string& aString)
     {
         //std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return tolower(c); }); //just have some patience
         std::transform(aString.begin(), aString.end(), aString.begin(), ToLower());
@@ -48,7 +48,7 @@ namespace StringOperations
         return lower;
     }
     
-    void trim(std::string& aString)
+    inline void trim(std::string& aString)
     {
         if (aString.empty())
         {
@@ -79,14 +79,14 @@ namespace StringOperations
         aString = begin > end ? "" : aString.substr(begin, ++end - begin);
     }
 
-    std::string trim(const std::string& aString)
+    inline std::string trim(const std::string& aString)
     {
         std::string trimmed = aString;
         trim(trimmed);
         return trimmed;
     }
 
-    void replace(std::string& aString, const std::string& toSearch, const std::string& toReplace)
+    inline void replace(std::string& aString, const std::string& toSearch, const std::string& toReplace)
     {
         size_t startPos = 0;
         size_t foundPos;
@@ -98,12 +98,12 @@ namespace StringOperations
         }
     }
 
-    void dos2unix(std::string& aString)
+    inline void dos2unix(std::string& aString)
     {
         replace(aString, "\r\n", "\n");
     }
 
-    std::string urlEncode(const std::string& aString)
+    inline std::string urlEncode(const std::string& aString)
     {
         std::stringstream result;
 
@@ -134,7 +134,7 @@ namespace StringOperations
         return result.str();
     }
 
-    std::vector<std::string> tokenize(const std::string& str, const std::string& delimiter)
+    inline std::vector<std::string> tokenize(const std::string& str, const std::string& delimiter)
     {
         std::vector<std::string>    tokens;
         size_t                      pos = 0;
@@ -154,7 +154,7 @@ namespace StringOperations
         return tokens;
     }
 
-    std::string wideCharToUtf8(const std::wstring& wideString)
+    inline std::string wideCharToUtf8(const std::wstring& wideString)
     {
         size_t stringLength = wcstombs(nullptr, wideString.c_str(), 0);
         std::string utf8String(stringLength + 1, '\0');
