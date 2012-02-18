@@ -1,0 +1,33 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+PROJECT(utilstest)
+ENABLE_TESTING()
+
+FIND_PACKAGE(PkgConfig)
+FIND_PACKAGE(GTest REQUIRED)
+PKG_CHECK_MODULES(XDGBASEDIR libxdg-basedir REQUIRED)
+
+INCLUDE_DIRECTORIES(
+	${GTEST_INCLUDE_DIRS}
+	${XDGBASEDIR_INCLUDE_DIRS}
+	${CMAKE_CURRENT_SOURCE_DIR}/../..
+)
+
+ADD_EXECUTABLE(unittest
+	main.cpp
+	signaltest.cpp
+	stringoperationstest.cpp
+	fileoperationstest.cpp
+)
+
+SET (CMAKE_CXX_FLAGS "-std=c++0x")
+
+TARGET_LINK_LIBRARIES(unittest
+	-lpthread
+	-lgmock
+	${XDGBASEDIR_LIBRARIES}
+	${GTEST_BOTH_LIBRARIES}
+)
+
+ADD_TEST(UtilsTests unittest)
+ 

@@ -24,7 +24,9 @@
 #include <cwchar>
 #include <stdexcept>
 
-namespace StringOperations
+namespace utils
+{
+namespace stringops
 {
     namespace
     {
@@ -210,6 +212,7 @@ namespace StringOperations
         ss << numeric;
         return ss.str();
     }
+}
 }
 
 #endif

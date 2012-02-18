@@ -46,7 +46,9 @@
 #include "log.h"
 #include "types.h"
 
-namespace FileOperations
+namespace utils
+{
+namespace fileops
 {
     class IFileIterator
     {
@@ -207,13 +209,6 @@ namespace FileOperations
         return path;
     }
 
-    std::string combinePath(const std::string& left, const std::string& right)
-    {
-        std::string combined;
-        combinePath(left, right, combined);
-        return combined;
-    }
-
     void createDirectory(const std::string& path)
     {
     #ifndef WIN32
@@ -243,7 +238,7 @@ namespace FileOperations
             if (!strcmp(pDe->d_name, ".") || !strcmp(pDe->d_name, ".."))
                 continue;
 
-            combinePath(path, pDe->d_name, file);
+            file = combinePath(path, pDe->d_name);
             
             if (pDe->d_type == DT_DIR)
             {
@@ -326,7 +321,7 @@ namespace FileOperations
                 {
                     iterateDirectory(path + "/" + pDirEntry->d_name, iter);
                 }
-                catch (exception& e)
+                catch (std::exception& e)
                 {
                     Log::warn(e.what());
                 }
@@ -348,7 +343,7 @@ namespace FileOperations
                         {
                             iterateDirectory(filepath, iter);
                         }
-                        catch (exception& e)
+                        catch (std::exception& e)
                         {
                             Log::warn(e.what());
                         }
@@ -438,7 +433,7 @@ namespace FileOperations
                 {
                     numFiles += countFilesInDirectory(path + "/" + pDirEntry->d_name);
                 }
-                catch (exception& e)
+                catch (std::exception& e)
                 {
                 }
             }
@@ -459,7 +454,7 @@ namespace FileOperations
                         {
                             numFiles += countFilesInDirectory(path + "/" + pDirEntry->d_name);
                         }
-                        catch (exception& e)
+                        catch (std::exception& e)
                         {
                         }
                     }
@@ -575,6 +570,7 @@ namespace FileOperations
         return path;
     #endif
     }
+}
 }
 
 #endif
