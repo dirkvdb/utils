@@ -32,7 +32,9 @@
 
 #include <cassert>
 
-namespace TimeOperations
+namespace utils
+{
+namespace timeops
 {
     uint64_t getTimeInMilliSeconds()
     {
@@ -57,6 +59,7 @@ namespace TimeOperations
 	usleep(ms * 1000);
 #endif
 	}
+}
 }
 
 #endif

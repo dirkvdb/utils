@@ -28,7 +28,7 @@
 	#include <unistd.h>
 #endif
 
-namespace Utils
+namespace utils
 {
     void trace(const char *format, ...)
     {

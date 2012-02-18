@@ -29,7 +29,10 @@
 #include <string>
 #include <iostream>
 
-namespace Log
+
+namespace utils
+{
+namespace log
 {
     namespace // Inaccessible implementation details
     {
@@ -106,6 +109,7 @@ namespace Log
         traceImpl(ss, rest...);
 #endif
     }
+}
 }
 
 #endif

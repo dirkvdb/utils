@@ -20,7 +20,9 @@
 #include <sstream>
 #include <string>
 
-namespace NumericOperations
+namespace utils
+{
+namespace numericops
 {
 
 template<typename T>
@@ -70,6 +72,7 @@ std::string toString(T value)
     return result;
 }
 
+}
 }
 
 #endif
