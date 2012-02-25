@@ -30,7 +30,7 @@
 
 namespace utils
 {
-    void trace(const char *format, ...)
+    inline void trace(const char *format, ...)
     {
 	#ifdef ENABLE_TRACE
 	    va_list args;

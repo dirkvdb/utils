@@ -36,13 +36,13 @@ namespace utils
 {
 namespace timeops
 {
-    uint64_t getTimeInMilliSeconds()
+    inline uint64_t getTimeInMilliSeconds()
     {
 #ifdef WIN32
 	return static_cast<uint64_t>(timeGetTime());
 #else
-    timeval timeValue;
-    timezone timeZone;
+    struct timeval timeValue;
+    struct timezone timeZone;
     
     int32_t error = gettimeofday(&timeValue, &timeZone);
     assert(!error);
@@ -51,7 +51,7 @@ namespace timeops
 #endif
 }
 
-    void sleepMs(uint32_t ms)
+    inline void sleepMs(uint32_t ms)
     {
 #ifdef WIN32
 	Sleep(ms);

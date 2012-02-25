@@ -102,7 +102,7 @@ namespace log
     template<typename TFirst, typename... TRest>
     inline void debug(const TFirst& first, const TRest&... rest)
     {
-#ifdef DEBUG
+#ifndef NDEBUG
         std::stringstream ss;
         ss << "DEBUG: " << first;
         

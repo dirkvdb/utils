@@ -26,7 +26,7 @@ namespace numericops
 {
 
 template<typename T>
-void clip(T& value, const T& lowerLimit, const T& upperLimit)
+inline void clip(T& value, const T& lowerLimit, const T& upperLimit)
 {
     if (value < lowerLimit)
     {
@@ -39,7 +39,7 @@ void clip(T& value, const T& lowerLimit, const T& upperLimit)
 }
 
 template<typename T>
-void clipLow(T& value, const T& lowerLimit)
+inline void clipLow(T& value, const T& lowerLimit)
 {
     if (value < lowerLimit)
     {
@@ -48,7 +48,7 @@ void clipLow(T& value, const T& lowerLimit)
 }
 
 template<typename T>
-void clipHigh(T& value, const T& upperLimit)
+inline void clipHigh(T& value, const T& upperLimit)
 {
     if (value > upperLimit)
     {
@@ -57,7 +57,7 @@ void clipHigh(T& value, const T& upperLimit)
 }
 
 template<typename T>
-void toString(T value, std::string& aString)
+inline void toString(T value, std::string& aString)
 {
     std::stringstream ss;
     ss << value;
@@ -65,7 +65,7 @@ void toString(T value, std::string& aString)
 }
 
 template<typename T>
-std::string toString(T value)
+inline std::string toString(T value)
 {
     std::string result;
     toString(value, result);

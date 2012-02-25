@@ -17,7 +17,7 @@
 #ifndef SIMPLE_SUBSCRIBER_H
 #define SIMPLE_SUBSCRIBER_H
 
-#include "Utils/subscriber.h"
+#include "utils/subscriber.h"
 
 namespace utils
 {
