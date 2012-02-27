@@ -29,6 +29,8 @@
 #include <string>
 #include <iostream>
 
+#include "timeoperations.h"
+
 
 namespace utils
 {
@@ -104,7 +106,7 @@ namespace log
     {
 #ifndef NDEBUG
         std::stringstream ss;
-        ss << "DEBUG: " << first;
+        ss << "DEBUG: " << "[" << timeops::getTimeString() << "] " << first;
         
         traceImpl(ss, rest...);
 #endif
