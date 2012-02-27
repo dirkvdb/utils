@@ -33,6 +33,7 @@
 #include <cassert>
 #include <ctime>
 #include <iomanip>
+#include <sstream>
 
 namespace utils
 {
