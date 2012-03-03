@@ -48,7 +48,7 @@ public:
 
         m_Stop = false;
         m_PoolThread = std::async(std::launch::async, std::bind(&ThreadPool::poolThread, this));
-        log::info("Threadpool launched");
+        log::debug("Threadpool launched");
     }
 
     void stop()
@@ -61,14 +61,18 @@ public:
         }
 
         m_Stop = true;
-        log::info("Destroy threadpool");
+        log::debug("Destroy threadpool");
 
-        log::info("Signal for destruction");
-        m_ThreadStatusCondition.notify_all();    
+        log::debug("Signal for destruction");
 
-        log::info("Wait fot threadpool termination");
+        {
+            std::lock_guard<std::mutex> lock(m_ThreadListMutex);
+            m_ThreadStatusCondition.notify_all();
+        }
+
+        log::debug("Wait fot threadpool termination");
         m_PoolThread.wait();
-        log::info("Threadpool finished");
+        log::debug("Threadpool finished");
     }
 
     void queueFunction(std::function<void()> func)
@@ -76,9 +80,8 @@ public:
         {
             std::lock_guard<std::mutex> lock(m_ThreadListMutex);
             m_QueuedThreads.push_back(std::bind(&ThreadPool::wrapFunction, this, func));    
+            m_ThreadStatusCondition.notify_all();
         }
-        
-        m_ThreadStatusCondition.notify_all();
     }
 
 private:
@@ -100,14 +103,16 @@ private:
 
             for (auto iter = m_RunningThreads.begin(); iter != m_RunningThreads.end(); ++iter)
             {
+                log::debug("Is valid?");
                 bool ready = iter->wait_for(std::chrono::microseconds(1));
-                //if (iter->valid())
                 if (ready)
+                //if (iter->valid())
                 {
                     iter->get();
                     iter = m_RunningThreads.erase(iter);
                     log::debug("Thread finished: running (", m_RunningThreads.size(), ")");
                 }
+                log::debug("Whoppa");
             }
             
             try
@@ -145,6 +150,7 @@ private:
         log::debug("Wrapper func");
         func();
 
+        std::lock_guard<std::mutex> lock(m_ThreadListMutex);
         m_ThreadStatusCondition.notify_all();
     }
 

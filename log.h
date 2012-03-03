@@ -28,6 +28,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <thread>
 
 #include "timeoperations.h"
 
@@ -106,7 +107,7 @@ namespace log
     {
 #ifndef NDEBUG
         std::stringstream ss;
-        ss << "DEBUG: " << "[" << timeops::getTimeString() << "] " << first;
+        ss << "DEBUG: " << "[" << timeops::getTimeString() << "] [" << std::this_thread::get_id() << "] " << first;
         
         traceImpl(ss, rest...);
 #endif
