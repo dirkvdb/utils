@@ -61,16 +61,12 @@ public:
         }
 
         m_Stop = true;
-        log::debug("Destroy threadpool");
-
-        log::debug("Signal for destruction");
 
         {
             std::lock_guard<std::mutex> lock(m_ThreadListMutex);
             m_ThreadStatusCondition.notify_all();
         }
 
-        log::debug("Wait fot threadpool termination");
         m_PoolThread.wait();
         log::debug("Threadpool finished");
     }
@@ -87,14 +83,10 @@ public:
 private:
     void poolThread()
     {
-        log::debug("Start pool thread");
-
         while (!m_Stop)
         {
             std::unique_lock<std::mutex> lock(m_ThreadListMutex);
             m_ThreadStatusCondition.wait(lock);
-
-            log::debug("Thread status signal received: stop =", m_Stop);
 
             if (m_Stop)
             {
@@ -103,23 +95,19 @@ private:
 
             for (auto iter = m_RunningThreads.begin(); iter != m_RunningThreads.end(); ++iter)
             {
-                log::debug("Is valid?");
-                bool ready = iter->wait_for(std::chrono::microseconds(1));
+                bool ready = iter->wait_for(std::chrono::seconds::zero());
                 if (ready)
-                //if (iter->valid())
                 {
                     iter->get();
                     iter = m_RunningThreads.erase(iter);
                     log::debug("Thread finished: running (", m_RunningThreads.size(), ")");
                 }
-                log::debug("Whoppa");
             }
             
             try
             {
                 while (!m_Stop && m_RunningThreads.size() < m_MaxNumThreads && !m_QueuedThreads.empty())
                 {
-                    log::debug("Launch thread");
                     m_RunningThreads.push_back(std::async(std::launch::async, m_QueuedThreads.front()));
                     m_QueuedThreads.pop_front();
                 }
@@ -134,22 +122,17 @@ private:
 
         for (auto& fut : m_RunningThreads)
         {
-            log::debug("Wait for future");
             fut.get();
             log::debug("Thread aborted: running (", m_RunningThreads.size(), ")");
         }
 
         m_RunningThreads.clear();
         m_QueuedThreads.clear();
-
-        log::debug("Pool thread finished");
     }
 
     void wrapFunction(std::function<void()> func)
     {
-        log::debug("Wrapper func");
         func();
-
         std::lock_guard<std::mutex> lock(m_ThreadListMutex);
         m_ThreadStatusCondition.notify_all();
     }
