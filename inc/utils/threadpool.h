@@ -95,8 +95,8 @@ private:
 
             for (auto iter = m_RunningThreads.begin(); iter != m_RunningThreads.end(); ++iter)
             {
-                bool ready = iter->wait_for(std::chrono::seconds::zero());
-                if (ready)
+                std::future_status status = iter->wait_for(std::chrono::seconds::zero());
+                if (status == std::future_status::ready)
                 {
                     iter->get();
                     iter = m_RunningThreads.erase(iter);
