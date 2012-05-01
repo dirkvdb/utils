@@ -28,9 +28,9 @@ class ReceiverMock
 {
 public:
     MOCK_METHOD0_T(onItem, void());
-    MOCK_METHOD1_T(onItem1, void(const ArgType&));
-    MOCK_METHOD2_T(onItem2, void(const ArgType&, const ArgType&));
-    MOCK_METHOD3_T(onItem3, void(const ArgType&, const ArgType&, const ArgType&));
+    MOCK_METHOD1_T(onItem1, void(ArgType));
+    MOCK_METHOD2_T(onItem2, void(ArgType, ArgType));
+    MOCK_METHOD3_T(onItem3, void(ArgType, ArgType, ArgType));
 };
 
 class SignalTest : public Test
@@ -182,4 +182,17 @@ TEST_F(SignalTest, ConnectDisconnect3)
     sig.disconnect(&m_Mock2);
 
     sig(2, 7, 0);
+}
+
+TEST_F(SignalTest, PointerArgument)
+{
+    int integer = 0;
+
+    ReceiverMock<int*>  mock;
+
+    Signal<void (int*)> sig;
+    EXPECT_CALL(mock, onItem1(&integer)).Times(1);
+
+    sig.connect(std::bind(&ReceiverMock<int*>::onItem1, &mock, _1), &mock);
+    sig(&integer);
 }

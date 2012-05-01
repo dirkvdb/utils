@@ -17,7 +17,6 @@
 #ifndef UTILS_SIGNAL_H
 #define UTILS_SIGNAL_H
 
-#include <iostream>
 #include <map>
 #include <mutex>
 #include <functional>
