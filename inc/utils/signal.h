@@ -32,28 +32,25 @@ namespace details
     class SignalBase
     {
     public:
-        void connect(SlotFunction func, void* receiver)
+        void connect(SlotFunction func, const void* receiver)
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
-            m_Slots[receiver] = func;
+            m_Slots.insert(std::make_pair(receiver, func));
         }
 
-        void disconnect(void* receiver)
+        void disconnect(const void* receiver)
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
-            for (auto iter = m_Slots.begin(); iter != m_Slots.end(); ++iter)
+            auto iter = m_Slots.find(receiver);
+            if (iter != m_Slots.end())
             {
-                if (iter->first == receiver)
-                {
-                    m_Slots.erase(iter);
-                    break;
-                }
+                m_Slots.erase(iter);
             }
         }
 
     protected:
-        std::map<void*, SlotFunction>   m_Slots;
-        std::mutex                      m_Mutex;
+        std::map<const void*, SlotFunction>     m_Slots;
+        std::mutex                              m_Mutex;
     };    
 
     template <typename SlotFunction>
@@ -65,9 +62,9 @@ namespace details
         void operator()()
         {
             std::lock_guard<std::mutex> lock(base::m_Mutex);
-            for (auto iter = base::m_Slots.begin(); iter != base::m_Slots.end(); ++iter)
+            for (auto& func : base::m_Slots)
             {
-                iter->second();
+                func.second();
             }
         }
     };
@@ -81,9 +78,9 @@ namespace details
         void operator()(Argument1Type arg1)
         {
             std::lock_guard<std::mutex> lock(base::m_Mutex);
-            for (auto iter = base::m_Slots.begin(); iter != base::m_Slots.end(); ++iter)
+            for (auto& func : base::m_Slots)
             {
-                iter->second(arg1);
+                func.second(arg1);
             }
         }
     };
@@ -97,9 +94,9 @@ namespace details
         void operator()(Argument1Type arg1, Argument2Type arg2)
         {
             std::lock_guard<std::mutex> lock(base::m_Mutex);
-            for (auto iter = base::m_Slots.begin(); iter != base::m_Slots.end(); ++iter)
+            for (auto& func : base::m_Slots)
             {
-                iter->second(arg1, arg2);
+                func.second(arg1, arg2);
             }
         }
     };
@@ -113,9 +110,9 @@ namespace details
         void operator()(Argument1Type arg1, Argument2Type arg2, Argument3Type arg3)
         {
             std::lock_guard<std::mutex> lock(base::m_Mutex);
-            for (auto iter = base::m_Slots.begin(); iter != base::m_Slots.end(); ++iter)
+            for (auto& func : base::m_Slots)
             {
-                iter->second(arg1, arg2, arg3);
+                func.second(arg1, arg2, arg3);
             }
         }
     };

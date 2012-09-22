@@ -26,48 +26,27 @@
 #endif
 
 #include <sstream>
-#include <string>
+#include <fstream>
 #include <iostream>
+#include <string>
 #include <thread>
+#include <mutex>
 
 #include "timeoperations.h"
 
 
 namespace utils
 {
-namespace log
+class log
 {
-    namespace // Inaccessible implementation details
+public:
+    inline static void logToFile(std::ofstream& filestream)
     {
-#ifdef CONSOLE_SUPPORTS_COLOR
-        const std::string red         = "\033[31m";
-        const std::string green       = "\033[32m";
-        const std::string yellow      = "\033[33m";
-        const std::string purple      = "\033[35m";
-        const std::string standard    = "\033[39m";
-#else
-        const std::string red;
-        const std::string green;
-        const std::string yellow;
-        const std::string purple;
-        const std::string standard;
-#endif
-        
-        inline void traceImpl(std::stringstream& ss)
-        {
-            std::cout << ss.str() << standard << std::endl;
-        }
-
-        template<typename TFirst, typename... TRest>
-        inline void traceImpl(std::stringstream& ss, const TFirst& first, const TRest&... rest)
-        {
-            ss << " " << first;
-            traceImpl(ss, rest...);
-        }  
+        m_LogFile = &filestream;
     }
 
     template<typename TFirst, typename... TRest>
-    inline void info(const TFirst& first, const TRest&... rest)
+    inline static void info(const TFirst& first, const TRest&... rest)
     {
         std::stringstream ss;
         ss << green << "INFO:  " << first;
@@ -76,7 +55,7 @@ namespace log
     }
     
     template<typename TFirst, typename... TRest>
-    inline void warn(const TFirst& first, const TRest&... rest)
+    inline static void warn(const TFirst& first, const TRest&... rest)
     {
         std::stringstream ss;
         ss << yellow << "WARN:  " << first;
@@ -85,7 +64,7 @@ namespace log
     }
     
     template<typename TFirst, typename... TRest>
-    inline void critical(const TFirst& first, const TRest&... rest)
+    inline static void critical(const TFirst& first, const TRest&... rest)
     {
         std::stringstream ss;
         ss << purple << "CRIT:  " << first;
@@ -94,7 +73,7 @@ namespace log
     }
     
     template<typename TFirst, typename... TRest>
-    inline void error(const TFirst& first, const TRest&... rest)
+    inline static void error(const TFirst& first, const TRest&... rest)
     {
         std::stringstream ss;
         ss << red << "ERROR: " << first;
@@ -103,7 +82,7 @@ namespace log
     }
         
     template<typename TFirst, typename... TRest>
-    inline void debug(const TFirst& first, const TRest&... rest)
+    inline static void debug(const TFirst& first, const TRest&... rest)
     {
 #ifndef NDEBUG
         std::stringstream ss;
@@ -112,7 +91,37 @@ namespace log
         traceImpl(ss, rest...);
 #endif
     }
-}
+    
+private:
+    static const std::string red;
+    static const std::string green;
+    static const std::string yellow;
+    static const std::string purple;
+    static const std::string standard;
+
+    static std::mutex       m_Mutex;
+    static std::ofstream*   m_LogFile;
+    
+    inline static void traceImpl(std::stringstream& ss)
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        std::cout << ss.str() << standard << std::endl;
+        
+        if (m_LogFile)
+        {
+            *m_LogFile << ss.str() << std::endl << std::flush;
+        }
+    }
+    
+    template<typename TFirst, typename... TRest>
+    inline static void traceImpl(std::stringstream& ss, const TFirst& first, const TRest&... rest)
+    {
+        ss << " " << first;
+        traceImpl(ss, rest...);
+    } 
+
+};
+
 }
 
 #endif

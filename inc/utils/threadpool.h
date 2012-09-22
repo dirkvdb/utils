@@ -31,7 +31,7 @@ namespace utils
 class ThreadPool
 {
 public:
-    ThreadPool(uint32_t maxNumThreads  = 4)
+    ThreadPool(uint32_t maxNumThreads = 4)
     : m_MaxNumThreads(maxNumThreads)
     , m_Stop(false)
     {
@@ -63,7 +63,7 @@ public:
         m_Stop = true;
 
         {
-            std::lock_guard<std::mutex> lock(m_ThreadListMutex);
+            std::lock_guard<std::mutex> listLock(m_ThreadListMutex);
             m_ThreadStatusCondition.notify_all();
         }
 
@@ -92,18 +92,11 @@ private:
             {
                 continue;
             }
-
-            for (auto iter = m_RunningThreads.begin(); iter != m_RunningThreads.end(); ++iter)
-            {
-                std::future_status status = iter->wait_for(std::chrono::seconds::zero());
-                if (status == std::future_status::ready)
-                {
-                    iter->get();
-                    iter = m_RunningThreads.erase(iter);
-                    log::debug("Thread finished: running (", m_RunningThreads.size(), ")");
-                }
-            }
             
+            std::remove_if(m_RunningThreads.begin(), m_RunningThreads.end(), [](std::future<void>& fut){
+                return std::future_status::ready == fut.wait_for(std::chrono::seconds::zero());
+            });
+
             try
             {
                 while (!m_Stop && m_RunningThreads.size() < m_MaxNumThreads && !m_QueuedThreads.empty())

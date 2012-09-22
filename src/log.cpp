@@ -14,25 +14,26 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef UTILS_SUBSCRIBER_H
-#define UTILS_SUBSCRIBER_H
-
-#include <string>
+#include "utils/log.h"
 
 namespace utils
 {
 
-template <typename Subject>
-class ISubscriber
-{
-public:
-    virtual ~ISubscriber() {}
+#ifdef CONSOLE_SUPPORTS_COLOR
+    const std::string log::red         = "\033[31m";
+    const std::string log::green       = "\033[32m";
+    const std::string log::yellow      = "\033[33m";
+    const std::string log::purple      = "\033[35m";
+    const std::string log::standard    = "\033[39m";
+#else
+    const std::string log::red;
+    const std::string log::green;
+    const std::string log::yellow;
+    const std::string log::purple;
+    const std::string log::standard;
+#endif
 
-    virtual void onItem(Subject subject, void* pData = nullptr) = 0;
-    virtual void finalItemReceived(void* pData = nullptr) {}
-    virtual void onError(const std::string& message) {}
-};
+std::mutex log::m_Mutex;
+std::ofstream* log::m_LogFile = nullptr;
 
 }
-
-#endif

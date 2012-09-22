@@ -28,19 +28,9 @@ namespace utils
 {
 namespace stringops
 {
-    namespace
-    {
-        class ToLower
-        {
-        public:
-            char operator() (char c) const { return std::tolower(c); }
-        };
-    }
-
     inline void lowercase(std::string& aString)
     {
-        //std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return tolower(c); }); //just have some patience
-        std::transform(aString.begin(), aString.end(), aString.begin(), ToLower());
+        std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return tolower(c); });
     }
 
     inline std::string lowercase(const std::string& aString)
