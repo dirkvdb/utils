@@ -60,6 +60,7 @@ public:
     {
         if (!m_Stop)
         {
+        
             {
                 std::lock_guard<std::mutex> lock(m_QueueMutex);
                 m_JobQueue.push_back(job);
