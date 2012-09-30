@@ -32,6 +32,12 @@ namespace details
     class SignalBase
     {
     public:
+        virtual ~SignalBase()
+        {
+            std::lock_guard<std::mutex> lock(m_Mutex);
+            m_Slots.clear();
+        }
+    
         void connect(SlotFunction func, const void* receiver)
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
