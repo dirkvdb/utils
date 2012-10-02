@@ -229,6 +229,10 @@
 		433638181562DE440018D554 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_STANDARD_32_64_BIT)",
+					"$(NATIVE_ARCH_ACTUAL)",
+				);
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				DSTROOT = /tmp/Utils.dst;
@@ -245,6 +249,10 @@
 		433638191562DE440018D554 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_STANDARD_32_64_BIT)",
+					"$(NATIVE_ARCH_ACTUAL)",
+				);
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				DSTROOT = /tmp/Utils.dst;
