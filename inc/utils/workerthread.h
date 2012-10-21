@@ -66,7 +66,6 @@ public:
                 m_JobQueue.push_back(job);
             }
             
-            std::lock_guard<std::mutex> lock(m_JobMutex);
             m_JobCondition.notify_all();
         }
     }
