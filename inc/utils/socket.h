@@ -17,6 +17,8 @@
 #ifndef UTILS_SOCKET_H
 #define UTILS_SOCKET_H
 
+#include <string>
+#include <sstream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
