@@ -40,6 +40,18 @@ namespace stringops
         return lower;
     }
     
+    inline void uppercase(std::string& aString)
+    {
+        std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return toupper(c); });
+    }
+    
+    inline std::string uppercase(const std::string& aString)
+    {
+        std::string lower = aString;
+        uppercase(lower);
+        return lower;
+    }
+    
     inline void trim(std::string& aString)
     {
         if (aString.empty())

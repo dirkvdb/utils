@@ -20,6 +20,8 @@
 		433638351562DE620018D554 /* trace.h in Headers */ = {isa = PBXBuildFile; fileRef = 433638291562DE620018D554 /* trace.h */; };
 		433638361562DE620018D554 /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 4336382A1562DE620018D554 /* types.h */; };
 		433638381562DE6F0018D554 /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 433638371562DE6F0018D554 /* log.cpp */; };
+		43F5551C168F522300F71BAB /* fileoperations.h in Headers */ = {isa = PBXBuildFile; fileRef = 43F5551B168F522300F71BAB /* fileoperations.h */; };
+		43F5551F168F522A00F71BAB /* fileoperations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43F5551E168F522A00F71BAB /* fileoperations.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +40,8 @@
 		433638291562DE620018D554 /* trace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trace.h; sourceTree = "<group>"; };
 		4336382A1562DE620018D554 /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
 		433638371562DE6F0018D554 /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = log.cpp; path = src/log.cpp; sourceTree = "<group>"; };
+		43F5551B168F522300F71BAB /* fileoperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fileoperations.h; sourceTree = "<group>"; };
+		43F5551E168F522A00F71BAB /* fileoperations.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fileoperations.cpp; path = src/fileoperations.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +59,7 @@
 		433637FF1562DE440018D554 = {
 			isa = PBXGroup;
 			children = (
+				43F5551E168F522A00F71BAB /* fileoperations.cpp */,
 				4336381E1562DE620018D554 /* utils */,
 				433638371562DE6F0018D554 /* log.cpp */,
 				4336380C1562DE440018D554 /* Frameworks */,
@@ -81,6 +86,7 @@
 		4336381E1562DE620018D554 /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				43F5551B168F522300F71BAB /* fileoperations.h */,
 				433638201562DE620018D554 /* functiontraits.h */,
 				433638211562DE620018D554 /* log.h */,
 				433638221562DE620018D554 /* numericoperations.h */,
@@ -116,6 +122,7 @@
 				433638341562DE620018D554 /* timeoperations.h in Headers */,
 				433638351562DE620018D554 /* trace.h in Headers */,
 				433638361562DE620018D554 /* types.h in Headers */,
+				43F5551C168F522300F71BAB /* fileoperations.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,6 +177,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				433638381562DE6F0018D554 /* log.cpp in Sources */,
+				43F5551F168F522A00F71BAB /* fileoperations.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
