@@ -42,7 +42,7 @@ public:
     
 private:
     std::string                         m_Path;
-    std::unique_ptr<DirectoryHandle>    m_DirHandle;
+    std::shared_ptr<DirectoryHandle>    m_DirHandle;
 };
 
 enum class FileSystemEntryType
