@@ -18,6 +18,7 @@
 #define UTILS_SOCKET_H
 
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <sys/types.h>
 #include <sys/socket.h>
