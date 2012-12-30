@@ -33,6 +33,7 @@
 #include <mutex>
 
 #include "timeoperations.h"
+#include "stringoperations.h"
 
 
 namespace utils
@@ -45,50 +46,50 @@ public:
         m_LogFile = &filestream;
     }
 
-    template<typename TFirst, typename... TRest>
-    inline static void info(const TFirst& first, const TRest&... rest)
+    template<typename... T>
+    inline static void info(const T&... args)
     {
         std::stringstream ss;
-        ss << green << "INFO:  " << first;
+        ss << green << "INFO:  " << stringops::format(std::forward<const T>(args)...);
         
-        traceImpl(ss, rest...);
+        traceImpl(ss);
     }
     
-    template<typename TFirst, typename... TRest>
-    inline static void warn(const TFirst& first, const TRest&... rest)
+    template<typename... T>
+    inline static void warn(const T&... args)
     {
         std::stringstream ss;
-        ss << yellow << "WARN:  " << first;
+        ss << yellow << "WARN:  " << stringops::format(std::forward<const T>(args)...);
         
-        traceImpl(ss, rest...);
+        traceImpl(ss);
     }
     
-    template<typename TFirst, typename... TRest>
-    inline static void critical(const TFirst& first, const TRest&... rest)
+    template<typename... T>
+    inline static void critical(const T&... args)
     {
         std::stringstream ss;
-        ss << purple << "CRIT:  " << first;
+        ss << purple << "CRIT:  " << stringops::format(std::forward<const T>(args)...);
         
-        traceImpl(ss, rest...);
+        traceImpl(ss);
     }
     
-    template<typename TFirst, typename... TRest>
-    inline static void error(const TFirst& first, const TRest&... rest)
+    template<typename... T>
+    inline static void error(const T&... args)
     {
         std::stringstream ss;
-        ss << red << "ERROR: " << first;
+        ss << red << "ERROR: " << stringops::format(std::forward<const T>(args)...);
         
-        traceImpl(ss, rest...);
+        traceImpl(ss);
     }
         
-    template<typename TFirst, typename... TRest>
-    inline static void debug(const TFirst& first, const TRest&... rest)
+    template<typename... T>
+    inline static void debug(const T&... args)
     {
 #ifndef NDEBUG
         std::stringstream ss;
-        ss << "DEBUG: " << "[" << timeops::getTimeString() << "] [" << std::this_thread::get_id() << "] " << first;
+        ss << "DEBUG: " << "[" << timeops::getTimeString() << "] [" << std::this_thread::get_id() << "] " << stringops::format(std::forward<const T>(args)...);
         
-        traceImpl(ss, rest...);
+        traceImpl(ss);
 #endif
     }
     
@@ -112,14 +113,6 @@ private:
             *m_LogFile << ss.str() << std::endl << std::flush;
         }
     }
-    
-    template<typename TFirst, typename... TRest>
-    inline static void traceImpl(std::stringstream& ss, const TFirst& first, const TRest&... rest)
-    {
-        ss << " " << first;
-        traceImpl(ss, rest...);
-    } 
-
 };
 
 }

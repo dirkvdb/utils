@@ -28,6 +28,42 @@ namespace utils
 {
 namespace stringops
 {
+    inline std::string format(const char* s)
+    {
+        std::stringstream ss;
+        
+        while (*s)
+        {
+            if (*s == '%' && *++s != '%')
+            {
+                throw std::logic_error("invalid format string: missing arguments");
+            }
+            
+            ss << *s++;
+        }
+        
+        return ss.str();
+    }
+    
+    template<typename T, typename... Args>
+    inline std::string format(const char* s, const T& value, const Args&... args)
+    {
+        std::stringstream ss;
+        
+        while (*s)
+        {
+            if (*s == '%' && *++s != '%')
+            {
+                ss << value;
+                return ss.str();
+            }
+            
+            ss << *s++;
+        }
+        
+        throw std::logic_error("extra arguments provided to format");
+    }
+    
     inline void lowercase(std::string& aString)
     {
         std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return tolower(c); });

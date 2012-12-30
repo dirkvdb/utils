@@ -61,9 +61,9 @@
 		433637FF1562DE440018D554 = {
 			isa = PBXGroup;
 			children = (
-				43F5551E168F522A00F71BAB /* fileoperations.cpp */,
 				4336381E1562DE620018D554 /* utils */,
 				433638371562DE6F0018D554 /* log.cpp */,
+				43F5551E168F522A00F71BAB /* fileoperations.cpp */,
 				4336380C1562DE440018D554 /* Frameworks */,
 				4336380B1562DE440018D554 /* Products */,
 			);
