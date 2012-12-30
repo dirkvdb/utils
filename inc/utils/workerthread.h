@@ -32,7 +32,7 @@ class WorkerThread
 public:
     void start()
     {
-        std::lock_guard<std::mutex> lock(m_JobMutex);
+        std::lock_guard<std::mutex> lock(m_Mutex);
         if (!m_Thread)
         {
             m_Stop = false;
@@ -44,8 +44,11 @@ public:
     {
         if (m_Thread)
         {
-            m_Stop = true;
-            m_JobCondition.notify_all();
+            {
+                std::lock_guard<std::mutex> lock(m_Mutex);
+                m_Stop = true;
+                m_Condition.notify_all();
+            }
             
             if (m_Thread->joinable())
             {
@@ -60,13 +63,9 @@ public:
     {
         if (!m_Stop)
         {
-        
-            {
-                std::lock_guard<std::mutex> lock(m_QueueMutex);
-                m_JobQueue.push_back(job);
-            }
-            
-            m_JobCondition.notify_all();
+            std::lock_guard<std::mutex> lock(m_Mutex);
+            m_JobQueue.push_back(job);
+            m_Condition.notify_all();
         }
     }
     
@@ -75,56 +74,43 @@ public:
 private:
     void clearJobs()
     {
-        std::lock_guard<std::mutex> lock(m_QueueMutex);
+        std::lock_guard<std::mutex> lock(m_Mutex);
         m_JobQueue.clear();
     }
     
-    std::function<void()> getJob()
-    {
-        std::lock_guard<std::mutex> lock(m_QueueMutex);
-        auto func = m_JobQueue.front();
-        m_JobQueue.pop_front();
-        
-        return func;
-    }
-
     void workerThread()
     {
         while (!m_Stop)
         {
-            std::unique_lock<std::mutex> lock(m_JobMutex);
-            m_JobCondition.wait(lock);
-            
+            std::unique_lock<std::mutex> lock(m_Mutex);
+            m_Condition.wait(lock, [this] { return (!m_JobQueue.empty()) || m_Stop; });
             if (m_Stop)
             {
                 continue;
             }
             
-            while (!m_Stop && !m_JobQueue.empty())
+            auto job = m_JobQueue.front();
+            m_JobQueue.pop_front();
+            lock.unlock();
+            
+            try
             {
-                try
-                {
-                    getJob()();
-                }
-                catch (std::exception& e)
-                {
-                    ErrorOccurred(e);
-                }
+                job();
+            }
+            catch (std::exception& e)
+            {
+                ErrorOccurred(e);
             }
         }
         
         clearJobs();
     }
     
-    bool                                m_Stop;
-
-    std::unique_ptr<std::thread>        m_Thread;
-    std::condition_variable             m_JobCondition;
-    std::mutex                          m_JobMutex;
-    std::mutex                          m_QueueMutex;
-
-
-    std::deque<const std::function<void()>>   m_JobQueue;
+    bool                                        m_Stop;
+    std::unique_ptr<std::thread>                m_Thread;
+    std::condition_variable                     m_Condition;
+    std::mutex                                  m_Mutex;
+    std::deque<const std::function<void()>>     m_JobQueue;
 };
 
 }
