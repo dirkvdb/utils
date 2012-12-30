@@ -18,8 +18,10 @@
 #define UTILS_SOCKET_H
 
 #include <string>
+#include <vector>
 #include <cstring>
 #include <sstream>
+#include <stdexcept>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -127,7 +129,7 @@ public:
 
 	void write(const void* data, size_t bytes)
 	{
-		if (send(m_Socket, data, bytes, 0) < bytes)
+		if (send(m_Socket, data, bytes, 0) < static_cast<ssize_t>(bytes))
 		{
 			throw std::logic_error("Failed to write data to socket");		
 		}
@@ -143,7 +145,7 @@ public:
 		std::vector<char> buf(characters + 1, '\0');
 		
 		auto received = recv(m_Socket, buf.data(), characters, MSG_WAITALL);
-		if (received < characters)
+		if (received < static_cast<ssize_t>(characters))
 		{
 			throw std::logic_error("Failed to read string from socket");	
 		}
@@ -155,7 +157,7 @@ public:
 	{
 		std::vector<uint8_t> data(bytes);
 		auto received = recv(m_Socket, data.data(), bytes, MSG_WAITALL);
-		if (received < bytes)
+		if (received < static_cast<ssize_t>(bytes))
 		{
 			data.resize(received);
 		}
