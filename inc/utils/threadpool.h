@@ -107,7 +107,7 @@ private:
             }
             catch (std::exception& e)
             {
-                log::warn("Thread error:", e.what());
+                log::warn("Thread error: %", e.what());
             }    
         }
 
@@ -116,7 +116,7 @@ private:
         for (auto& fut : m_RunningThreads)
         {
             fut.get();
-            log::debug("Thread aborted: running (", m_RunningThreads.size(), ")");
+            log::debug("Thread aborted: running (%)", m_RunningThreads.size());
         }
 
         m_RunningThreads.clear();

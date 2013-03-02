@@ -45,6 +45,11 @@ namespace stringops
         return ss.str();
     }
     
+    inline std::string format(const std::string& s)
+    {
+        return format(s.c_str());
+    }
+    
     template<typename T, typename... Args>
     inline std::string format(const char* s, const T& value, const Args&... args)
     {
@@ -54,8 +59,8 @@ namespace stringops
         {
             if (*s == '%' && *++s != '%')
             {
-                ss << value;
-                return ss.str();
+                ss << value << s;
+                return format(ss.str().c_str(), std::forward<const Args>(args)...);
             }
             
             ss << *s++;
