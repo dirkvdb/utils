@@ -28,45 +28,142 @@ namespace utils
 {
 namespace stringops
 {
-    inline std::string format(const char* s)
+    template <typename... Ts>
+    inline std::string format(const char* f, const Ts&... args);
+    
+    namespace
     {
-        std::stringstream ss;
+        template<class _Ty>
+        struct _is_char : std::false_type {};
         
-        while (*s)
+        template<>
+        struct _is_char<char> : std::true_type {};
+        
+        template<class _Ty>
+        struct is_char : _is_char<typename std::remove_cv<_Ty>::type> {};
+        
+        template <class _Ty>
+        struct _is_c_string : std::false_type {};
+        
+        template<class _Ty>
+        struct _is_c_string<_Ty *> : _is_char<typename std::remove_cv<_Ty>::type> {};
+        
+        template<class _Ty>
+        struct is_c_string : _is_c_string<typename std::remove_cv<_Ty>::type> {};
+        
+        template <typename T>
+        typename std::enable_if<std::is_enum<T>::value, long>::type normalizeArg(T arg) { return arg; }
+        
+        template <typename T>
+        typename std::enable_if<std::is_integral<T>::value, long>::type normalizeArg(T arg) { return arg; }
+        
+        template <typename T>
+        typename std::enable_if<std::is_floating_point<T>::value, double>::type normalizeArg(T arg) { return arg; }
+        
+        
+        template <typename T>
+        typename std::enable_if<std::is_pointer<T>::value, T>::type normalizeArg(T arg) { return arg; }
+
+        const char* normalizeArg(const std::string& arg) { return arg.c_str(); }
+        
+        void checkFormat(const char* f)
         {
-            if (*s == '%' && *++s != '%')
+            for (; *f; ++f)
             {
-                throw std::logic_error("invalid format string: missing arguments");
+                if (*f != '%' || *++f == '%') continue;
+                throw std::logic_error("Too many format specifiers");
             }
-            
-            ss << *s++;
         }
         
-        return ss.str();
-    }
-    
-    inline std::string format(const std::string& s)
-    {
-        return format(s.c_str());
-    }
-    
-    template<typename T, typename... Args>
-    inline std::string format(const char* s, const T& value, const Args&... args)
-    {
-        std::stringstream ss;
-        
-        while (*s)
+        template <class T, typename... Ts>
+        void checkFormat(const char * f, const T& t, const Ts&... ts)
         {
-            if (*s == '%' && *++s != '%')
+            for (; *f; ++f)
             {
-                ss << value << s;
-                return format(ss.str().c_str(), std::forward<const Args>(args)...);
+                if (*f != '%' || *++f == '%')
+                {
+                    continue;
+                }
+                
+                switch (*f)
+                {
+                    default:
+                        throw std::logic_error(format("Invalid format char %c", *f));
+                    case 'd':
+                        if (!std::is_integral<T>::value)
+                        {
+                            throw std::logic_error("T is not an integral");
+                        }
+                        break;
+                    case 'p':
+                        if (!std::is_pointer<T>::value)
+                        {
+                            throw std::logic_error("T is not a pointer");
+                        }
+                        break;
+                    case 'f': case 'g':
+                        if (!std::is_floating_point<T>::value)
+                        {
+                            throw std::logic_error("T is not a float");
+                        }
+                        break;
+                    case 's':
+                        if (!is_c_string<T>::value)
+                        {
+                            throw std::logic_error("T is not a string");
+                        }
+                        break;
+                    case 'c':
+                        if (!is_char<T>::value)
+                        {
+                            throw std::logic_error("T is not a character");
+                        }
+                        break;
+                }
+                
+                return checkFormat(++f, ts...);
             }
             
-            ss << *s++;
+            throw std::logic_error("Too few format specifiers");
         }
+    }
+    
+    template <typename... Ts>
+    inline std::string format(const char* f, const Ts&... args)
+    {
+#ifndef NDEBUG
+        checkFormat(f, normalizeArg(args)...);
+#endif
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-security"
+        int size = snprintf(nullptr, 0, f, normalizeArg(args)...);
         
-        throw std::logic_error("extra arguments provided to format");
+        std::string ss;
+        ss.resize(size + 1);
+        snprintf(&ss[0], ss.size() + 1, f, normalizeArg(args)...);
+        ss.resize(size);
+#pragma clang diagnostic pop
+        
+        return ss;
+    }
+
+    template <typename... Ts>
+    inline void print(const char* f, const Ts&... args)
+    {
+#ifndef NDEBUG
+        checkFormat(f, normalizeArg(args)...);
+#endif
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-security"
+        printf(f, normalizeArg(args)...);
+#pragma clang diagnostic pop
+    }
+    
+    template <typename... Ts>
+    inline void printLine(const Ts&... args)
+    {
+        print(args...);
+        printf("\n");
     }
     
     inline void lowercase(std::string& aString)

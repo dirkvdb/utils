@@ -45,51 +45,76 @@ public:
     {
         m_LogFile = &filestream;
     }
+    
+    inline static void info(const std::string& s)
+    {
+        info(s.c_str());
+    }
 
     template<typename... T>
-    inline static void info(const T&... args)
+    inline static void info(const char* s, const T&... args)
     {
         std::stringstream ss;
-        ss << green << "INFO:  " << stringops::format(std::forward<const T>(args)...);
+        ss << green << "INFO:  " << s;
         
-        traceImpl(ss);
+        traceImpl(ss.str(), args...);
+    }
+    
+    inline static void warn(const std::string& s)
+    {
+        warn(s.c_str());
     }
     
     template<typename... T>
-    inline static void warn(const T&... args)
+    inline static void warn(const char* s, const T&... args)
     {
         std::stringstream ss;
-        ss << yellow << "WARN:  " << stringops::format(std::forward<const T>(args)...);
+        ss << yellow << "WARN:  " << s;
         
-        traceImpl(ss);
+        traceImpl(ss.str(), args...);
+    }
+    
+    inline static void critical(const std::string& s)
+    {
+        critical(s.c_str());
     }
     
     template<typename... T>
-    inline static void critical(const T&... args)
+    inline static void critical(const char* s, const T&... args)
     {
         std::stringstream ss;
-        ss << purple << "CRIT:  " << stringops::format(std::forward<const T>(args)...);
+        ss << purple << "CRIT:  " << s;
         
-        traceImpl(ss);
+        traceImpl(ss.str(), args...);
+    }
+    
+    inline static void error(const std::string& s)
+    {
+        error(s.c_str());
     }
     
     template<typename... T>
-    inline static void error(const T&... args)
+    inline static void error(const char* s, const T&... args)
     {
         std::stringstream ss;
-        ss << red << "ERROR: " << stringops::format(std::forward<const T>(args)...);
+        ss << red << "ERROR:  " << s;
         
-        traceImpl(ss);
+        traceImpl(ss.str(), args...);
+    }
+    
+    inline static void debug(const std::string& s)
+    {
+        debug(s.c_str());
     }
         
     template<typename... T>
-    inline static void debug(const T&... args)
+    inline static void debug(const char* s, const T&... args)
     {
 #ifndef NDEBUG
         std::stringstream ss;
-        ss << "DEBUG: " << "[" << timeops::getTimeString() << "] [" << std::this_thread::get_id() << "] " << stringops::format(std::forward<const T>(args)...);
+        ss << red << "DEBUG: [%s] [" << std::this_thread::get_id() << "] " << s;
         
-        traceImpl(ss);
+        traceImpl(ss.str(), timeops::getTimeString(), args...);
 #endif
     }
     
@@ -103,14 +128,32 @@ private:
     static std::mutex       m_Mutex;
     static std::ofstream*   m_LogFile;
     
-    inline static void traceImpl(std::stringstream& ss)
+    template<typename... Ts>
+    inline static void traceImpl(const char* s)
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
-        std::cout << ss.str() << standard << std::endl;
+        stringops::print(s);
         
         if (m_LogFile)
         {
-            *m_LogFile << ss.str() << std::endl << std::flush;
+            *m_LogFile << s << std::endl << std::flush;
+        }
+    }
+    
+    template<typename... Ts>
+    inline static void traceImpl(const std::string& s, const Ts&... args)
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        
+        if (m_LogFile)
+        {
+            auto str = stringops::format(s.c_str(), args...);
+            std::cout << str  << standard << std::endl;
+            *m_LogFile << str << std::endl << std::flush;
+        }
+        else
+        {
+            stringops::printLine(s.c_str(), args...);
         }
     }
 };
