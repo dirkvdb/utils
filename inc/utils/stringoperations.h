@@ -134,15 +134,15 @@ namespace stringops
 #ifndef NDEBUG
         checkFormat(f, normalizeArg(args)...);
 #endif
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-security"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-security"
         int size = snprintf(nullptr, 0, f, normalizeArg(args)...);
         
         std::string ss;
         ss.resize(size + 1);
         snprintf(&ss[0], ss.size() + 1, f, normalizeArg(args)...);
         ss.resize(size);
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
         
         return ss;
     }
@@ -153,10 +153,10 @@ namespace stringops
 #ifndef NDEBUG
         checkFormat(f, normalizeArg(args)...);
 #endif
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-security"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-security"
         printf(f, normalizeArg(args)...);
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
     }
     
     template <typename... Ts>
