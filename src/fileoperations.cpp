@@ -15,6 +15,7 @@
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "utils/fileoperations.h"
+#include "utils/stringoperations.h"
 
 #ifdef HAVE_CONFIG_H
     #include "config.h"
@@ -405,9 +406,7 @@ FileSystemEntryInfo getFileInfo(const std::string& filepath)
     }
     else
     {
-        std::stringstream ss;
-        ss << "Failed to obtain file info for file: " << filepath << " (" << strerror(errno) << ")";
-        throw std::logic_error(ss.str().c_str());
+        throw std::logic_error(stringops::format("Failed to obtain file info for file: % (%)", filepath, strerror(errno)));
     }
 }
 
@@ -429,7 +428,7 @@ void deleteFile(const std::string& filepath)
     if (DeleteFile(filepath.c_str()) == FALSE)
 #endif
     {
-        throw std::logic_error("Failed to remove file: " + filepath);
+        throw std::logic_error(stringops::format("Failed to remove file: % (%)", filepath, strerror(errno)));
     }
 }
 
@@ -481,7 +480,7 @@ void createDirectory(const std::string& path)
     if (CreateDirectory(path.c_str(), nullptr) == 0)
 #endif
     {
-        throw std::logic_error("Failed to create directory: " + path);
+        throw std::logic_error(stringops::format("Failed to create directory: % (%)", path, strerror(errno)));
     }
 }
 
@@ -518,9 +517,7 @@ void changeDirectory(const std::string& dir)
     if (_chdir(dir.c_str()))
 #endif
     {
-        std::stringstream ss;
-        ss << "Failed to change directory to " << dir << ": " << strerror(errno);
-        throw std::logic_error(ss.str());
+        throw std::logic_error(stringops::format("Failed to change directory to % (%)", dir, strerror(errno)));
     }
 }
 
