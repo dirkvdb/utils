@@ -16,8 +16,8 @@
 
 #include "utils/signal.h"
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 using namespace utils;
 using namespace testing;

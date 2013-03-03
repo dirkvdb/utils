@@ -406,7 +406,7 @@ FileSystemEntryInfo getFileInfo(const std::string& filepath)
     }
     else
     {
-        throw std::logic_error(stringops::format("Failed to obtain file info for file: % (%)", filepath, strerror(errno)));
+        throw std::logic_error(stringops::format("Failed to obtain file info for file: %s (%s)", filepath, strerror(errno)));
     }
 }
 
@@ -428,7 +428,7 @@ void deleteFile(const std::string& filepath)
     if (DeleteFile(filepath.c_str()) == FALSE)
 #endif
     {
-        throw std::logic_error(stringops::format("Failed to remove file: % (%)", filepath, strerror(errno)));
+        throw std::logic_error(stringops::format("Failed to remove file: %s (%s)", filepath, strerror(errno)));
     }
 }
 
@@ -480,7 +480,7 @@ void createDirectory(const std::string& path)
     if (CreateDirectory(path.c_str(), nullptr) == 0)
 #endif
     {
-        throw std::logic_error(stringops::format("Failed to create directory: % (%)", path, strerror(errno)));
+        throw std::logic_error(stringops::format("Failed to create directory: %s (%s)", path, strerror(errno)));
     }
 }
 
@@ -517,7 +517,7 @@ void changeDirectory(const std::string& dir)
     if (_chdir(dir.c_str()))
 #endif
     {
-        throw std::logic_error(stringops::format("Failed to change directory to % (%)", dir, strerror(errno)));
+        throw std::logic_error(stringops::format("Failed to change directory to %s (%s)", dir, strerror(errno)));
     }
 }
 

@@ -93,7 +93,7 @@ namespace stringops
                 {
                     default:
                         throw std::logic_error(format("Invalid format char %c", *f));
-                    case 'd':
+                    case 'd': case 'c':
                         if (!std::is_integral<T>::value)
                         {
                             throw std::logic_error("T is not an integral");
@@ -115,12 +115,6 @@ namespace stringops
                         if (!is_c_string<T>::value)
                         {
                             throw std::logic_error("T is not a string");
-                        }
-                        break;
-                    case 'c':
-                        if (!is_char<T>::value)
-                        {
-                            throw std::logic_error("T is not a character");
                         }
                         break;
                 }

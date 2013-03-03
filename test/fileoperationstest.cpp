@@ -14,13 +14,13 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <gtest/gtest.h>
 #include <fstream>
 #include <stdexcept>
 #include <vector>
 #include <algorithm>
 
 #include "utils/fileoperations.h"
+#include "gtest/gtest.h"
 
 using namespace std;
 using namespace utils::fileops;
@@ -123,21 +123,9 @@ TEST(FileOperationsTest, DeleteDirectory)
     file.close();
     EXPECT_TRUE(pathExists("temp"));
     EXPECT_TRUE(pathExists("temp/temp"));
-    deleteDirectory("temp");
+    deleteDirectoryRecursive("temp");
     EXPECT_FALSE(pathExists("temp"));
 }
-
-class IteratorTester : public IFileIterator
-{
-public:
-    bool onFile(const std::string& filename)
-    {
-        files.push_back(filename);
-        return true;
-    }
-
-    vector<string> files;
-};
 
 TEST(FileOperationsTest, IterateDirectory)
 {
@@ -150,16 +138,20 @@ TEST(FileOperationsTest, IterateDirectory)
     ofstream file3("temp/temp/afile.txt");
     file3.close();
 
-    IteratorTester iter;
-
-    iterateDirectory("temp", iter);
-    deleteDirectory("temp");
     
-    ASSERT_EQ(3, iter.files.size());
-    sort(iter.files.begin(), iter.files.end());
-    EXPECT_EQ("temp/afile1.txt", iter.files[0]);
-    EXPECT_EQ("temp/afile2.txt", iter.files[1]);
-    EXPECT_EQ("temp/temp/afile.txt", iter.files[2]);
+    std::vector<std::string> files;
+    for (auto& entry : Directory("temp"))
+    {
+		files.push_back(entry.path());
+	}
+
+    deleteDirectoryRecursive("temp");
+    
+    ASSERT_EQ(3u, files.size());
+    sort(files.begin(), files.end());
+    EXPECT_EQ("temp/afile1.txt", files[0]);
+    EXPECT_EQ("temp/afile2.txt", files[1]);
+    EXPECT_EQ("temp/temp", files[2]);
 }
 
 TEST(FileOperationsTest, GetFileSize)
@@ -168,16 +160,14 @@ TEST(FileOperationsTest, GetFileSize)
     file << "tata";
     file.close();
 
-    int64_t size;
-    getFileSize("test.file", size);
+    int64_t size = getFileSize("test.file");
     EXPECT_EQ(4, size);
     deleteFile("test.file");
 }
 
 TEST(FileOperationsTest, GetFileSizeBadFile)
 {
-    int64_t size;
-    EXPECT_THROW(getFileSize("noexist", size), logic_error);
+    EXPECT_THROW(getFileSize("noexist"), logic_error);
 }
 
 TEST(FileOperationsTest, GetFileInfo)
@@ -186,17 +176,12 @@ TEST(FileOperationsTest, GetFileInfo)
     file << "tatata";
     file.close();
 
-    int64_t size;
-    uint32_t modified;
-    
-    getFileInfo("test.file", size, modified);
-    EXPECT_EQ(6, size);
+    auto info = getFileInfo("test.file");
+    EXPECT_EQ(6u, info.sizeInBytes);
     deleteFile("test.file");
 }
 
 TEST(FileOperationsTest, GetFileInfoBadFile)
 {
-    int64_t size;
-    uint32_t modified;
-    EXPECT_THROW(getFileInfo("noexist", size, modified), logic_error);
+    EXPECT_THROW(getFileInfo("noexist"), logic_error);
 }
