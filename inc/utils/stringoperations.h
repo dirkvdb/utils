@@ -70,7 +70,11 @@ namespace stringops
         {
             for (; *f; ++f)
             {
-                if (*f != '%' || *++f == '%') continue;
+                if (*f != '%' || *++f == '%')
+                {
+                    continue;
+                }
+                
                 throw std::logic_error("Too many format specifiers");
             }
         }
