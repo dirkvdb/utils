@@ -17,9 +17,7 @@
 #include "utils/fileoperations.h"
 #include "utils/stringoperations.h"
 
-#ifdef HAVE_CONFIG_H
-    #include "config.h"
-#endif
+#include "config.h"
 
 #include <fstream>
 #include <stdexcept>
@@ -31,7 +29,7 @@
     #include <unistd.h>
     #include <sys/types.h>
     #include <dirent.h>
-#ifdef HAVE_XDG_BASEDIR
+#ifdef HAVE_XDGBASEDIR
     #include <basedir.h>
 #endif
 #else
@@ -584,7 +582,7 @@ std::string getHomeDirectory()
 std::string getConfigDirectory()
 {
 #ifndef WIN32
-#ifdef HAVE_XDG_BASEDIR
+#ifdef HAVE_XDGBASEDIR
     xdgHandle handle;
     if (!xdgInitHandle(&handle))
     {
@@ -605,7 +603,7 @@ std::string getConfigDirectory()
 std::string getDataDirectory()
 {
 #ifndef WIN32
-#ifdef HAVE_XDG_BASEDIR
+#ifdef HAVE_XDGBASEDIR
     xdgHandle handle;
     if (!xdgInitHandle(&handle))
     {

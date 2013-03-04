@@ -5,6 +5,7 @@ ADD_LIBRARY(utils STATIC
     src/fileoperations.cpp
     inc/utils/functiontraits.h
     inc/utils/log.h
+    src/log.cpp
     inc/utils/numericoperations.h
     inc/utils/signal.h
     inc/utils/simplesubscriber.h

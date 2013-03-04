@@ -23,7 +23,7 @@ namespace utils
 {
 
 template <typename T>
-class SimpleSubscriber : public ISubscriber<T>
+class SimpleSubscriber : public ISubscriber<const T&>
 {
 public:
 	T& getItem()
