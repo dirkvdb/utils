@@ -14,12 +14,11 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <gtest/gtest.h>
-
 #include <string>
 #include <vector>
 #include <iostream>
 
+#include "gtest/gtest.h"
 #include "utils/stringoperations.h"
 
 using std::string;
@@ -83,22 +82,22 @@ TEST(StringOperationsTest, Tokenize)
     string testString = "A-B-C";
     vector<string> tokenized;
     tokenized = tokenize(testString, "-");
-    EXPECT_EQ(3, tokenized.size());
-    EXPECT_EQ("A", tokenized[0]);
-    EXPECT_EQ("B", tokenized[1]);
-    EXPECT_EQ("C", tokenized[2]);
+    EXPECT_EQ(3u, tokenized.size());
+    EXPECT_STREQ("A", tokenized[0].c_str());
+    EXPECT_STREQ("B", tokenized[1].c_str());
+    EXPECT_STREQ("C", tokenized[2].c_str());
             
     testString = "A_*_B_*_C";
     tokenized = tokenize(testString, "_*_");
-    EXPECT_EQ(3, tokenized.size());
-    EXPECT_EQ("A", tokenized[0]);
-    EXPECT_EQ("B", tokenized[1]);
-    EXPECT_EQ("C", tokenized[2]);
+    EXPECT_EQ(3u, tokenized.size());
+    EXPECT_STREQ("A", tokenized[0].c_str());
+    EXPECT_STREQ("B", tokenized[1].c_str());
+    EXPECT_STREQ("C", tokenized[2].c_str());
     
     testString = "A_*_B_*_C";
     tokenized = tokenize(testString, "_**_");
-    EXPECT_EQ(1, tokenized.size());
-    EXPECT_EQ("A_*_B_*_C", tokenized[0]);
+    EXPECT_EQ(1u, tokenized.size());
+    EXPECT_STREQ("A_*_B_*_C", tokenized[0].c_str());
 }
 
 TEST(StringOperationsTest, ToNumeric)
