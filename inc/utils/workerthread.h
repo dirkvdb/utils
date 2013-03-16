@@ -20,6 +20,7 @@
 #include <string>
 #include <thread>
 #include <deque>
+#include <condition_variable>
 #include <list>
 
 #include "log.h"
@@ -110,7 +111,7 @@ private:
     std::unique_ptr<std::thread>                m_Thread;
     std::condition_variable                     m_Condition;
     std::mutex                                  m_Mutex;
-    std::deque<const std::function<void()>>     m_JobQueue;
+    std::deque<std::function<void()>>     		m_JobQueue;
 };
 
 }
