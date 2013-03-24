@@ -25,6 +25,7 @@ ADD_LIBRARY(utils STATIC
     inc/utils/types.h
 )
 
+ADD_DEFINITIONS("-DHAVE_UTILS_CONFIG")
 ADD_DEFINITIONS("-std=c++11")
 IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     SET(CMAKE_CXX_FLAGS "-stdlib=libc++")

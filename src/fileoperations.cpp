@@ -17,7 +17,9 @@
 #include "utils/fileoperations.h"
 #include "utils/stringoperations.h"
 
-#include "utilsconfig.h"
+#ifdef HAVE_UTILS_CONFIG
+    #include "utilsconfig.h"
+#endif
 
 #include <fstream>
 #include <stdexcept>
