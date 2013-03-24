@@ -112,7 +112,7 @@ public:
     {
 #ifndef NDEBUG
         std::stringstream ss;
-        ss << red << "DEBUG: [%s] [" << std::this_thread::get_id() << "] " << s;
+        ss << "DEBUG: [%s] [" << std::this_thread::get_id() << "] " << s;
         
         traceImpl(ss.str(), timeops::getTimeString(), args...);
 #endif
@@ -153,7 +153,7 @@ private:
         }
         else
         {
-            stringops::printLine(s.c_str(), args...);
+            stringops::printLine((s + standard).c_str(), args...);
         }
     }
 };

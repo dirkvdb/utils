@@ -65,9 +65,11 @@ namespace stringops
         template <typename T>
         typename std::enable_if<std::is_pointer<T>::value, T>::type normalizeArg(T arg) { return arg; }
 
-        const char* normalizeArg(const std::string& arg) { return arg.c_str(); }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+        inline const char* normalizeArg(const std::string& arg) { return arg.c_str(); }
         
-        void checkFormat(const char* f)
+        inline void checkFormat(const char* f)
         {
             for (; *f; ++f)
             {
@@ -80,9 +82,10 @@ namespace stringops
                 throw std::logic_error("Too many format specifiers");
             }
         }
+#pragma GCC diagnostic pop
         
         template <class T, typename... Ts>
-        void checkFormat(const char * f, const T& t, const Ts&... ts)
+        inline void checkFormat(const char * f, const T& t, const Ts&... ts)
         {
             for (; *f; ++f)
             {
