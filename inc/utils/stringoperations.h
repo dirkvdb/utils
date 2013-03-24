@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cwchar>
 #include <stdexcept>
+#include <cassert>
 
 namespace utils
 {
@@ -75,6 +76,7 @@ namespace stringops
                     continue;
                 }
                 
+                assert(!"Too many format specifiers");
                 throw std::logic_error("Too many format specifiers");
             }
         }
@@ -92,6 +94,7 @@ namespace stringops
                 switch (*f)
                 {
                     default:
+                        assert(!"Invalid format char");
                         throw std::logic_error(format("Invalid format char %c", *f));
                     case 'd': case 'c':
                         if (!std::is_integral<T>::value)
