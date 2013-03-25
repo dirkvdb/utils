@@ -21,8 +21,10 @@ ADD_LIBRARY(utils STATIC
     inc/utils/stringoperations.h
     inc/utils/subscriber.h
     inc/utils/timeoperations.h
+    inc/utils/timerthread.h
     inc/utils/trace.h
     inc/utils/types.h
+    inc/utils/workerthread.h
 )
 
 ADD_DEFINITIONS("-DHAVE_UTILS_CONFIG")
