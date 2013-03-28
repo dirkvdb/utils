@@ -16,6 +16,7 @@ ADD_LIBRARY(utils STATIC
     inc/utils/log.h
     src/log.cpp
     inc/utils/numericoperations.h
+    inc/utils/readerinterface.h
     inc/utils/signal.h
     inc/utils/simplesubscriber.h
     inc/utils/stringoperations.h
