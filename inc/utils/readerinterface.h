@@ -39,6 +39,13 @@ public:
     virtual uint64_t read(uint8_t* pData, uint64_t size) = 0;
 };
 
+class IReaderBuilder
+{
+public:
+    virtual bool supportsUri(const std::string& uri) = 0;
+    virtual IReader* build(const std::string& uri) = 0;
+};
+
 }
 
 #endif
