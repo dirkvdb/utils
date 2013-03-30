@@ -432,7 +432,7 @@ void deleteFile(const std::string& filepath)
     }
 }
 
-void getPathFromFilepath(const std::string& filepath, std::string& path)
+std::string getPathFromFilepath(const std::string& filepath)
 {
     if (!filepath.empty() && filepath[filepath.length() - 1] == '/')
     {
@@ -442,16 +442,14 @@ void getPathFromFilepath(const std::string& filepath, std::string& path)
     std::string::size_type pos = filepath.find_last_of('/');
     if (pos == std::string::npos)
     {
-        path = "";
-        return;
+        return "";
     }
     else if (pos == 0)
     {
-        path = "/";
-        return;
+        return "/";
     }
 
-    path = filepath.substr(0, pos);
+    return filepath.substr(0, pos);
 }
 
 std::string combinePath(const std::string& left, const std::string& right)

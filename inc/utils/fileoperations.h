@@ -130,7 +130,7 @@ FileSystemEntryInfo getFileInfo(const std::string& filepath);
 
 bool pathExists(const std::string& filepath);
 void deleteFile(const std::string& filepath);
-void getPathFromFilepath(const std::string& filepath, std::string& path);
+std::string getPathFromFilepath(const std::string& filepath);
 std::string combinePath(const std::string& left, const std::string& right);
 
 void createDirectory(const std::string& path);

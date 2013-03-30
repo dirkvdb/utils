@@ -77,18 +77,12 @@ TEST(FileOperationsTest, DeleteFileOnDir)
 
 TEST(FileOperationsTest, GetPathFromFilePath)
 {
-    string path;
+    EXPECT_EQ("/", getPathFromFilepath("/temp"));
+    EXPECT_EQ("/temp", getPathFromFilepath("/temp/file.txt"));
+    EXPECT_EQ("/virtualDir", getPathFromFilepath("/virtualDir/testfile.txt"));
+    EXPECT_EQ("temp", getPathFromFilepath("temp/aFile"));
     
-    EXPECT_THROW(getPathFromFilepath("/temp/", path), logic_error);
-
-    getPathFromFilepath("/temp", path);
-    EXPECT_EQ("/", path);
-
-    getPathFromFilepath("/temp/file.txt", path);
-    EXPECT_EQ("/temp", path);
-
-    getPathFromFilepath("temp/aFile", path);
-    EXPECT_EQ("temp", path);
+    EXPECT_THROW(getPathFromFilepath("/temp/"), logic_error);
 }
 
 TEST(FileOperationsTest, CombinePath)
