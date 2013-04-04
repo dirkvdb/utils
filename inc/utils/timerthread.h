@@ -17,7 +17,11 @@
 #ifndef UTILS_TIMER_THREAD_H
 #define UTILS_TIMER_THREAD_H
 
+#include <map>
+#include <thread>
 #include <chrono>
+#include <functional>
+
 
 #include "utils/log.h"
 
@@ -27,6 +31,7 @@ namespace utils
 class TimerThread
 {
 public:
+    TimerThread() : m_Stop(false) {}
     TimerThread(const TimerThread&) = delete;
     TimerThread& operator=(const TimerThread) = delete;
     
@@ -35,12 +40,10 @@ public:
         cancel();
     }
     
-    void run(std::function<void()> cb, const std::chrono::milliseconds& interval)
+    void run(const std::chrono::milliseconds& interval, std::function<void()> cb)
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
-        m_Callback = cb;
-        m_Interval = interval;
-        m_Thread.reset(std::bind(&TimerThread::timerThread, this));
+        m_Thread.reset(new std::thread(std::bind(&TimerThread::timerThread, this, interval, cb)));
     }
     
     void cancel()
@@ -65,28 +68,27 @@ public:
     }
     
 private:
-    void timerThread()
+    void timerThread(const std::chrono::milliseconds& interval, std::function<void()> cb)
     {
         while (!m_Stop)
         {
             std::unique_lock<std::mutex> lock(m_Mutex);
-            m_Condition.wait_for(lock, m_Interval);
+            m_Condition.wait_for(lock, interval);
             if (m_Stop)
             {
                 continue;
             }
             
-            func();
+            cb();
         }
     }
 
     std::mutex                                          m_Mutex;
     std::condition_variable                             m_Condition;
     std::unique_ptr<std::thread>                        m_Thread;
-    std::map<uint32_t, std::vector<ServiceVariable>>    m_ChangedVariables;
-    std::chrono::milliseconds                           m_Interval;
-    std::function<void()>                               m_Callback;
     bool                                                m_Stop;
+};
+
 }
 
 #endif
