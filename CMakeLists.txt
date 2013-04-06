@@ -28,6 +28,8 @@ ADD_LIBRARY(utils STATIC
     inc/utils/workerthread.h
 )
 
+OPTION(COLORED_OUTPUT "Colored output" ON)
+
 ADD_DEFINITIONS("-DHAVE_UTILS_CONFIG")
 ADD_DEFINITIONS("-std=c++11")
 IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

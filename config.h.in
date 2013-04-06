@@ -2,5 +2,6 @@
 #define UTILS_CONFIG_H
 
 #cmakedefine HAVE_XDGBASEDIR 1
+#cmakedefine COLORED_OUTPUT 1
 
 #endif

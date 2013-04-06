@@ -38,6 +38,7 @@
 
 namespace utils
 {
+
 class log
 {
 public:
