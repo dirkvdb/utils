@@ -24,6 +24,7 @@
 #include <cwchar>
 #include <stdexcept>
 #include <cassert>
+#include <iostream>
 
 namespace utils
 {
@@ -128,7 +129,8 @@ namespace stringops
                 return checkFormat(++f, ts...);
             }
             
-            throw std::logic_error("Too few format specifiers");
+            std::cerr << f << std::endl;
+            throw std::logic_error("Too few format specifiers:");
         }
     }
     

@@ -26,6 +26,21 @@ namespace numericops
 {
 
 template<typename T>
+inline T clip(const T& value, const T& lowerLimit, const T& upperLimit)
+{
+    if (value < lowerLimit)
+    {
+        return lowerLimit;
+    }
+    else if (value > upperLimit)
+    {
+        return upperLimit;
+    }
+    
+    return value;
+}
+
+template<typename T>
 inline void clip(T& value, const T& lowerLimit, const T& upperLimit)
 {
     if (value < lowerLimit)
