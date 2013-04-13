@@ -23,7 +23,8 @@
 #include <condition_variable>
 #include <list>
 
-#include "log.h"
+#include "utils/log.h"
+#include "utils/signal.h"
 
 namespace utils
 {
