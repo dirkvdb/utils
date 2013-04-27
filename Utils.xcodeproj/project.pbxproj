@@ -262,6 +262,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/xcode $(SRCROOT)/inc";
 				VALID_ARCHS = "armv7 armv7s i386 x86_64";
 			};
 			name = Debug;
@@ -282,6 +283,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/xcode $(SRCROOT)/inc";
 				VALID_ARCHS = "armv7 armv7s i386 x86_64";
 			};
 			name = Release;

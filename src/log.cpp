@@ -43,8 +43,8 @@ static bool supportsColor()
         }
 
         initialized = true;
-    }
 #endif
+    }
 
     return colorSupport;
 }
