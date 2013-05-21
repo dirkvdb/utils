@@ -56,7 +56,7 @@ public:
     inline static void info(const char* s, const T&... args)
     {
         std::stringstream ss;
-        ss << green << "INFO:  " << s;
+        ss << green << "INFO:  [" << timeops::getTimeString() << "] " << s;
         
         traceImpl(ss.str(), args...);
     }
@@ -70,7 +70,7 @@ public:
     inline static void warn(const char* s, const T&... args)
     {
         std::stringstream ss;
-        ss << yellow << "WARN:  " << s;
+        ss << yellow << "WARN:  [" << timeops::getTimeString() << "] " << s;
         
         traceImpl(ss.str(), args...);
     }
@@ -84,7 +84,7 @@ public:
     inline static void critical(const char* s, const T&... args)
     {
         std::stringstream ss;
-        ss << purple << "CRIT:  " << s;
+        ss << purple << "CRIT:  [" << timeops::getTimeString() << "] " << s;
         
         traceImpl(ss.str(), args...);
     }
@@ -98,7 +98,7 @@ public:
     inline static void error(const char* s, const T&... args)
     {
         std::stringstream ss;
-        ss << red << "ERROR:  " << s;
+        ss << red << "ERROR:  [" << timeops::getTimeString() << "] " << s;
         
         traceImpl(ss.str(), args...);
     }
@@ -113,9 +113,9 @@ public:
     {
 #ifndef NDEBUG
         std::stringstream ss;
-        ss << "DEBUG: [%s] [" << std::this_thread::get_id() << "] " << s;
+        ss << "DEBUG: [" << timeops::getTimeString() << "] [" << std::this_thread::get_id() << "] " << s;
         
-        traceImpl(ss.str(), timeops::getTimeString(), args...);
+        traceImpl(ss.str(), args...);
 #endif
     }
     
@@ -149,7 +149,7 @@ private:
         if (m_LogFile)
         {
             auto str = stringops::format(s.c_str(), args...);
-            std::cout << str  << standard << std::endl;
+            std::cout << str << standard << std::endl;
             *m_LogFile << str << std::endl << std::flush;
         }
         else

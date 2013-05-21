@@ -43,6 +43,7 @@ public:
     void run(const std::chrono::milliseconds& interval, std::function<void()> cb)
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
+        m_Stop = false;
         m_Thread.reset(new std::thread(std::bind(&TimerThread::timerThread, this, interval, cb)));
     }
     
