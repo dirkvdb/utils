@@ -68,6 +68,23 @@ public:
         m_Thread.reset();
     }
     
+    void cancelDontWait()
+    {
+        {
+            std::lock_guard<std::mutex> lock(m_Mutex);
+            if (!m_Thread)
+            {
+                return;
+            }
+            
+            m_Stop = true;
+            m_Condition.notify_all();
+        }
+    
+        m_Thread->detach();
+        m_Thread.reset();
+    }
+    
 private:
     void timerThread(const std::chrono::milliseconds& interval, std::function<void()> cb)
     {
@@ -79,6 +96,8 @@ private:
             {
                 continue;
             }
+            
+            m_Mutex.unlock();
             
             cb();
         }
