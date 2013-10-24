@@ -33,6 +33,7 @@ public:
     virtual uint64_t currentPosition() = 0;
     virtual bool eof() = 0;
     virtual std::string uri() = 0;
+    virtual void clearErrors() = 0;
     
     virtual void seekAbsolute(uint64_t position) = 0;
     virtual void seekRelative(uint64_t offset) = 0;    
