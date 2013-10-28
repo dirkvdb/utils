@@ -12,7 +12,8 @@ LINK_DIRECTORIES(
 	${XDGBASEDIR_LIBRARY_DIRS}
 )
 
-ADD_EXECUTABLE(unittest
+ADD_EXECUTABLE(utilstest
+	bufferedreadertest.cpp
 	gmock-gtest-all.cc
 	main.cpp
 	signaltest.cpp
@@ -20,11 +21,11 @@ ADD_EXECUTABLE(unittest
 	fileoperationstest.cpp
 )
 
-TARGET_LINK_LIBRARIES(unittest
+TARGET_LINK_LIBRARIES(utilstest
 	utils
 	-lpthread
 	${XDGBASEDIR_LIBRARIES}
 )
 
-ADD_TEST(UtilsTests unittest)
+ADD_TEST(UtilsTests utilstest)
  

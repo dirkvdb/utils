@@ -1,4 +1,4 @@
-//    Copyright (C) 2009 Dirk Vanden Boer <dirk.vdb@gmail.com>
+//    Copyright (C) 2014 Dirk Vanden Boer <dirk.vdb@gmail.com>
 //
 //    This program is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -14,40 +14,36 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef UTILS_READER_INTERFACE_H
-#define UTILS_READER_INTERFACE_H
+#ifndef UTILS_FILE_READER_H
+#define UTILS_FILE_READER_H
 
 #include <string>
-#include <vector>
+#include <fstream>
+
+#include "utils/readerinterface.h"
 
 namespace utils
 {
 
-class IReader
+class FileReader : public IReader
 {
 public:
-    virtual ~IReader() {};
+    virtual void open(const std::string& filename) override;
 
-    virtual void open(const std::string& uri) = 0;
-
-    virtual uint64_t getContentLength() = 0;
-    virtual uint64_t currentPosition() = 0;
-    virtual bool eof() = 0;
-    virtual std::string uri() = 0;
-    virtual void clearErrors() = 0;
+    virtual uint64_t getContentLength() override;
+    virtual uint64_t currentPosition() override;
+    virtual bool eof() override;
+    virtual std::string uri() override;
     
-    virtual void seekAbsolute(uint64_t position) = 0;
-    virtual void seekRelative(uint64_t offset) = 0;    
-    virtual uint64_t read(uint8_t* pData, uint64_t size) = 0;
-    
-    virtual std::vector<uint8_t> readAllData() = 0;
-};
+    virtual void seekAbsolute(uint64_t position) override;
+    virtual void seekRelative(uint64_t offset) override;
+    virtual uint64_t read(uint8_t* pData, uint64_t size) override;
+    virtual std::vector<uint8_t> readAllData() override;
+    virtual void clearErrors() override;
 
-class IReaderBuilder
-{
-public:
-    virtual bool supportsUri(const std::string& uri) = 0;
-    virtual IReader* build(const std::string& uri) = 0;
+private:
+    std::string         m_FileName;
+    std::ifstream       m_File;
 };
 
 }

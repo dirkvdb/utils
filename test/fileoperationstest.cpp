@@ -31,8 +31,7 @@ TEST(FileOperationsTest, ReadTextFile)
     file << "line1\nline2\nline3\n";
     file.close();
     
-    string contents;
-    EXPECT_TRUE(readTextFile(contents, "testfile.txt"));
+    string contents = readTextFile("testfile.txt");
     EXPECT_EQ("line1\nline2\nline3\n", contents);
     deleteFile("testfile.txt");
 }

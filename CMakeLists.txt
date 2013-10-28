@@ -10,13 +10,15 @@ IF (XDGBASEDIR_FOUND)
 ENDIF (XDGBASEDIR_FOUND)
 
 ADD_LIBRARY(utils STATIC
-    inc/utils/fileoperations.h
-    src/fileoperations.cpp
+    inc/utils/bufferedreader.h      src/bufferedreader.cpp
+    inc/utils/fileoperations.h      src/fileoperations.cpp
+    inc/utils/filereader.h          src/filereader.cpp
     inc/utils/functiontraits.h
     inc/utils/log.h
     src/log.cpp
     inc/utils/numericoperations.h
     inc/utils/readerinterface.h
+    inc/utils/readerfactory.h       src/readerfactory.cpp
     inc/utils/signal.h
     inc/utils/simplesubscriber.h
     inc/utils/stringoperations.h

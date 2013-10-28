@@ -287,13 +287,13 @@ bool FileSystemIterator::operator !=(const FileSystemIterator& other) const
     return !(*this == other);
 }
 
-bool readTextFile(std::string& contents, const std::string& filename)
+std::string readTextFile(const std::string& filename)
 {
     std::ifstream fileStream(filename.c_str(), std::ifstream::binary);
 
     if (!fileStream.is_open())
     {
-        return false;
+        throw std::runtime_error("Failed to open file for reading: " + filename);
     }
 
     fileStream.seekg(0, std::ios::end);
@@ -303,28 +303,41 @@ bool readTextFile(std::string& contents, const std::string& filename)
     std::vector<char> buffer(length + 1);
     fileStream.read(buffer.data(), length);
     buffer[length] = 0;
-    contents = &(buffer.front());
 
-    return true;
+    return &(buffer.front());
 }
 
-bool readFile(std::vector<uint8_t>& contents, const std::string& filename)
+std::vector<uint8_t> readFile(const std::string& filename)
 {
     std::ifstream fileStream(filename.c_str(), std::ifstream::binary);
 
     if (!fileStream.is_open())
     {
-        return false;
+        throw std::runtime_error("Failed to open file for reading: " + filename);
     }
+    
+    std::vector<uint8_t> data;
 
     fileStream.seekg(0, std::ios::end);
     uint32_t length = static_cast<uint32_t>(fileStream.tellg());
     fileStream.seekg (0, std::ios::beg);
 
-    contents.resize(length);
-    fileStream.read(reinterpret_cast<char*>(contents.data()), length);
+    data.resize(length);
+    fileStream.read(reinterpret_cast<char*>(data.data()), length);
 
-    return true;
+    return data;
+}
+
+void writeFile(const std::vector<uint8_t>& contents, const std::string& filename)
+{
+    std::ofstream fileStream(filename.c_str(), std::ifstream::binary);
+
+    if (!fileStream.is_open())
+    {
+        throw std::runtime_error("Failed to open file for writing: " + filename);
+    }
+
+    fileStream.write(reinterpret_cast<const char*>(contents.data()), contents.size());
 }
 
 std::string getFileExtension(const std::string& filepath)
