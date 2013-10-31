@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+GET_DIRECTORY_PROPERTY(UTILS_LIBRARIES  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.." DEFINITION UTILS_LIBRARIES)
 
 INCLUDE_DIRECTORIES(
 	${XDGBASEDIR_INCLUDE_DIRS}
@@ -12,20 +13,22 @@ LINK_DIRECTORIES(
 	${XDGBASEDIR_LIBRARY_DIRS}
 )
 
-ADD_EXECUTABLE(utilstest
-	bufferedreadertest.cpp
-	gmock-gtest-all.cc
-	main.cpp
-	signaltest.cpp
-	stringoperationstest.cpp
-	fileoperationstest.cpp
-)
+IF (BUILD_TESTING)
+    ADD_EXECUTABLE(utilstest
+        bufferedreadertest.cpp
+        gmock-gtest-all.cc
+        main.cpp
+        signaltest.cpp
+        stringoperationstest.cpp
+        fileoperationstest.cpp
+    )
 
 TARGET_LINK_LIBRARIES(utilstest
-	utils
 	-lpthread
+    ${UTILS_LIBRARIES}
 	${XDGBASEDIR_LIBRARIES}
 )
 
 ADD_TEST(UtilsTests utilstest)
  
+ENDIF (BUILD_TESTING)

@@ -21,6 +21,7 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <cctype>
 #include <cwchar>
 #include <stdexcept>
 #include <cassert>
@@ -174,7 +175,7 @@ namespace stringops
     
     inline void lowercase(std::string& aString)
     {
-        std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return tolower(c); });
+        std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return std::tolower(c); });
     }
 
     inline std::string lowercase(const std::string& aString)
@@ -186,7 +187,7 @@ namespace stringops
     
     inline void uppercase(std::string& aString)
     {
-        std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return toupper(c); });
+        std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return std::toupper(c); });
     }
     
     inline std::string uppercase(const std::string& aString)
