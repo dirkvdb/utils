@@ -25,6 +25,7 @@ ADD_LIBRARY(utils STATIC
     inc/utils/subscriber.h
     inc/utils/timeoperations.h
     inc/utils/timerthread.h
+    inc/utils/threadpool.h
     inc/utils/trace.h
     inc/utils/types.h
     inc/utils/workerthread.h
