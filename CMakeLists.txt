@@ -13,8 +13,7 @@ ADD_LIBRARY(utils STATIC
     inc/utils/fileoperations.h      src/fileoperations.cpp
     inc/utils/filereader.h          src/filereader.cpp
     inc/utils/functiontraits.h
-    inc/utils/log.h
-    src/log.cpp
+    inc/utils/log.h                 src/log.cpp
     inc/utils/numericoperations.h
     inc/utils/readerinterface.h
     inc/utils/readerfactory.h       src/readerfactory.cpp
@@ -46,8 +45,8 @@ IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Gcc")
 ENDIF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Gcc")
 
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/inc ${XDGBASEDIR_INCLUDE_DIRS})
-SET (UTILS_LIBRARIES utils ${XDGBASEDIR_LIBRARIES})
 SET (UTILS_INCLUDE_DIRS utils ${XDGBASEDIR_INCLUDE_DIRS})
+SET (UTILS_LIBRARIES utils -lpthread ${XDGBASEDIR_LIBRARIES})
 
 SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -Wall -Wfatal-errors")
 

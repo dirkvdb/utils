@@ -144,16 +144,16 @@ private:
     template<typename... Ts>
     inline static void traceImpl(const std::string& s, const Ts&... args)
     {
-        std::lock_guard<std::mutex> lock(m_Mutex);
-        
         if (m_LogFile)
         {
             auto str = stringops::format(s.c_str(), args...);
+            std::lock_guard<std::mutex> lock(m_Mutex);
             std::cout << str << standard << std::endl;
             *m_LogFile << str << std::endl << std::flush;
         }
         else
         {
+            std::lock_guard<std::mutex> lock(m_Mutex);
             stringops::printLine((s + standard).c_str(), args...);
         }
     }
