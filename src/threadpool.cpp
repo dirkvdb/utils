@@ -101,7 +101,7 @@ void ThreadPool::start()
         return;
     }
     
-    for (auto i = 0; i < m_MaxNumThreads; ++i)
+    for (auto i = 0u; i < m_MaxNumThreads; ++i)
     {
         m_Threads.push_back(std::unique_ptr<Task>(new Task(*this)));
     }

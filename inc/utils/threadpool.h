@@ -17,9 +17,10 @@
 #ifndef UTILS_THREAD_POOL_H
 #define UTILS_THREAD_POOL_H
 
-#include <string>
 #include <vector>
 #include <deque>
+#include <memory>
+#include <functional>
 #include <condition_variable>
 
 #include "utils/signal.h"

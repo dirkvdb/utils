@@ -18,6 +18,7 @@
 #define UTILS_WORKER_THREAD_H
 
 #include <deque>
+#include <memory>
 #include <condition_variable>
 
 #include "utils/signal.h"
