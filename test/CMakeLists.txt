@@ -13,15 +13,16 @@ LINK_DIRECTORIES(
 	${XDGBASEDIR_LIBRARY_DIRS}
 )
 
-IF (BUILD_TESTING)
-    ADD_EXECUTABLE(utilstest
-        bufferedreadertest.cpp
-        gmock-gtest-all.cc
-        main.cpp
-        signaltest.cpp
-        stringoperationstest.cpp
-        fileoperationstest.cpp
-    )
+ADD_EXECUTABLE(utilstest EXCLUDE_FROM_ALL
+    bufferedreadertest.cpp
+    fileoperationstest.cpp
+    gmock-gtest-all.cc
+    main.cpp
+    signaltest.cpp
+    stringoperationstest.cpp
+    threadpooltest.cpp
+    workerthreadtest.cpp
+)
 
 TARGET_LINK_LIBRARIES(utilstest
 	-lpthread
@@ -30,5 +31,4 @@ TARGET_LINK_LIBRARIES(utilstest
 )
 
 ADD_TEST(UtilsTests utilstest)
- 
-ENDIF (BUILD_TESTING)
+ADD_DEPENDENCIES(check utilstest)

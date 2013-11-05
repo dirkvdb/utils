@@ -18,13 +18,11 @@
 #define UTILS_THREAD_POOL_H
 
 #include <string>
-#include <mutex>
+#include <vector>
 #include <deque>
-#include <list>
-#include <future>
 #include <condition_variable>
 
-#include "log.h"
+#include "utils/signal.h"
 
 namespace utils
 {
@@ -32,122 +30,32 @@ namespace utils
 class ThreadPool
 {
 public:
-    ThreadPool(uint32_t maxNumThreads = 4)
-    : m_MaxNumThreads(maxNumThreads)
-    , m_Stop(false)
-    {
-    }
+    ThreadPool(uint32_t maxNumThreads = 4);
+    ~ThreadPool();
+    ThreadPool(ThreadPool&) = delete;
+    ThreadPool& operator=(const ThreadPool&) = delete;
 
-    void start()
-    {
-        std::lock_guard<std::mutex> lock(m_PoolMutex);
-        
-        if (m_PoolThread.valid())
-        {
-            throw std::logic_error("Threadpool is already running");
-        }
+    void start();
+    void stop();
+    void addJob(std::function<void()> job);
 
-        m_Stop = false;
-        m_PoolThread = std::async(std::launch::async, std::bind(&ThreadPool::poolThread, this));
-        log::debug("Threadpool launched");
-    }
-
-    void stop()
-    {
-        std::lock_guard<std::mutex> lock(m_PoolMutex);
-
-        if (!m_PoolThread.valid())
-        {
-            return;
-        }
-
-        m_Stop = true;
-
-        {
-            std::lock_guard<std::mutex> listLock(m_ThreadListMutex);
-            m_ThreadStatusCondition.notify_all();
-        }
-
-        m_PoolThread.wait();
-        log::debug("Threadpool finished");
-    }
-
-    void queueFunction(std::function<void()> func)
-    {
-        {
-            std::lock_guard<std::mutex> lock(m_ThreadListMutex);
-            m_QueuedThreads.push_back(std::bind(&ThreadPool::wrapFunction, this, func));    
-            m_ThreadStatusCondition.notify_all();
-        }
-    }
+    utils::Signal<void(std::exception_ptr)> ErrorOccurred;
 
 private:
-    void poolThread()
-    {
-        while (!m_Stop)
-        {
-            std::unique_lock<std::mutex> lock(m_ThreadListMutex);
-            m_ThreadStatusCondition.wait(lock);
+    bool hasJobs();
+    std::function<void()> getJob();
+    
+    class Task;
+    friend class Task;
 
-            if (m_Stop)
-            {
-                continue;
-            }
-            
-            std::remove_if(m_RunningThreads.begin(), m_RunningThreads.end(), [](std::future<void>& fut){
-                return std::future_status::ready == fut.wait_for(std::chrono::seconds::zero());
-            });
+    std::mutex                                  m_JobsMutex;
+    std::mutex                                  m_PoolMutex;
+    std::condition_variable                     m_Condition;
+    std::deque<std::function<void()>>           m_QueuedJobs;
+    std::vector<std::unique_ptr<Task>>          m_Threads;
 
-            try
-            {
-                while (!m_Stop && m_RunningThreads.size() < m_MaxNumThreads && !m_QueuedThreads.empty())
-                {
-                    m_RunningThreads.push_back(std::async(std::launch::async, m_QueuedThreads.front()));
-                    m_QueuedThreads.pop_front();
-                }
-            }
-            catch (std::exception& e)
-            {
-                log::warn("Thread error: %s", e.what());
-            }    
-        }
-
-        log::debug("Termination sheduled, wait for running threads");
-
-        for (auto& fut : m_RunningThreads)
-        {
-            fut.get();
-            log::debug("Thread aborted: running (%d)", m_RunningThreads.size());
-        }
-
-        m_RunningThreads.clear();
-        m_QueuedThreads.clear();
-    }
-
-    void wrapFunction(std::function<void()> func)
-    {
-        func();
-        std::lock_guard<std::mutex> lock(m_ThreadListMutex);
-        m_ThreadStatusCondition.notify_all();
-    }
-
-
-    ThreadPool(ThreadPool&);
-    ThreadPool& operator=(const ThreadPool&);
-
-    std::future<void>                   m_PoolThread;
-
-    std::condition_variable             m_ThreadStatusCondition;
-
-    std::mutex                          m_ThreadListMutex;
-    std::mutex                          m_PoolMutex;
-    std::list<std::future<void>>        m_RunningThreads;
-    std::deque<std::function<void()>>   m_QueuedThreads;
-
-    uint32_t                            m_MaxNumThreads;
-    bool                                m_Stop;
+    uint32_t                                    m_MaxNumThreads;
 };
-
 }
 
 #endif

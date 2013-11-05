@@ -17,102 +17,41 @@
 #ifndef UTILS_WORKER_THREAD_H
 #define UTILS_WORKER_THREAD_H
 
-#include <string>
-#include <thread>
 #include <deque>
 #include <condition_variable>
-#include <list>
 
-#include "utils/log.h"
 #include "utils/signal.h"
 
 namespace utils
 {
-    
+
 class WorkerThread
 {
 public:
-    void start()
-    {
-        std::lock_guard<std::mutex> lock(m_Mutex);
-        if (!m_Thread)
-        {
-            m_Stop = false;
-            m_Thread.reset(new std::thread(&WorkerThread::workerThread, this));
-        }
-    }
-    
-    void stop()
-    {
-        if (m_Thread)
-        {
-            {
-                std::lock_guard<std::mutex> lock(m_Mutex);
-                m_Stop = true;
-                m_Condition.notify_all();
-            }
-            
-            if (m_Thread->joinable())
-            {
-                m_Thread->join();
-            }
-            
-            m_Thread.reset();
-        }
-    }
-    
-    void addJob(const std::function<void()>& job)
-    {
-        if (!m_Stop)
-        {
-            std::lock_guard<std::mutex> lock(m_Mutex);
-            m_JobQueue.push_back(job);
-            m_Condition.notify_all();
-        }
-    }
-    
-    utils::Signal<void(std::exception&)> ErrorOccurred;
+    WorkerThread();
+    ~WorkerThread();
+    WorkerThread(const WorkerThread&) = delete;
+    WorkerThread& operator=(const WorkerThread&) = delete;
+
+    void start();
+    void stop();
+
+    void addJob(const std::function<void()>& job);
+
+    utils::Signal<void(std::exception_ptr)> ErrorOccurred;
 
 private:
-    void clearJobs()
-    {
-        std::lock_guard<std::mutex> lock(m_Mutex);
-        m_JobQueue.clear();
-    }
+    class Task;
     
-    void workerThread()
-    {
-        while (!m_Stop)
-        {
-            std::unique_lock<std::mutex> lock(m_Mutex);
-            m_Condition.wait(lock, [this] { return (!m_JobQueue.empty()) || m_Stop; });
-            if (m_Stop)
-            {
-                continue;
-            }
-            
-            auto job = m_JobQueue.front();
-            m_JobQueue.pop_front();
-            lock.unlock();
-            
-            try
-            {
-                job();
-            }
-            catch (std::exception& e)
-            {
-                ErrorOccurred(e);
-            }
-        }
-        
-        clearJobs();
-    }
+    bool hasJobs();
+    std::function<void()> nextJob();
+    void clearJobs();
     
-    bool                                        m_Stop;
-    std::unique_ptr<std::thread>                m_Thread;
-    std::condition_variable                     m_Condition;
-    std::mutex                                  m_Mutex;
     std::deque<std::function<void()>>     		m_JobQueue;
+    std::mutex                                  m_Mutex;
+    std::unique_ptr<Task>                       m_Thread;
+    
+    friend class Task;
 };
 
 }

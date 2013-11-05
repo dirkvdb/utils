@@ -1,5 +1,4 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-
 ENABLE_TESTING()
 
 FIND_PACKAGE(PkgConfig)
@@ -25,10 +24,10 @@ ADD_LIBRARY(utils STATIC
     inc/utils/subscriber.h
     inc/utils/timeoperations.h
     inc/utils/timerthread.h
-    inc/utils/threadpool.h
+    inc/utils/threadpool.h          src/threadpool.cpp
     inc/utils/trace.h
     inc/utils/types.h
-    inc/utils/workerthread.h
+    inc/utils/workerthread.h        src/workerthread.cpp
 )
 
 OPTION(COLORED_OUTPUT "Colored output" ON)
