@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4341AB351387B66600297297"
-               BuildableName = "libUtils.a"
-               BlueprintName = "Utils"
-               ReferencedContainer = "container:Utils.xcodeproj">
+               BlueprintIdentifier = "4303F1F7161216A80057A64C"
+               BuildableName = "libUPnPFrameworkNative.a"
+               BlueprintName = "UPnPFrameworkNative"
+               ReferencedContainer = "container:UPnPFramework.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

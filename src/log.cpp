@@ -18,7 +18,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef HAVE_CONFIG
 #include "utilsconfig.h"
+#endif
 
 namespace utils
 {
