@@ -137,17 +137,25 @@ uint64_t BufferedReader::read(uint8_t* pData, uint64_t size)
                 auto read = m_Reader->read(m_Buffer.data(), m_Buffer.size());
                 auto bytesToRead = std::min(read, size - bytesInBuffer);
                 
-                // copy the reaming data from the buffer
-                memcpy(pData + bytesInBuffer, m_Buffer.data(), bytesToRead);
-                
-                m_BufferStartPosition = m_CurrentPosition;
-                m_CurrentPosition += bytesToRead;
-                m_BufferOffset = bytesToRead;
-                
-                assert(m_BufferOffset <= m_Buffer.size());
-                if (m_BufferOffset == m_Buffer.size())
+                if (bytesToRead > 0)
                 {
-                    // buffer was completely emptied, mark it as not filled
+                    // copy the reaming data from the buffer
+                    memcpy(pData + bytesInBuffer, m_Buffer.data(), bytesToRead);
+                    
+                    m_BufferStartPosition = m_CurrentPosition;
+                    m_CurrentPosition += bytesToRead;
+                    m_BufferOffset = bytesToRead;
+                    
+                    assert(m_BufferOffset <= m_Buffer.size());
+                    if (m_BufferOffset == m_Buffer.size())
+                    {
+                        // buffer was completely emptied, mark it as not filled
+                        m_BufferFilled = false;
+                    }
+                }
+                else
+                {
+                    // buffer is not filled as we could not obtain extra data
                     m_BufferFilled = false;
                 }
                 
