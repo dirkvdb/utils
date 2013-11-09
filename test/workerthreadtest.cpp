@@ -79,3 +79,29 @@ TEST_F(WorkerThreadTest, RunJobs)
     EXPECT_EQ(1, threadIds.size());
 }
 
+TEST_F(WorkerThreadTest, RunJobThatFails)
+{
+    std::mutex mutex;
+    std::condition_variable cond;
+    std::exception_ptr ex;
+    
+    wt.ErrorOccurred.connect([&] (std::exception_ptr e) {
+        ex = e;
+        std::lock_guard<std::mutex> lock(mutex);
+        cond.notify_one();
+    }, this);
+
+    wt.addJob([&] () {
+        throw std::runtime_error("Error");
+    });
+    
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        cond.wait(lock, [&] () { return ex != nullptr; });
+    }
+    
+    wt.stop();
+    
+    EXPECT_THROW(std::rethrow_exception(ex), std::runtime_error);
+}
+

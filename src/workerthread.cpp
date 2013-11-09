@@ -77,7 +77,7 @@ public:
                 }
                 catch (...)
                 {
-                    m_Worker.ErrorOccurred(std::make_exception_ptr(std::current_exception()));
+                    m_Worker.ErrorOccurred(std::current_exception());
                 }
                 
                 job = m_Worker.nextJob();
