@@ -16,7 +16,7 @@ LINK_DIRECTORIES(
 ADD_EXECUTABLE(utilstest EXCLUDE_FROM_ALL
     bufferedreadertest.cpp
     fileoperationstest.cpp
-    gmock-gtest-all.cc
+    gmock-gtest-all.cpp
     main.cpp
     signaltest.cpp
     stringoperationstest.cpp

@@ -33,7 +33,7 @@ class BufferedReader : public IReader
 public:
     BufferedReader(std::unique_ptr<IReader> reader, size_t bufferSize);
 
-    virtual void open(const std::string& filename);
+    virtual void open(const std::string& filename) override;
 
     virtual uint64_t getContentLength() override;
     virtual uint64_t currentPosition() override;
