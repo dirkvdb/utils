@@ -48,6 +48,10 @@ namespace timeops
     
     int32_t error = gettimeofday(&timeValue, nullptr);
     assert(!error);
+    if (error)
+    {
+        throw std::runtime_error("Failed to obtain the current time");
+    }
     
     return (timeValue.tv_sec * 1000) + (timeValue.tv_usec / 1000);
 #endif
@@ -68,6 +72,10 @@ namespace timeops
     
         int32_t error = gettimeofday(&timeValue, nullptr);
         assert(!error);
+        if (error)
+        {
+            throw std::runtime_error("Failed to obtain the current time");
+        }
 
         struct tm* timePtr = gmtime(&timeValue.tv_sec);
         char timeString[128];

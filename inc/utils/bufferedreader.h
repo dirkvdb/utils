@@ -39,7 +39,7 @@ public:
     virtual uint64_t currentPosition() override;
     virtual bool eof() override;
     virtual std::string uri() override;
-    
+
     virtual void seekAbsolute(uint64_t position) override;
     virtual void seekRelative(uint64_t offset) override;
     virtual uint64_t read(uint8_t* pData, uint64_t size) override;
@@ -49,15 +49,14 @@ public:
 private:
     void updateOffsetsAfterSeek(uint64_t newPosition);
 
-    std::unique_ptr<IReader>        m_Reader;
-    std::vector<uint8_t>            m_Buffer;
-    uint64_t                        m_BufferStartPosition;
-    uint64_t                        m_BufferOffset;
-    uint64_t                        m_CurrentPosition;
-    uint64_t                        m_ContentLength;
-    bool                            m_BufferFilled;
+    std::unique_ptr<IReader> m_Reader;
+    std::vector<uint8_t> m_Buffer;
+    uint64_t m_BufferStartPosition;
+    uint64_t m_BufferOffset;
+    uint64_t m_CurrentPosition;
+    uint64_t m_ContentLength;
+    bool m_BufferFilled;
 };
-
 }
 
 #endif
