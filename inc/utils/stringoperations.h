@@ -345,7 +345,7 @@ namespace stringops
     }
 
     template<typename T>
-    inline std::string getPostData(T& numeric)
+    inline std::string toString(T& numeric)
     {
         std::stringstream ss;
         ss << numeric;

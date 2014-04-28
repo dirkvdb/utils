@@ -304,7 +304,7 @@ std::string readTextFile(const std::string& filename)
     fileStream.read(buffer.data(), length);
     buffer[length] = 0;
 
-    return &(buffer.front());
+    return buffer.data();
 }
 
 std::vector<uint8_t> readFile(const std::string& filename)
