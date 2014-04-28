@@ -17,21 +17,9 @@
 #ifndef UTILS_TIME_OPERATIONS_H
 #define UTILS_TIME_OPERATIONS_H
 
-#include "types.h"
-
-#ifdef WIN32
-    #define WIN32_LEAN_AND_MEAN 1
-    #include <windows.h>
-    #include <Mmsystem.h>
-    #undef max
-    #undef DELETE
-#else
-    #include <sys/time.h>
-    #include <unistd.h>
-#endif
-
-#include <cassert>
-#include <ctime>
+#include <cinttypes>
+#include <chrono>
+#include <thread>
 #include <iomanip>
 #include <sstream>
 
@@ -41,49 +29,28 @@ namespace timeops
 {
     inline uint64_t getTimeInMilliSeconds()
     {
-#ifdef WIN32
-    return static_cast<uint64_t>(timeGetTime());
-#else
-    struct timeval timeValue;
-    
-    int32_t error = gettimeofday(&timeValue, nullptr);
-    assert(!error);
-    if (error)
-    {
-        throw std::runtime_error("Failed to obtain the current time");
+        auto start = std::chrono::system_clock::now();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(start.time_since_epoch()).count();
     }
-    
-    return (timeValue.tv_sec * 1000) + (timeValue.tv_usec / 1000);
-#endif
-}
 
     inline void sleepMs(uint32_t ms)
     {
-#ifdef WIN32
-    Sleep(ms);
-#else
-    usleep(ms * 1000);
-#endif
+        std::chrono::milliseconds duration(ms);
+        std::this_thread::sleep_for(duration);
     }
 
     inline std::string getTimeString()
     {
-        struct timeval timeValue;
-    
-        int32_t error = gettimeofday(&timeValue, nullptr);
-        assert(!error);
-        if (error)
-        {
-            throw std::runtime_error("Failed to obtain the current time");
-        }
-
-        struct tm* timePtr = gmtime(&timeValue.tv_sec);
-        char timeString[128];
-        strftime(timeString, 127, "%H:%M:%S.", timePtr);
+        using namespace std::chrono;
+        
+        const auto t    = system_clock::now();
+        time_t time     = system_clock::to_time_t(t);
+        auto tRounded   = system_clock::from_time_t(time);
+        const tm tm     = *std::localtime(&time);
         
         std::stringstream ss;
-        ss << timeString << std::setw(3) << std::setfill('0') << (timeValue.tv_usec / 1000);
-
+        ss << std::put_time(&tm, "%T.") << std::setw(3) << std::setfill('0')
+           << duration_cast<milliseconds>(t - tRounded).count();
         return ss.str();
     }
 }
