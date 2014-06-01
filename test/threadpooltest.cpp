@@ -17,6 +17,7 @@
 #include "utils/threadpool.h"
 #include "gtest/gtest.h"
 
+#include <chrono>
 #include <thread>
 
 using namespace utils;
@@ -63,8 +64,8 @@ TEST_F(ThreadPoolTest, RunJobs)
     const long jobCount = g_poolSize * 100;
 
     std::mutex mutex;
-    std::condition_variable cond1;
-    std::condition_variable cond2;
+    std::condition_variable cond;
+    std::condition_variable jobCond;
     
     uint32_t count = 0;
     std::set<std::thread::id> threadIds;
@@ -72,25 +73,26 @@ TEST_F(ThreadPoolTest, RunJobs)
     for (auto i = 0; i < jobCount; ++i)
     {
         tp.addJob([&] () {
-            std::this_thread::yield();
             std::unique_lock<std::mutex> lock(mutex);
             threadIds.insert(std::this_thread::get_id());
-            cond1.wait(lock);
+
+            if (count < g_poolSize)
+            {
+                jobCond.wait_for(lock, std::chrono::milliseconds(10));
+            }
+
             if (++count == jobCount)
             {
-                cond2.notify_one();
+                cond.notify_one();
             }
         });
 
-        if (i > g_poolSize)
-        {
-            cond1.notify_all();
-        }
+        jobCond.notify_one();
     }
     
     std::unique_lock<std::mutex> lock(mutex);
-    cond2.wait(lock, [&] () { return count == jobCount; });
+    cond.wait(lock, [&] () { return count == jobCount; });
     
-    EXPECT_EQ(g_poolSize, threadIds.size());
+    EXPECT_EQ(g_poolSize, static_cast<uint32_t>(threadIds.size()));
 }
 
