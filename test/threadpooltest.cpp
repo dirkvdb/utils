@@ -63,7 +63,8 @@ TEST_F(ThreadPoolTest, RunJobs)
     const long jobCount = g_poolSize * 100;
 
     std::mutex mutex;
-    std::condition_variable cond;
+    std::condition_variable cond1;
+    std::condition_variable cond2;
     
     uint32_t count = 0;
     std::set<std::thread::id> threadIds;
@@ -72,17 +73,23 @@ TEST_F(ThreadPoolTest, RunJobs)
     {
         tp.addJob([&] () {
             std::this_thread::yield();
-            std::lock_guard<std::mutex> lock(mutex);
+            std::unique_lock<std::mutex> lock(mutex);
             threadIds.insert(std::this_thread::get_id());
+            cond1.wait(lock);
             if (++count == jobCount)
             {
-                cond.notify_one();
+                cond2.notify_one();
             }
         });
+
+        if (i > g_poolSize)
+        {
+            cond1.notify_all();
+        }
     }
     
     std::unique_lock<std::mutex> lock(mutex);
-    cond.wait(lock, [&] () { return count == jobCount; });
+    cond2.wait(lock, [&] () { return count == jobCount; });
     
     EXPECT_EQ(g_poolSize, threadIds.size());
 }
