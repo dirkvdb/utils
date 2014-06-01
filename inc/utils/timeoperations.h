@@ -22,6 +22,7 @@
 #include <thread>
 #include <iomanip>
 #include <sstream>
+#include <ctime>
 
 namespace utils
 {
@@ -43,14 +44,20 @@ namespace timeops
     {
         using namespace std::chrono;
         
-        const auto t    = system_clock::now();
-        time_t time     = system_clock::to_time_t(t);
-        auto tRounded   = system_clock::from_time_t(time);
-        const tm tm     = *std::localtime(&time);
+        const auto t        = system_clock::now();
+        time_t time         = system_clock::to_time_t(t);
+        auto tRounded       = system_clock::from_time_t(time);
+        const tm timePtr    = *std::localtime(&time);
         
+        //not yet supported even in gcc 4.9.0
+        //std::stringstream ss;
+        //ss << std::put_time(&tm, "%T.") << std::setw(3) << std::setfill('0')
+        //   << duration_cast<milliseconds>(t - tRounded).count();
+        
+        char timeString[128];
+        std::strftime(timeString, 127, "%H:%M:%S.", &timePtr);
         std::stringstream ss;
-        ss << std::put_time(&tm, "%T.") << std::setw(3) << std::setfill('0')
-           << duration_cast<milliseconds>(t - tRounded).count();
+        ss << timeString << std::setw(3) << std::setfill('0') << duration_cast<milliseconds>(t - tRounded).count();
         return ss.str();
     }
 }
