@@ -29,5 +29,5 @@ TARGET_LINK_LIBRARIES(utilstest
 	${XDGBASEDIR_LIBRARIES}
 )
 
-ADD_TEST(UtilsTests utilstest)
+ADD_TEST(NAME UtilsTests COMMAND utilstest)
 ADD_DEPENDENCIES(check utilstest)
