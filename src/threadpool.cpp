@@ -26,6 +26,7 @@ class ThreadPool::Task
 public:
     Task(ThreadPool& pool)
     : m_Stop(false)
+    , m_StopFinish(false)
     , m_Pool(pool)
     , m_Thread(&Task::run, this)
     {
@@ -43,6 +44,11 @@ public:
     {
         m_Stop = true;
     }
+
+    void stopFinishJobs()
+    {
+        m_StopFinish = true;
+    }
     
     void run()
     {
@@ -51,10 +57,10 @@ public:
             std::unique_lock<std::mutex> lock(m_Pool.m_PoolMutex);
             if (!m_Pool.hasJobs() || !m_Stop)
             {
-                m_Pool.m_Condition.wait(lock, [this] () { return m_Pool.hasJobs() || m_Stop; });
+                m_Pool.m_Condition.wait(lock, [this] () { return m_Pool.hasJobs() || m_Stop || m_StopFinish; });
             }
             
-            if (m_Stop)
+            if (m_Stop || (m_StopFinish && !m_Pool.hasJobs()))
             {
                 break;
             }
@@ -80,6 +86,7 @@ public:
 
 private:
     bool            m_Stop;
+    bool            m_StopFinish;
     ThreadPool&     m_Pool;
 
     std::thread     m_Thread;
@@ -119,6 +126,22 @@ void ThreadPool::stop()
         t->stop();
     }
     
+    {
+        std::lock_guard<std::mutex> lock(m_PoolMutex);
+        m_Condition.notify_all();
+    }
+
+    // Will cause joining of the threads
+    m_Threads.clear();
+}
+
+void ThreadPool::stopFinishJobs()
+{
+    for (auto& t : m_Threads)
+    {
+        t->stopFinishJobs();
+    }
+
     {
         std::lock_guard<std::mutex> lock(m_PoolMutex);
         m_Condition.notify_all();
