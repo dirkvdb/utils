@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4378DE51190D8BBC006B2281 /* bufferedreader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EC577C18299EF300827609 /* bufferedreader.cpp */; };
+		4378DE52190D8BBC006B2281 /* fileoperations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EC577D18299EF300827609 /* fileoperations.cpp */; };
+		4378DE53190D8BBC006B2281 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EC577E18299EF300827609 /* filereader.cpp */; };
+		4378DE54190D8BBC006B2281 /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EC577F18299EF300827609 /* log.cpp */; };
+		4378DE55190D8BBC006B2281 /* readerfactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EC578018299EF300827609 /* readerfactory.cpp */; };
+		4378DE56190D8BBC006B2281 /* threadpool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EC578118299EF300827609 /* threadpool.cpp */; };
+		4378DE57190D8BBC006B2281 /* workerthread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EC578218299EF300827609 /* workerthread.cpp */; };
 		43EC576918299EE000827609 /* bufferedreader.h in Headers */ = {isa = PBXBuildFile; fileRef = 43EC575618299EE000827609 /* bufferedreader.h */; };
 		43EC576A18299EE000827609 /* fileoperations.h in Headers */ = {isa = PBXBuildFile; fileRef = 43EC575718299EE000827609 /* fileoperations.h */; };
 		43EC576B18299EE000827609 /* filereader.h in Headers */ = {isa = PBXBuildFile; fileRef = 43EC575818299EE000827609 /* filereader.h */; };
@@ -270,6 +277,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4378DE51190D8BBC006B2281 /* bufferedreader.cpp in Sources */,
+				4378DE52190D8BBC006B2281 /* fileoperations.cpp in Sources */,
+				4378DE53190D8BBC006B2281 /* filereader.cpp in Sources */,
+				4378DE54190D8BBC006B2281 /* log.cpp in Sources */,
+				4378DE55190D8BBC006B2281 /* readerfactory.cpp in Sources */,
+				4378DE56190D8BBC006B2281 /* threadpool.cpp in Sources */,
+				4378DE57190D8BBC006B2281 /* workerthread.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

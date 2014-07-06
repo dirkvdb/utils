@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0500"
+   LastUpgradeVersion = "0510"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4303F1F7161216A80057A64C"
-               BuildableName = "libUPnPFrameworkNative.a"
-               BlueprintName = "UPnPFrameworkNative"
-               ReferencedContainer = "container:UPnPFramework.xcodeproj">
+               BuildableName = "libUtilsNative.a"
+               BlueprintName = "UtilsNative"
+               ReferencedContainer = "container:Utils.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
