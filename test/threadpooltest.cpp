@@ -96,3 +96,28 @@ TEST_F(ThreadPoolTest, RunJobs)
     EXPECT_EQ(g_poolSize, static_cast<uint32_t>(threadIds.size()));
 }
 
+TEST_F(ThreadPoolTest, StopFinishJobs)
+{
+    const long jobCount = g_poolSize * 100;
+
+    std::mutex mutex;
+
+    long count = 0;
+    for (auto i = 0; i < jobCount; ++i)
+    {
+        tp.addJob([&] () {
+            std::unique_lock<std::mutex> lock(mutex);
+            ++count;
+        });
+    }
+    
+    
+    tp.stopFinishJobs();
+    EXPECT_EQ(jobCount, count);
+}
+
+TEST_F(ThreadPoolTest, StartStopFinishJobs)
+{
+    EXPECT_NO_THROW(tp.stopFinishJobs());
+}
+

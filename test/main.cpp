@@ -19,7 +19,7 @@
 
 int main(int argc, char **argv)
 {
-	if (!setlocale(LC_CTYPE, ""))
+	if (!setlocale(LC_CTYPE, "en_US.UTF-8"))
     {
         std::cerr << "Locale not specified. Check LANG, LC_CTYPE, LC_ALL" << std::endl;
         return 1;

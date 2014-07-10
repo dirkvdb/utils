@@ -94,7 +94,7 @@ public:
     inline static void error(const char* s, const T&... args)
     {
         std::stringstream ss;
-        ss << red << "ERROR:  [" << timeops::getTimeString() << "] " << s;
+        ss << red << "ERROR: [" << timeops::getTimeString() << "] " << s;
         
         traceImpl(ss.str(), args...);
     }

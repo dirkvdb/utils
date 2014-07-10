@@ -121,13 +121,12 @@ void ThreadPool::stop()
         m_QueuedJobs.clear();
     }
 
-    for (auto& t : m_Threads)
-    {
-        t->stop();
-    }
-    
     {
         std::lock_guard<std::mutex> lock(m_PoolMutex);
+        for (auto& t : m_Threads)
+        {
+            t->stop();
+        }
         m_Condition.notify_all();
     }
 
