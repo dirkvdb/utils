@@ -144,3 +144,9 @@ TEST(StringOperationsTest, Trim)
     trim(s);
     EXPECT_EQ("", s);
 }
+
+TEST(StringOperationsTest, StringFormat)
+{
+    const char* testStr = "TestString";
+    EXPECT_STREQ(testStr, format("%s", testStr).c_str());
+}
