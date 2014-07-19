@@ -104,24 +104,28 @@ namespace stringops
                     case 'd': case 'c':
                         if (!std::is_integral<T>::value)
                         {
+                            assert(false);
                             throw std::logic_error("T is not an integral");
                         }
                         break;
                     case 'p':
                         if (!std::is_pointer<T>::value)
                         {
+                            assert(false);
                             throw std::logic_error("T is not a pointer");
                         }
                         break;
                     case 'f': case 'g':
                         if (!std::is_floating_point<T>::value)
                         {
+                            assert(false);
                             throw std::logic_error("T is not a float");
                         }
                         break;
                     case 's':
                         if (!is_c_string<T>::value)
                         {
+                            assert(false);
                             throw std::logic_error("T is not a string");
                         }
                         break;
@@ -152,6 +156,15 @@ namespace stringops
 #pragma GCC diagnostic pop
         
         return ss;
+    }
+
+    template <typename... Ts>
+    inline void print(const char* f)
+    {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-security"
+        printf(f);
+#pragma GCC diagnostic pop
     }
 
     template <typename... Ts>

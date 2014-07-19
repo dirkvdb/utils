@@ -56,6 +56,14 @@ public:
         
         traceImpl(ss.str(), args...);
     }
+
+    inline static void info(const char* s)
+    {
+        std::stringstream ss;
+        ss << green << "INFO:  [" << timeops::getTimeString() << "] " << s;
+
+        traceImpl(ss.str());
+    }
     
     inline static void warn(const std::string& s)
     {
@@ -69,6 +77,14 @@ public:
         ss << yellow << "WARN:  [" << timeops::getTimeString() << "] " << s;
         
         traceImpl(ss.str(), args...);
+    }
+
+    inline static void warn(const char* s)
+    {
+        std::stringstream ss;
+        ss << yellow << "WARN:  [" << timeops::getTimeString() << "] " << s;
+
+        traceImpl(ss.str());
     }
     
     inline static void critical(const std::string& s)
@@ -84,6 +100,14 @@ public:
         
         traceImpl(ss.str(), args...);
     }
+
+    inline static void critical(const char* s)
+    {
+        std::stringstream ss;
+        ss << purple << "CRIT:  [" << timeops::getTimeString() << "] " << s;
+
+        traceImpl(ss.str());
+    }
     
     inline static void error(const std::string& s)
     {
@@ -97,6 +121,14 @@ public:
         ss << red << "ERROR: [" << timeops::getTimeString() << "] " << s;
         
         traceImpl(ss.str(), args...);
+    }
+
+    inline static void error(const char* s)
+    {
+        std::stringstream ss;
+        ss << red << "ERROR: [" << timeops::getTimeString() << "] " << s;
+
+        traceImpl(ss.str());
     }
     
     inline static void debug(const std::string& s)
@@ -114,7 +146,16 @@ public:
         traceImpl(ss.str(), args...);
 #endif
     }
-    
+
+    inline static void debug(const char* s)
+    {
+#ifndef NDEBUG
+        std::stringstream ss;
+        ss << "DEBUG: [" << timeops::getTimeString() << "] [" << std::this_thread::get_id() << "] " << s;
+        traceImpl(ss.str().c_str());
+#endif
+    }
+
 private:
     static const std::string red;
     static const std::string green;
@@ -129,7 +170,7 @@ private:
     inline static void traceImpl(const char* s)
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
-        stringops::print(s);
+        stringops::printLine(s);
         
         if (m_LogFile)
         {

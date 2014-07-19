@@ -44,6 +44,13 @@ TEST(FileOperationsTest, GetFileExtension)
     EXPECT_EQ("", getFileExtension("file"));
 }
 
+TEST(FileOperationsTest, GetFileName)
+{
+    EXPECT_EQ("The filename (1000)", getFileName("/some/path/The filename (1000)"));
+    EXPECT_EQ("Amper & sand", getFileName("/some/path/Amper & sand"));
+    EXPECT_EQ("SomeFile.txt", getFileName("SomeFile.txt"));
+}
+
 TEST(FileOperationsTest, PathExists)
 {
     ofstream file("testfile.txt");

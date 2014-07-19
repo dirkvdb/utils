@@ -355,15 +355,13 @@ std::string getFileExtension(const std::string& filepath)
     
 std::string getFileName(const std::string& filepath)
 {
-    std::string name;
-    
-    std::string::size_type pos = filepath.find_last_of('/');
+    auto pos = filepath.find_last_of('/');
     if (pos != std::string::npos && pos != filepath.size())
     {
-        name = filepath.substr(pos + 1, filepath.size());
+        return filepath.substr(pos + 1, filepath.size());
     }
     
-    return name;
+    return filepath;
 }
 
 uint64_t getFileSize(const std::string& filepath)
