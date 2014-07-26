@@ -44,6 +44,11 @@ void BufferedReader::open(const std::string& filename)
     m_BufferFilled = false;
 }
 
+void BufferedReader::close()
+{
+    m_Reader->close();
+}
+
 uint64_t BufferedReader::getContentLength()
 {
     return m_ContentLength;

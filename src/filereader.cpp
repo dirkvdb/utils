@@ -23,30 +23,35 @@ namespace utils
 
 void FileReader::open(const std::string& filename)
 {
-    m_FileName = filename;
-    m_File.open(filename.c_str(), std::ios::binary);
+    m_fileName = filename;
+    m_file.open(filename.c_str(), std::ios::binary);
     
-    if (!m_File.is_open())
+    if (!m_file.is_open())
     {
         throw std::logic_error("Failed to open file for reading: " + filename);
     }
 }
 
+void FileReader::close()
+{
+    m_file.close();
+}
+
 uint64_t FileReader::getContentLength()
 {
-    uint64_t curPos = m_File.tellg();
+    uint64_t curPos = m_file.tellg();
     
-    m_File.seekg(0, std::ios::end);
-    uint64_t length = m_File.tellg();
+    m_file.seekg(0, std::ios::end);
+    uint64_t length = m_file.tellg();
   
-    m_File.seekg (curPos);
+    m_file.seekg (curPos);
     
     return length;
 }
 
 uint64_t FileReader::currentPosition()
 {
-    return m_File.tellg();
+    return m_file.tellg();
 }
 
 void FileReader::seekAbsolute(uint64_t position)
@@ -56,7 +61,7 @@ void FileReader::seekAbsolute(uint64_t position)
         clearErrors();
     }
 
-    m_File.seekg(position);
+    m_file.seekg(position);
 }
 
 void FileReader::seekRelative(uint64_t offset)
@@ -66,23 +71,23 @@ void FileReader::seekRelative(uint64_t offset)
         clearErrors();
     }
 
-    m_File.seekg(offset, std::ios::cur);
+    m_file.seekg(offset, std::ios::cur);
 }
 
 bool FileReader::eof()
 {
-    return m_File.eof();
+    return m_file.eof();
 }
 
 std::string FileReader::uri()
 {
-    return m_FileName;
+    return m_fileName;
 }
 
 uint64_t FileReader::read(uint8_t* pData, uint64_t size)
 {
-    m_File.read(reinterpret_cast<char*>(pData), size);
-    return m_File.gcount();
+    m_file.read(reinterpret_cast<char*>(pData), size);
+    return m_file.gcount();
 }
 
 std::vector<uint8_t> FileReader::readAllData()
@@ -93,7 +98,7 @@ std::vector<uint8_t> FileReader::readAllData()
     seekAbsolute(0);
     if (data.size() != read(data.data(), data.size()))
     {
-        throw std::runtime_error("Failed to read all file data for file: " + m_FileName);
+        throw std::runtime_error("Failed to read all file data for file: " + m_fileName);
     }
     
     return data;
@@ -101,7 +106,7 @@ std::vector<uint8_t> FileReader::readAllData()
 
 void FileReader::clearErrors()
 {
-    m_File.clear();
+    m_file.clear();
 }
 
 }

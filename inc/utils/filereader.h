@@ -28,22 +28,23 @@ namespace utils
 class FileReader : public IReader
 {
 public:
-    virtual void open(const std::string& filename) override;
+    void open(const std::string& filename) override;
+    void close() override;
 
-    virtual uint64_t getContentLength() override;
-    virtual uint64_t currentPosition() override;
-    virtual bool eof() override;
-    virtual std::string uri() override;
+    uint64_t getContentLength() override;
+    uint64_t currentPosition() override;
+    bool eof() override;
+    std::string uri() override;
     
-    virtual void seekAbsolute(uint64_t position) override;
-    virtual void seekRelative(uint64_t offset) override;
-    virtual uint64_t read(uint8_t* pData, uint64_t size) override;
-    virtual std::vector<uint8_t> readAllData() override;
-    virtual void clearErrors() override;
+    void seekAbsolute(uint64_t position) override;
+    void seekRelative(uint64_t offset) override;
+    uint64_t read(uint8_t* pData, uint64_t size) override;
+    std::vector<uint8_t> readAllData() override;
+    void clearErrors() override;
 
 private:
-    std::string         m_FileName;
-    std::ifstream       m_File;
+    std::string         m_fileName;
+    std::ifstream       m_file;
 };
 
 }

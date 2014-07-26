@@ -29,6 +29,7 @@ public:
     virtual ~IReader() {};
 
     virtual void open(const std::string& uri) = 0;
+    virtual void close() = 0;
 
     virtual uint64_t getContentLength() = 0;
     virtual uint64_t currentPosition() = 0;
