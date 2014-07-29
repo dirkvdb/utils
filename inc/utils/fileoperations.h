@@ -136,6 +136,7 @@ std::string getPathFromFilepath(const std::string& filepath);
 std::string combinePath(const std::string& left, const std::string& right);
 
 void createDirectory(const std::string& path);
+void createDirectoryIfNotExists(const std::string& path);
 void deleteDirectory(const std::string& path);
 void deleteDirectoryRecursive(const std::string& path);
 void changeDirectory(const std::string& dir);

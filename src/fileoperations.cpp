@@ -505,6 +505,23 @@ void createDirectory(const std::string& path)
     }
 }
 
+void createDirectoryIfNotExists(const std::string& path)
+{
+    if (pathExists(path))
+    {
+        return;
+    }
+
+#ifndef WIN32
+    if (mkdir(path.c_str(), 0755) != 0)
+#else
+    if (CreateDirectory(path.c_str(), nullptr) == 0)
+#endif
+    {
+        throw std::logic_error(stringops::format("Failed to create directory: %s (%s)", path, strerror(errno)));
+    }
+}
+
 void deleteDirectory(const std::string& path)
 {
     if (remove(path.c_str()))
