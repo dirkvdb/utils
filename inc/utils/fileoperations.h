@@ -126,6 +126,7 @@ void writeFile(const std::vector<uint8_t>& contents, const std::string& filename
 
 std::string getFileExtension(const std::string& filepath);
 std::string getFileName(const std::string& filepath);
+std::string getFileNameWithoutExtension(const std::string& filepath);
 uint64_t getFileSize(const std::string& filepath);
 FileSystemEntryInfo getFileInfo(const std::string& filepath);
 

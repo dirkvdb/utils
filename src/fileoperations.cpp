@@ -364,6 +364,18 @@ std::string getFileName(const std::string& filepath)
     return filepath;
 }
 
+std::string getFileNameWithoutExtension(const std::string& filepath)
+{
+    auto filename = getFileName(filepath);
+    auto pos = filename.find_last_of('.');
+    if (pos != std::string::npos && pos != filename.size())
+    {
+        return filename.substr(0, pos);
+    }
+
+    return filename;
+}
+
 uint64_t getFileSize(const std::string& filepath)
 {
 #ifndef WIN32

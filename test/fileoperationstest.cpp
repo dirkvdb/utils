@@ -44,6 +44,14 @@ TEST(FileOperationsTest, GetFileExtension)
     EXPECT_EQ("", getFileExtension("file"));
 }
 
+TEST(FileOperationsTest, GetFileNameWithoutExtension)
+{
+    EXPECT_EQ("fi.le", getFileNameWithoutExtension("/path/to/fi.le.txt"));
+    EXPECT_EQ("file", getFileNameWithoutExtension("/path/to/file"));
+    EXPECT_EQ("fi.le", getFileNameWithoutExtension("fi.le.txt"));
+    EXPECT_EQ("file", getFileNameWithoutExtension("file.txt"));
+}
+
 TEST(FileOperationsTest, GetFileName)
 {
     EXPECT_EQ("The filename (1000)", getFileName("/some/path/The filename (1000)"));
