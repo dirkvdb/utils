@@ -102,7 +102,7 @@ void WorkerThread::start()
     std::lock_guard<std::mutex> lock(m_Mutex);
     if (!m_Thread)
     {
-        m_Thread.reset(new Task(*this));
+        m_Thread = std::make_unique<Task>(*this);
     }
 }
 

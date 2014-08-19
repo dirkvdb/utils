@@ -88,7 +88,7 @@ private:
 
 Directory::Directory(const std::string& path)
 : m_Path(path)
-, m_DirHandle(new DirectoryHandle(path))
+, m_DirHandle(std::make_shared<DirectoryHandle>(path))
 {
 }
 
@@ -166,7 +166,7 @@ FileSystemIterator::FileSystemIterator()
 
 FileSystemIterator::FileSystemIterator(const Directory& dir)
 : m_pDir(&dir)
-, m_IterData(new IteratorData())
+, m_IterData(std::make_shared<IteratorData>())
 {
     nextFile();
 }

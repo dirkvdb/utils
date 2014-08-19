@@ -44,7 +44,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
         m_Stop = false;
-        m_Thread.reset(new std::thread(std::bind(&TimerThread::timerThread, this, interval, cb)));
+        m_Thread = std::make_unique<std::thread>(std::bind(&TimerThread::timerThread, this, interval, cb));
     }
     
     void cancel()

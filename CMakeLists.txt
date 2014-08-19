@@ -43,7 +43,7 @@ OPTION(COLORED_OUTPUT "Colored output" ON)
 OPTION(STANDALONE "Not used as a submodule of another project" OFF)
 
 ADD_DEFINITIONS("-DHAVE_UTILS_CONFIG")
-ADD_DEFINITIONS("-std=c++11")
+ADD_DEFINITIONS("-std=c++1y")
 IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     SET(CMAKE_CXX_FLAGS "-stdlib=libc++")
 ENDIF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

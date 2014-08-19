@@ -39,7 +39,7 @@ class BufferedReaderTest : public Test
 {
 public:
     BufferedReaderTest()
-    : reader(std::unique_ptr<utils::IReader>(new FileReader()), 10)
+    : reader(std::make_unique<FileReader>(), 10)
     {
     }
 
