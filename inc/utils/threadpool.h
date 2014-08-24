@@ -41,7 +41,7 @@ public:
     void stopFinishJobs();
     void addJob(std::function<void()> job);
 
-    utils::Signal<void(std::exception_ptr)> ErrorOccurred;
+    utils::Signal<std::exception_ptr> ErrorOccurred;
 
 private:
     bool hasJobs();

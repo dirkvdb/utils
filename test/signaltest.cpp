@@ -16,6 +16,8 @@
 
 #include "utils/signal.h"
 
+#include <memory>
+
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
@@ -42,7 +44,7 @@ protected:
 
 TEST_F(SignalTest, ConnectDisconnect)
 {
-    Signal<void ()> sig;
+    Signal<> sig;
     EXPECT_CALL(m_Mock1, onItem()).Times(0);
     EXPECT_CALL(m_Mock2, onItem()).Times(0);
 
@@ -78,7 +80,7 @@ TEST_F(SignalTest, ConnectDisconnect)
 
 TEST_F(SignalTest, ConnectDisconnect1)
 {
-    Signal<void (const int&)> sig;
+    Signal<const int&> sig;
     EXPECT_CALL(m_Mock1, onItem1(_)).Times(0);
     EXPECT_CALL(m_Mock2, onItem1(_)).Times(0);
 
@@ -114,7 +116,7 @@ TEST_F(SignalTest, ConnectDisconnect1)
 
 TEST_F(SignalTest, ConnectDisconnect2)
 {
-    Signal<void (const int&, const int&)> sig;
+    Signal<const int&, const int&> sig;
     EXPECT_CALL(m_Mock1, onItem2(_, _)).Times(0);
     EXPECT_CALL(m_Mock2, onItem2(_, _)).Times(0);
 
@@ -150,7 +152,7 @@ TEST_F(SignalTest, ConnectDisconnect2)
 
 TEST_F(SignalTest, ConnectDisconnect3)
 {
-    Signal<void (const int&, const int&, const int&)> sig;
+    Signal<const int&, const int&, const int&> sig;
     EXPECT_CALL(m_Mock1, onItem3(_, _, _)).Times(0);
     EXPECT_CALL(m_Mock2, onItem3(_, _, _)).Times(0);
 
@@ -184,15 +186,41 @@ TEST_F(SignalTest, ConnectDisconnect3)
     sig(2, 7, 0);
 }
 
+TEST_F(SignalTest, ValueArgument)
+{
+    int32_t integer1 = 0;
+    int32_t integer2 = 1;
+
+    ReceiverMock<int32_t> mock;
+
+    Signal<int32_t, int32_t> sig;
+    EXPECT_CALL(mock, onItem2(integer1, integer2)).Times(1);
+
+    sig.connect(std::bind(&ReceiverMock<int32_t>::onItem2, &mock, _1, _2), &mock);
+    sig(integer1, integer2);
+}
+
 TEST_F(SignalTest, PointerArgument)
 {
     int integer = 0;
 
-    ReceiverMock<int*>  mock;
+    ReceiverMock<int32_t*> mock;
 
-    Signal<void (int*)> sig;
+    Signal<int32_t*> sig;
     EXPECT_CALL(mock, onItem1(&integer)).Times(1);
 
-    sig.connect(std::bind(&ReceiverMock<int*>::onItem1, &mock, _1), &mock);
+    sig.connect(std::bind(&ReceiverMock<int32_t*>::onItem1, &mock, _1), &mock);
     sig(&integer);
+}
+
+TEST_F(SignalTest, NonCopyableArgument)
+{
+    std::unique_ptr<int32_t> ptr;
+    ReceiverMock<std::unique_ptr<int32_t>&> mock;
+
+    Signal<std::unique_ptr<int32_t>&> sig;
+    EXPECT_CALL(mock, onItem1(_)).Times(1);
+
+    sig.connect(std::bind(&ReceiverMock<std::unique_ptr<int32_t>&>::onItem1, &mock, _1), &mock);
+    sig(ptr);
 }

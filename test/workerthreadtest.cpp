@@ -76,7 +76,7 @@ TEST_F(WorkerThreadTest, RunJobs)
     std::unique_lock<std::mutex> lock(mutex);
     cond.wait(lock, [&] () { return count == jobCount; });
     
-    EXPECT_EQ(1, threadIds.size());
+    EXPECT_EQ(1u, threadIds.size());
 }
 
 TEST_F(WorkerThreadTest, RunJobThatFails)

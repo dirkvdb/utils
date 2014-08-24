@@ -39,7 +39,7 @@ public:
 
     void addJob(const std::function<void()>& job);
 
-    utils::Signal<void(std::exception_ptr)> ErrorOccurred;
+    utils::Signal<std::exception_ptr> ErrorOccurred;
 
 private:
     class Task;
