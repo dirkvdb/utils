@@ -28,6 +28,12 @@ namespace utils
 {
 namespace timeops
 {
+    inline uint64_t getTime()
+    {
+        auto start = std::chrono::system_clock::now();
+        return std::chrono::duration_cast<std::chrono::seconds>(start.time_since_epoch()).count();
+    }
+
     inline uint64_t getTimeInMilliSeconds()
     {
         auto start = std::chrono::system_clock::now();
