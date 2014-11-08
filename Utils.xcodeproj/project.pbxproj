@@ -393,7 +393,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				DSTROOT = /tmp/UPnPFramework.dst;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
@@ -411,7 +411,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_AFTER_BUILD = NO;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../utils/inc $(SRCROOT)/inc";
-				VALID_ARCHS = "armv7 x86_64 i386 armv7s";
+				VALID_ARCHS = "arm64 armv7 armv7s";
 			};
 			name = Debug;
 		};
@@ -419,7 +419,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				DSTROOT = /tmp/UPnPFramework.dst;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
@@ -438,7 +438,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_AFTER_BUILD = NO;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../utils/inc $(SRCROOT)/inc";
-				VALID_ARCHS = "armv7 x86_64 i386 armv7s";
+				VALID_ARCHS = "arm64 armv7 armv7s";
 			};
 			name = Release;
 		};
