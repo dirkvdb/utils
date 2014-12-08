@@ -25,39 +25,6 @@
 namespace utils
 {
 
-static bool supportsColor()
-{
-    static bool colorSupport = false;
-    static bool initialized = false;
-    if (!initialized)
-    {
-#ifdef COLORED_OUTPUT
-        const char* pTerm = getenv("TERM");
-        if (pTerm)
-        {
-            const std::string term(pTerm);
-            colorSupport =  term == "xterm" ||
-                            term == "xterm-color" ||
-                            term == "xterm-256color" ||
-                            term == "screen" ||
-                            term == "linux" ||
-                            term == "cygwin";
-        }
-
-        initialized = true;
-#endif
-    }
-
-    return colorSupport;
-}
-
-const std::string log::red         = supportsColor() ? "\033[31m" : "";
-const std::string log::green       = supportsColor() ? "\033[32m" : "";
-const std::string log::yellow      = supportsColor() ? "\033[33m" : "";
-const std::string log::purple      = supportsColor() ? "\033[35m" : "";
-const std::string log::standard    = supportsColor() ? "\033[39m" : "";
-
 std::mutex log::m_Mutex;
-std::ofstream* log::m_LogFile = nullptr;
 
 }

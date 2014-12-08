@@ -22,6 +22,7 @@ ADD_LIBRARY(utils STATIC
     inc/utils/bufferedreader.h      src/bufferedreader.cpp
     inc/utils/fileoperations.h      src/fileoperations.cpp
     inc/utils/filereader.h          src/filereader.cpp
+    inc/utils/format.h              src/format.cpp
     inc/utils/functiontraits.h
     inc/utils/log.h                 src/log.cpp
     inc/utils/numericoperations.h

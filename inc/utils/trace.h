@@ -37,8 +37,8 @@ namespace utils
 	    formatted = g_strdup_vprintf (format, args);
 	    va_end(args);
 
-	    str = g_strdup_printf ("MARK: %s: %s", g_get_prgname(), formatted);
-	    g_free (formatted);
+	    str = g_strdup_printf("MARK: {}: {}", g_get_prgname(), formatted);
+	    g_free(formatted);
 
 	    access(str, F_OK);
 	    g_free(str);

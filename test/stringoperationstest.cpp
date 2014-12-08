@@ -27,11 +27,6 @@ using std::vector;
 
 using namespace utils::stringops;
 
-TEST(StringOperationsTest, Format)
-{
-	EXPECT_STREQ("fmt 1 test d", format("fmt %d %s %c", 1, "test", 'd').c_str());
-}
-
 TEST(StringOperationsTest, LowerCase)
 {
     string testString = "TESTSTRING";
@@ -143,10 +138,4 @@ TEST(StringOperationsTest, Trim)
     s = " \r\n\t";
     trim(s);
     EXPECT_EQ("", s);
-}
-
-TEST(StringOperationsTest, StringFormat)
-{
-    const char* testStr = "TestString";
-    EXPECT_STREQ(testStr, format("%s", testStr).c_str());
 }

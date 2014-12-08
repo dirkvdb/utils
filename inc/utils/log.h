@@ -28,6 +28,7 @@
 #include <thread>
 #include <mutex>
 
+#include "format.h"
 #include "timeoperations.h"
 #include "stringoperations.h"
 
@@ -38,11 +39,6 @@ namespace utils
 class log
 {
 public:
-    inline static void logToFile(std::ofstream& filestream)
-    {
-        m_LogFile = &filestream;
-    }
-    
     inline static void info(const std::string& s)
     {
         info(s.c_str());
@@ -51,18 +47,12 @@ public:
     template<typename... T>
     inline static void info(const char* s, const T&... args)
     {
-        std::stringstream ss;
-        ss << green << "INFO:  [" << timeops::getTimeString() << "] " << s;
-        
-        traceImpl(ss.str(), args...);
+        fmt::print_colored(fmt::GREEN, "INFO:  [{}] {}\n", timeops::getTimeString(), fmt::format(s, args...));
     }
 
     inline static void info(const char* s)
     {
-        std::stringstream ss;
-        ss << green << "INFO:  [" << timeops::getTimeString() << "] " << s;
-
-        traceImpl(ss.str());
+        fmt::print_colored(fmt::GREEN, "INFO:  [{}] {}\n", timeops::getTimeString(), s);
     }
     
     inline static void warn(const std::string& s)
@@ -73,18 +63,12 @@ public:
     template<typename... T>
     inline static void warn(const char* s, const T&... args)
     {
-        std::stringstream ss;
-        ss << yellow << "WARN:  [" << timeops::getTimeString() << "] " << s;
-        
-        traceImpl(ss.str(), args...);
+        fmt::print_colored(fmt::YELLOW, "WARN:  [{}] {}\n", timeops::getTimeString(), fmt::format(s, args...));
     }
 
     inline static void warn(const char* s)
     {
-        std::stringstream ss;
-        ss << yellow << "WARN:  [" << timeops::getTimeString() << "] " << s;
-
-        traceImpl(ss.str());
+        fmt::print_colored(fmt::YELLOW, "WARN:  [{}] {}\n", timeops::getTimeString(), s);
     }
     
     inline static void critical(const std::string& s)
@@ -95,18 +79,12 @@ public:
     template<typename... T>
     inline static void critical(const char* s, const T&... args)
     {
-        std::stringstream ss;
-        ss << purple << "CRIT:  [" << timeops::getTimeString() << "] " << s;
-        
-        traceImpl(ss.str(), args...);
+        fmt::print_colored(fmt::MAGENTA, "CRIT:  [{}] {}\n", timeops::getTimeString(), fmt::format(s, args...));
     }
 
     inline static void critical(const char* s)
     {
-        std::stringstream ss;
-        ss << purple << "CRIT:  [" << timeops::getTimeString() << "] " << s;
-
-        traceImpl(ss.str());
+        fmt::print_colored(fmt::MAGENTA, "CRIT:  [{}] {}\n", timeops::getTimeString(), s);
     }
     
     inline static void error(const std::string& s)
@@ -117,18 +95,12 @@ public:
     template<typename... T>
     inline static void error(const char* s, const T&... args)
     {
-        std::stringstream ss;
-        ss << red << "ERROR: [" << timeops::getTimeString() << "] " << s;
-        
-        traceImpl(ss.str(), args...);
+        fmt::print_colored(fmt::MAGENTA, "ERROR: [{}] {}\n", timeops::getTimeString(), fmt::format(s, args...));
     }
 
     inline static void error(const char* s)
     {
-        std::stringstream ss;
-        ss << red << "ERROR: [" << timeops::getTimeString() << "] " << s;
-
-        traceImpl(ss.str());
+        fmt::print_colored(fmt::MAGENTA, "ERROR: [{}] {}\n", timeops::getTimeString(), s);
     }
     
     inline static void debug(const std::string& s)
@@ -140,60 +112,19 @@ public:
     inline static void debug(const char* s, const T&... args)
     {
 #ifndef NDEBUG
-        std::stringstream ss;
-        ss << "DEBUG: [" << timeops::getTimeString() << "] [" << std::this_thread::get_id() << "] " << s;
-        
-        traceImpl(ss.str(), args...);
+        fmt::print_colored(fmt::WHITE, "DEBUG: [{}] [{}] {}\n", std::this_thread::get_id(), timeops::getTimeString(), fmt::format(s, args...));
 #endif
     }
 
     inline static void debug(const char* s)
     {
 #ifndef NDEBUG
-        std::stringstream ss;
-        ss << "DEBUG: [" << timeops::getTimeString() << "] [" << std::this_thread::get_id() << "] " << s;
-        traceImpl(ss.str().c_str());
+        fmt::print_colored(fmt::WHITE, "DEBUG: [{}] [{}] {}\n", std::this_thread::get_id(), timeops::getTimeString(), s);
 #endif
     }
 
 private:
-    static const std::string red;
-    static const std::string green;
-    static const std::string yellow;
-    static const std::string purple;
-    static const std::string standard;
-
     static std::mutex       m_Mutex;
-    static std::ofstream*   m_LogFile;
-    
-    template<typename... Ts>
-    inline static void traceImpl(const char* s)
-    {
-        std::lock_guard<std::mutex> lock(m_Mutex);
-        stringops::printLine(s);
-        
-        if (m_LogFile)
-        {
-            *m_LogFile << s << std::endl << std::flush;
-        }
-    }
-    
-    template<typename... Ts>
-    inline static void traceImpl(const std::string& s, const Ts&... args)
-    {
-        if (m_LogFile)
-        {
-            auto str = stringops::format(s.c_str(), args...);
-            std::lock_guard<std::mutex> lock(m_Mutex);
-            std::cout << str << standard << std::endl;
-            *m_LogFile << str << std::endl << std::flush;
-        }
-        else
-        {
-            std::lock_guard<std::mutex> lock(m_Mutex);
-            stringops::printLine((s + standard).c_str(), args...);
-        }
-    }
 };
 
 }
