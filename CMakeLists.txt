@@ -18,7 +18,17 @@ IF (XDGBASEDIR_PKG_FOUND)
     )
 ENDIF (XDGBASEDIR_PKG_FOUND)
 
+FIND_LIBRARY(BFD_LIBRARY
+    NAMES bfd
+)
+
+IF (BFD_LIBRARY)
+    ADD_DEFINITIONS(-DBACKWARD_HAS_BFD=1)
+    SET(BFD_LIBRARIES ${BFD_LIBRARY})
+ENDIF()
+
 ADD_LIBRARY(utils STATIC
+	inc/utils/backtrace.h      		src/backtrace.cpp
     inc/utils/bufferedreader.h      src/bufferedreader.cpp
     inc/utils/fileoperations.h      src/fileoperations.cpp
     inc/utils/filereader.h          src/filereader.cpp
@@ -55,7 +65,7 @@ ENDIF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Gcc")
 
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/inc ${XDGBASEDIR_INCLUDE_DIR})
 SET (UTILS_INCLUDE_DIRS utils ${XDGBASEDIR_INCLUDE_DIR})
-SET (UTILS_LIBRARIES utils -lpthread ${XDGBASEDIR_LIBRARY})
+SET (UTILS_LIBRARIES utils -lpthread ${BFD_LIBRARIES} ${XDGBASEDIR_LIBRARY})
 
 SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -Wfatal-errors")
 
