@@ -24,9 +24,14 @@ ADD_EXECUTABLE(utilstest EXCLUDE_FROM_ALL
     workerthreadtest.cpp
 )
 
+IF (COVERAGE)
+    SETUP_TARGET_FOR_COVERAGE(utils_coverage utilstest coverage)
+ENDIF ()
+
 TARGET_LINK_LIBRARIES(utilstest
 	${UTILS_LIBRARIES}
 	${XDGBASEDIR_LIBRARIES}
+    ${COVERAGE_LIBRARY}
 )
 
 IF (STANDALONE)
