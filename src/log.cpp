@@ -15,16 +15,11 @@
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "utils/log.h"
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifdef HAVE_UTILS_CONFIG
-#include "utilsconfig.h"
-#endif
 
 namespace utils
 {
 
-std::mutex log::m_Mutex;
+log::Level log::m_level = log::Level::Debug;
+std::mutex log::m_mutex;
 
 }

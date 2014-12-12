@@ -39,6 +39,20 @@ namespace utils
 class log
 {
 public:
+    enum class Level
+    {
+        Debug,
+        Info,
+        Warn,
+        Error,
+        Critical
+    };
+    
+    inline static void setFilter(Level level)
+    {
+        m_level = level;
+    }
+
     inline static void info(const std::string& s)
     {
         info(s.c_str());
@@ -47,12 +61,18 @@ public:
     template<typename... T>
     inline static void info(const char* s, const T&... args)
     {
-        fmt::print_colored(fmt::GREEN, "INFO:  [{}] {}\n", timeops::getTimeString(), fmt::format(s, args...));
+        if (m_level <= Level::Info)
+        {
+            info(fmt::format(s, std::forward<const T>(args)...).c_str());
+        }
     }
 
     inline static void info(const char* s)
     {
-        fmt::print_colored(fmt::GREEN, "INFO:  [{}] {}\n", timeops::getTimeString(), s);
+        if (m_level <= Level::Info)
+        {
+            fmt::print_colored(fmt::GREEN, "INFO:  [{}] {}\n", timeops::getTimeString(), s);
+        }
     }
     
     inline static void warn(const std::string& s)
@@ -63,12 +83,18 @@ public:
     template<typename... T>
     inline static void warn(const char* s, const T&... args)
     {
-        fmt::print_colored(fmt::YELLOW, "WARN:  [{}] {}\n", timeops::getTimeString(), fmt::format(s, args...));
+        if (m_level <= Level::Warn)
+        {
+            warn(fmt::format(s, std::forward<const T>(args)...).c_str());
+        }
     }
 
     inline static void warn(const char* s)
     {
-        fmt::print_colored(fmt::YELLOW, "WARN:  [{}] {}\n", timeops::getTimeString(), s);
+        if (m_level <= Level::Warn)
+        {
+            fmt::print_colored(fmt::YELLOW, "WARN:  [{}] {}\n", timeops::getTimeString(), s);
+        }
     }
     
     inline static void critical(const std::string& s)
@@ -79,12 +105,18 @@ public:
     template<typename... T>
     inline static void critical(const char* s, const T&... args)
     {
-        fmt::print_colored(fmt::MAGENTA, "CRIT:  [{}] {}\n", timeops::getTimeString(), fmt::format(s, args...));
+        if (m_level <= Level::Critical)
+        {
+            critical(fmt::format(s, std::forward<const T>(args)...).c_str());
+        }
     }
 
     inline static void critical(const char* s)
     {
-        fmt::print_colored(fmt::MAGENTA, "CRIT:  [{}] {}\n", timeops::getTimeString(), s);
+        if (m_level <= Level::Critical)
+        {
+            fmt::print_colored(fmt::MAGENTA, "CRIT:  [{}] {}\n", timeops::getTimeString(), s);
+        }
     }
     
     inline static void error(const std::string& s)
@@ -95,12 +127,18 @@ public:
     template<typename... T>
     inline static void error(const char* s, const T&... args)
     {
-        fmt::print_colored(fmt::MAGENTA, "ERROR: [{}] {}\n", timeops::getTimeString(), fmt::format(s, args...));
+        if (m_level <= Level::Error)
+        {
+            error(fmt::format(s, std::forward<const T>(args)...).c_str());
+        }
     }
 
     inline static void error(const char* s)
     {
-        fmt::print_colored(fmt::MAGENTA, "ERROR: [{}] {}\n", timeops::getTimeString(), s);
+        if (m_level <= Level::Error)
+        {
+            fmt::print_colored(fmt::MAGENTA, "ERROR: [{}] {}\n", timeops::getTimeString(), s);
+        }
     }
     
     inline static void debug(const std::string& s)
@@ -112,19 +150,26 @@ public:
     inline static void debug(const char* s, const T&... args)
     {
 #ifndef NDEBUG
-        fmt::print_colored(fmt::WHITE, "DEBUG: [{}] [{}] {}\n", std::this_thread::get_id(), timeops::getTimeString(), fmt::format(s, args...));
+        if (m_level == Level::Debug)
+        {
+            debug(fmt::format(s, std::forward<const T>(args)...).c_str());
+        }
 #endif
     }
 
     inline static void debug(const char* s)
     {
 #ifndef NDEBUG
-        fmt::print_colored(fmt::WHITE, "DEBUG: [{}] [{}] {}\n", std::this_thread::get_id(), timeops::getTimeString(), s);
+        if (m_level == Level::Debug)
+        {
+            fmt::print_colored(fmt::WHITE, "DEBUG: [{}] [{}] {}\n", std::this_thread::get_id(), timeops::getTimeString(), s);
+        }
 #endif
     }
 
 private:
-    static std::mutex       m_Mutex;
+    static Level            m_level;
+    static std::mutex       m_mutex;
 };
 
 }
