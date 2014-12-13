@@ -137,7 +137,7 @@ public:
     {
         if (m_level <= Level::Error)
         {
-            fmt::print_colored(fmt::MAGENTA, "ERROR: [{}] {}\n", timeops::getTimeString(), s);
+            fmt::print_colored(fmt::RED, "ERROR: [{}] {}\n", timeops::getTimeString(), s);
         }
     }
     

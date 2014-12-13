@@ -105,6 +105,21 @@ namespace stringops
         }
     }
 
+    inline std::string join(const std::vector<std::string>& items, const std::string& join)
+    {
+        std::stringstream ss;
+        for (auto iter = items.cbegin(); iter != items.cend(); ++iter)
+        {
+            ss << *iter;
+            if (iter + 1 != items.cend())
+            {
+                ss << join;
+            }
+        }
+
+        return ss.str();
+    }
+
     inline void dos2unix(std::string& aString)
     {
         replace(aString, "\r\n", "\n");

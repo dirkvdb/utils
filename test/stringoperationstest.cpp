@@ -139,3 +139,10 @@ TEST(StringOperationsTest, Trim)
     trim(s);
     EXPECT_EQ("", s);
 }
+
+TEST(StringOperationsTest, Join)
+{
+    EXPECT_EQ("one,two,three", join({ "one", "two", "three" }, ","));
+    EXPECT_EQ("one", join({ "one" }, ","));
+}
+
