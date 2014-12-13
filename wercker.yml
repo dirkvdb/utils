@@ -1,4 +1,4 @@
-box: wercker/default
+box: dirkvdb/cxx14
 no-response-timeout: 10
 build:
     steps:
@@ -9,7 +9,6 @@ build:
                 BUILD_DIR="${SRC_DIR}/build"
                 echo "SRC_DIR ${SRC_DIR}"
                 echo "BUILD_DIR ${BUILD_DIR}"
-                echo "MODULE_DIR ${MODULE_DIR}"
 
         - script:
             name: Compile Utils
