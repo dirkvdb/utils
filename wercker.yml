@@ -1,0 +1,29 @@
+box: wercker/default
+no-response-timeout: 10
+build:
+    steps:
+        - script:
+            name: Setup environnement variables
+            code: |
+                SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+                BUILD_DIR="${SRC_DIR}/build"
+                echo "SRC_DIR ${SRC_DIR}"
+                echo "BUILD_DIR ${BUILD_DIR}"
+                echo "MODULE_DIR ${MODULE_DIR}"
+
+        - script:
+            name: Compile Utils
+            code: |
+                mkdir -p "${BUILD_DIR}"
+                cd "${SRC_DIR}"
+                git submodule update --init --recursive
+                cd "${BUILD_DIR}"
+                cmake -DSTANDALONE=1 -DCMAKE_BUILD_TYPE=Release "${SRC_DIR}"
+                make -j8
+                make check -j8
+
+        - script:
+            name: Run Tests
+            code: |
+                cd "${BUILD_DIR}"
+                make test
