@@ -65,7 +65,6 @@ TEST_F(ThreadPoolTest, RunJobs)
 
     std::mutex mutex;
     std::condition_variable cond;
-    std::condition_variable jobCond;
     
     uint32_t count = 0;
     std::set<std::thread::id> threadIds;
@@ -78,7 +77,8 @@ TEST_F(ThreadPoolTest, RunJobs)
 
             if (count < g_poolSize)
             {
-                jobCond.wait_for(lock, std::chrono::milliseconds(10));
+                // make sure all the jobs in the pool are used before finishing this task
+                cond.wait_for(lock, std::chrono::milliseconds(10));
             }
 
             if (++count == jobCount)
@@ -86,8 +86,6 @@ TEST_F(ThreadPoolTest, RunJobs)
                 cond.notify_one();
             }
         });
-
-        jobCond.notify_one();
     }
     
     std::unique_lock<std::mutex> lock(mutex);
