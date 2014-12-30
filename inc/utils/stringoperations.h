@@ -27,6 +27,8 @@
 #include <cassert>
 #include <iostream>
 
+#include "utils/cppcompat.h"
+
 namespace utils
 {
 namespace stringops
