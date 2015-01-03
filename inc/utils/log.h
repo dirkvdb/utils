@@ -30,8 +30,6 @@
 
 #include "format.h"
 #include "timeoperations.h"
-#include "stringoperations.h"
-
 
 namespace utils
 {
