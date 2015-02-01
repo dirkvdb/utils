@@ -22,11 +22,14 @@
 #include <string>
 #include <memory>
 #include "utils/format.h"
+#include "utilsconfig.h"
+#include <iostream>
 
 namespace utils
 {
 
 class PerfEvent;
+class QueueEvent;
 enum class EventOperation;
 
 using PerfTime = std::chrono::high_resolution_clock::time_point;
@@ -38,6 +41,7 @@ enum class EventType
 {
     Task,
     Interrupt,
+    SemaPhore,
     Queue,
     Message
 };
@@ -52,13 +56,19 @@ struct PerfData
 {
     PerfData(EventOperation o, PerfTime t)
     : op(o), time(t) {}
+    
+    PerfData(EventOperation o, PerfTime t, uint32_t s)
+    : op(o)
+    , time(t)
+    , size(s) {}
 
     EventOperation op;
     PerfTime time;
-    uint32_t size = 0;
+    uint32_t size;
 };
 
 using PerfEventPtr = std::shared_ptr<PerfEvent>;
+using QueueEventPtr = std::shared_ptr<QueueEvent>;
 
 class PerfLogger
 {
@@ -67,6 +77,7 @@ public:
     static void disable();
     static bool isEnabled();
     static PerfEventPtr createEvent(EventType type, const std::string& name);
+    static QueueEventPtr createQueue(const std::string& name);
     static std::vector<std::string> getPerfData();
     static void writeToFile(const std::string& filePath);
 
@@ -79,9 +90,16 @@ class PerfEvent
 {
 public:
     PerfEvent(EventType type, uint32_t id, const std::string& name);
+    virtual ~PerfEvent() = default;
+    
     void start();
     void stop();
-    std::vector<std::string> getPerfData(PerfTime startTime) const;
+    void reset();
+    virtual std::vector<std::string> getPerfData(PerfTime startTime) const;
+    
+protected:
+    void addData(EventOperation op);
+    void addData(EventOperation op, uint32_t size);
 
 private:
     EventType               m_type;
@@ -89,6 +107,25 @@ private:
     std::string             m_name;
     
     std::vector<PerfData>   m_data;
+};
+
+class QueueEvent : public PerfEvent
+{
+public:
+    QueueEvent(uint32_t id, const std::string& name)
+    : PerfEvent(EventType::Queue, id, name)
+    {
+    }
+    
+    void itemAdded()
+    {
+        addData(EventOperation::Start, 1);
+    }
+    
+    void itemRemoved()
+    {
+        addData(EventOperation::Stop, 1);
+    }
 };
 
 class ScopedPerfTrace
@@ -111,12 +148,16 @@ private:
 
 #define __METHOD__ getMethodName(__PRETTY_FUNCTION__)
 
-#ifdef ENABLE_TRACE
-#define TraceMethod(arg) \
-    static auto __perfEv = PerfLogger::createEvent(arg, __METHOD__); \
+#ifdef PERF_TRACE
+#define TraceMethod() \
+    static auto __perfEv = PerfLogger::createEvent(EventType::Task, __METHOD__); \
+    ScopedPerfTrace __perfTrace(__perfEv);
+#define TraceInterrupt(arg) \
+    static auto __perfEv = PerfLogger::createEvent(EventType::Interrupt, __METHOD__); \
     ScopedPerfTrace __perfTrace(__perfEv);
 #else
-#define TraceMethod(arg)
+#define TraceMethod()
+#define TraceInterrupt()
 #endif
 
 }

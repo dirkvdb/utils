@@ -35,25 +35,39 @@ TEST_F(TraceTest, PerformTrace)
     {
     public:
         TestTracer()
-        : m_ev(PerfLogger::createEvent(EventType::Task, "TestTracer")) {}
+        : m_ev(PerfLogger::createEvent(EventType::Task, "TestTracer"))
+        , m_queuePerf(PerfLogger::createQueue("TestQueue"))
+        {
+        }
     
         void m1()
         {
-            TraceMethod(EventType::Task);
+            TraceMethod();
         }
         
         void m2()
         {
-            TraceMethod(EventType::Task);
+            TraceMethod();
         }
         
         void interrupt()
         {
-            TraceMethod(EventType::Interrupt);
+            TraceInterrupt();
+        }
+        
+        void queueAdd()
+        {
+            m_queuePerf->itemAdded();
+        }
+        
+        void queueRemove()
+        {
+            m_queuePerf->itemRemoved();
         }
         
     private:
         ScopedPerfTrace m_ev;
+        QueueEventPtr m_queuePerf;
     };
     
     PerfLogger::enable();
@@ -61,8 +75,13 @@ TEST_F(TraceTest, PerformTrace)
     {
         TestTracer t;
         t.m1();
+        t.queueAdd();
+        t.queueAdd();
         t.m2();
+        t.queueRemove();
         t.interrupt();
+        t.queueRemove();
+        t.m2();
     }
     
     PerfLogger::disable();

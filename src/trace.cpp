@@ -61,20 +61,35 @@ PerfEvent::PerfEvent(EventType type, uint32_t id, const std::string& name)
 
 void PerfEvent::start()
 {
-#ifdef ENABLE_TRACE
-    if (PerfLogger::isEnabled())
-    {
-        m_data.emplace_back(EventOperation::Start, Clock::now());
-    }
-#endif
+    addData(EventOperation::Start);
 }
 
 void PerfEvent::stop()
 {
-#ifdef ENABLE_TRACE
+    addData(EventOperation::Stop);
+}
+
+void PerfEvent::reset()
+{
+    m_data.clear();
+}
+
+void PerfEvent::addData(EventOperation op)
+{
+#ifdef PERF_TRACE
     if (PerfLogger::isEnabled())
     {
-        m_data.emplace_back(EventOperation::Stop, Clock::now());
+        m_data.emplace_back(op, Clock::now());
+    }
+#endif
+}
+
+void PerfEvent::addData(EventOperation op, uint32_t size)
+{
+#ifdef PERF_TRACE
+    if (PerfLogger::isEnabled())
+    {
+        m_data.emplace_back(op, Clock::now(), size);
     }
 #endif
 }
@@ -103,15 +118,29 @@ std::vector<std::string> PerfEvent::getPerfData(PerfTime startTime) const
 struct PerfLogger::Impl
 {
     std::mutex mutex;
-    std::atomic<uint32_t> id { 0 };
-    std::atomic<bool> enabled { false };
+    std::atomic<uint32_t> id;
+    std::atomic<bool> enabled;
     std::vector<PerfEventPtr> items;
-    PerfTime start { Clock::now() };
+    PerfTime start;
 };
 
 void PerfLogger::enable()
 {
-    m_pimpl = std::make_unique<PerfLogger::Impl>();
+    if (!m_pimpl)
+    {
+        m_pimpl = std::make_unique<PerfLogger::Impl>();
+    }
+    else
+    {
+        for (auto& item : m_pimpl->items)
+        {
+            item->reset();
+        }
+    }
+    
+    m_pimpl->start = Clock::now();
+    m_pimpl->id = 0;
+    m_pimpl->enabled = true;
 }
 
 void PerfLogger::disable()
@@ -127,7 +156,17 @@ bool PerfLogger::isEnabled()
 PerfEventPtr PerfLogger::createEvent(EventType type, const std::string& name)
 {
     auto ptr = std::make_shared<PerfEvent>(type, m_pimpl->id++, name);
-#ifdef ENABLE_TRACE
+#ifdef PERF_TRACE
+    std::lock_guard<std::mutex> lock(m_pimpl->mutex);
+    m_pimpl->items.emplace_back(ptr);
+#endif
+    return ptr;
+}
+
+QueueEventPtr PerfLogger::createQueue(const std::string& name)
+{
+    auto ptr = std::make_shared<QueueEvent>(m_pimpl->id++, name);
+#ifdef PERF_TRACE
     std::lock_guard<std::mutex> lock(m_pimpl->mutex);
     m_pimpl->items.emplace_back(ptr);
 #endif
