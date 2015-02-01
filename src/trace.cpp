@@ -16,18 +16,15 @@
 
 #include "utils/trace.h"
 #include <fstream>
+#include <mutex>
+#include <atomic>
 
 namespace utils
 {
 
 using Clock = std::chrono::high_resolution_clock;
 
-PerfTime PerfLogger::m_start;
-std::mutex PerfLogger::m_mutex;
-std::atomic<uint32_t> PerfLogger::m_id;
-std::atomic<bool> PerfLogger::m_enabled;
-std::vector<PerfEventPtr> PerfLogger::m_items;
-
+std::unique_ptr<PerfLogger::Impl> PerfLogger::m_pimpl;
 
 std::string toString(EventOperation op)
 {
@@ -103,30 +100,36 @@ std::vector<std::string> PerfEvent::getPerfData(PerfTime startTime) const
     return data;
 }
 
+struct PerfLogger::Impl
+{
+    std::mutex mutex;
+    std::atomic<uint32_t> id { 0 };
+    std::atomic<bool> enabled { false };
+    std::vector<PerfEventPtr> items;
+    PerfTime start { Clock::now() };
+};
+
 void PerfLogger::enable()
 {
-    m_start = std::chrono::high_resolution_clock::now();
-    m_id = 0;
-    m_items.clear();
-    m_enabled = true;
+    m_pimpl = std::make_unique<PerfLogger::Impl>();
 }
 
 void PerfLogger::disable()
 {
-    m_enabled = false;
+    m_pimpl->enabled = false;
 }
 
 bool PerfLogger::isEnabled()
 {
-    return m_enabled;
+    return m_pimpl->enabled;
 }
 
 PerfEventPtr PerfLogger::createEvent(EventType type, const std::string& name)
 {
-    auto ptr = std::make_shared<PerfEvent>(type, m_id++, name);
+    auto ptr = std::make_shared<PerfEvent>(type, m_pimpl->id++, name);
 #ifdef ENABLE_TRACE
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_items.emplace_back(ptr);
+    std::lock_guard<std::mutex> lock(m_pimpl->mutex);
+    m_pimpl->items.emplace_back(ptr);
 #endif
     return ptr;
 }
@@ -137,10 +140,10 @@ std::vector<std::string> PerfLogger::getPerfData()
     data.emplace_back(fmt::format("SPEED {}", Clock::period::den));
     data.emplace_back(fmt::format("TIME {}", Clock::period::den));
     
-    std::lock_guard<std::mutex> lock(m_mutex);
-    for (auto& item : m_items)
+    std::lock_guard<std::mutex> lock(m_pimpl->mutex);
+    for (auto& item : m_pimpl->items)
     {
-        auto pd = item->getPerfData(m_start);
+        auto pd = item->getPerfData(m_pimpl->start);
         data.insert(data.end(), pd.begin(), pd.end());
     }
     

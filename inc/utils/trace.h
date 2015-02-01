@@ -19,6 +19,8 @@
 
 #include <chrono>
 #include <vector>
+#include <string>
+#include <memory>
 #include "utils/format.h"
 
 namespace utils
@@ -69,11 +71,8 @@ public:
     static void writeToFile(const std::string& filePath);
 
 private:
-    static PerfTime m_start;
-    static std::mutex m_mutex;
-    static std::atomic<uint32_t> m_id;
-    static std::atomic<bool> m_enabled;
-    static std::vector<PerfEventPtr> m_items;
+    struct Impl;
+    static std::unique_ptr<Impl> m_pimpl;
 };
 
 class PerfEvent
@@ -114,8 +113,8 @@ private:
 
 #ifdef ENABLE_TRACE
 #define TraceMethod(arg) \
-    static auto __perfId = PerfLogger::createEvent(arg, __METHOD__); \
-    ScopedPerfTrace __perfTrace(__perfId);
+    static auto __perfEv = PerfLogger::createEvent(arg, __METHOD__); \
+    ScopedPerfTrace __perfTrace(__perfEv);
 #else
 #define TraceMethod(arg)
 #endif
