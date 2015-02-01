@@ -55,6 +55,7 @@ ADD_LIBRARY(utils STATIC
 OPTION(COLORED_OUTPUT "Colored output" ON)
 OPTION(STANDALONE "Not used as a submodule of another project" OFF)
 OPTION(COVERAGE "Enable code coverage" OFF)
+OPTION(PERF_TRACE "Enable time doctor performance traces" OFF)
 
 ADD_DEFINITIONS("-DHAVE_UTILS_CONFIG")
 ADD_DEFINITIONS("-std=c++1y")
