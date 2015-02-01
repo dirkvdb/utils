@@ -35,8 +35,9 @@ TEST_F(TraceTest, PerformTrace)
     {
     public:
         TestTracer()
-        : m_ev(PerfLogger::createEvent(EventType::Task, "TestTracer"))
+        : m_ev(PerfLogger::createTask("TestTracer"))
         , m_queuePerf(PerfLogger::createQueue("TestQueue"))
+        , m_note(PerfLogger::createNote("TestDetails"))
         {
         }
     
@@ -57,7 +58,9 @@ TEST_F(TraceTest, PerformTrace)
         
         void queueAdd()
         {
+            m_note->addNote("QAdd");
             m_queuePerf->itemAdded();
+            m_note->addNote("QAddDone");
         }
         
         void queueRemove()
@@ -68,6 +71,7 @@ TEST_F(TraceTest, PerformTrace)
     private:
         ScopedPerfTrace m_ev;
         QueueEventPtr m_queuePerf;
+        NoteEventPtr m_note;
     };
     
     PerfLogger::enable();

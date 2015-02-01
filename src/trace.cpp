@@ -49,16 +49,18 @@ enum class EventOperation
 };
 
 
-struct TraceData
+class TraceData
 {
+public:
     virtual ~TraceData() = default;
     virtual std::string toString(PerfTime startTime) const = 0;
 };
 
 using TraceDataPtr = std::unique_ptr<TraceData>;
 
-struct NameData : public TraceData
+class NameData : public TraceData
 {
+public:
     NameData(EventType t, uint32_t i, const std::string& n)
     : type(t)
     , id(i)
@@ -77,7 +79,7 @@ private:
     std::string name;
 };
 
-struct DescriptionData : public TraceData
+class DescriptionData : public TraceData
 {
     enum Type
     {
@@ -85,6 +87,7 @@ struct DescriptionData : public TraceData
         Number
     };
 
+public:
     DescriptionData(uint32_t i, const std::string& n)
     : valueType(String)
     , id(i)
@@ -112,8 +115,9 @@ private:
     double number;
 };
 
-struct DisplayNameData : public TraceData
+class DisplayNameData : public TraceData
 {
+public:
     DisplayNameData(EventType t, uint32_t i, const std::string& n)
     : type(t)
     , id(i)
@@ -132,8 +136,9 @@ private:
     std::string name;
 };
 
-struct OccurranceData : public TraceData
+class OccurranceData : public TraceData
 {
+public:
     OccurranceData(uint32_t i, PerfTime t)
     : id(i)
     , time(t)
@@ -150,8 +155,9 @@ private:
     PerfTime time;
 };
 
-struct StartData : public TraceData
+class StartData : public TraceData
 {
+public:
     StartData(EventType t, uint32_t i, PerfTime pt)
     : type(t)
     , id(i)
@@ -170,8 +176,9 @@ private:
     PerfTime time;
 };
 
-struct StopData : public TraceData
+class StopData : public TraceData
 {
+public:
     StopData(EventType t, uint32_t i, PerfTime pt)
     : type(t)
     , id(i)
