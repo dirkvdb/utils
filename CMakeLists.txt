@@ -47,7 +47,7 @@ ADD_LIBRARY(utils STATIC
     inc/utils/timeoperations.h
     inc/utils/timerthread.h
     inc/utils/threadpool.h          src/threadpool.cpp
-    inc/utils/trace.h
+    inc/utils/trace.h               src/trace.cpp
     inc/utils/types.h
     inc/utils/workerthread.h        src/workerthread.cpp
 )

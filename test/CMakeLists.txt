@@ -20,6 +20,7 @@ ADD_EXECUTABLE(utilstest EXCLUDE_FROM_ALL
     main.cpp
     signaltest.cpp
     stringoperationstest.cpp
+    tracetest.cpp
     threadpooltest.cpp
     workerthreadtest.cpp
 )
