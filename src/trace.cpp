@@ -15,27 +15,180 @@
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "utils/trace.h"
+#include "utils/format.h"
+
 #include <fstream>
 #include <mutex>
 #include <atomic>
+#include <chrono>
 
 namespace utils
 {
 
 using Clock = std::chrono::high_resolution_clock;
+using PerfTime = Clock::time_point;
 
-std::unique_ptr<PerfLogger::Impl> PerfLogger::m_pimpl;
-
-std::string toString(EventOperation op)
+enum class EventType
 {
-    switch (op)
+    Task,
+    Interrupt,
+    SemaPhore,
+    Queue,
+    Message,
+    ValueCount,
+    CycleCount,
+    Note
+};
+
+enum class EventOperation
+{
+    Start,
+    Stop,
+    Occurance,
+    Description
+};
+
+
+struct TraceData
+{
+    virtual ~TraceData() = default;
+    virtual std::string toString(PerfTime startTime) const = 0;
+};
+
+using TraceDataPtr = std::unique_ptr<TraceData>;
+
+struct NameData : public TraceData
+{
+    NameData(EventType t, uint32_t i, const std::string& n)
+    : type(t)
+    , id(i)
+    , name(n)
     {
-    case EventOperation::Start: return "STA";
-    case EventOperation::Stop:  return "STO";
-    default:
-        throw std::invalid_argument("invalid event operation");
     }
-}
+
+    std::string toString(PerfTime /*startTime*/) const override
+    {
+        return fmt::format("NAM {} {} {}", static_cast<uint32_t>(type), id, name);
+    }
+
+private:
+    EventType type;
+    uint32_t id;
+    std::string name;
+};
+
+struct DescriptionData : public TraceData
+{
+    enum Type
+    {
+        String,
+        Number
+    };
+
+    DescriptionData(uint32_t i, const std::string& n)
+    : valueType(String)
+    , id(i)
+    , name(n)
+    {
+    }
+    
+    DescriptionData(uint32_t i, double n)
+    : valueType(Number)
+    , id(i)
+    , number(n)
+    {
+    }
+
+    std::string toString(PerfTime /*startTime*/) const override
+    {
+        auto value = valueType == String ? name : std::to_string(number);
+        return fmt::format("DSC {} {} {}", static_cast<uint32_t>(valueType), id, value);
+    }
+    
+private:
+    Type valueType;
+    uint32_t id;
+    std::string name;
+    double number;
+};
+
+struct DisplayNameData : public TraceData
+{
+    DisplayNameData(EventType t, uint32_t i, const std::string& n)
+    : type(t)
+    , id(i)
+    , name(n)
+    {
+    }
+
+    std::string toString(PerfTime /*startTime*/) const override
+    {
+        return fmt::format("DNM {} {} {}", static_cast<uint32_t>(type), id, name);
+    }
+
+private:
+    EventType type;
+    uint32_t id;
+    std::string name;
+};
+
+struct OccurranceData : public TraceData
+{
+    OccurranceData(uint32_t i, PerfTime t)
+    : id(i)
+    , time(t)
+    {
+    }
+
+    std::string toString(PerfTime startTime) const override
+    {
+        return fmt::format("OCC 7 {} {}", id, (time - startTime).count());
+    }
+    
+private:
+    uint32_t id;
+    PerfTime time;
+};
+
+struct StartData : public TraceData
+{
+    StartData(EventType t, uint32_t i, PerfTime pt)
+    : type(t)
+    , id(i)
+    , time(pt)
+    {
+    }
+
+    std::string toString(PerfTime startTime) const override
+    {
+        return fmt::format("STA {} {} {}", static_cast<uint32_t>(type), id, (time - startTime).count());
+    }
+
+private:
+    EventType type;
+    uint32_t id;
+    PerfTime time;
+};
+
+struct StopData : public TraceData
+{
+    StopData(EventType t, uint32_t i, PerfTime pt)
+    : type(t)
+    , id(i)
+    , time(pt)
+    {
+    }
+
+    std::string toString(PerfTime startTime) const override
+    {
+        return fmt::format("STO {} {} {}", static_cast<uint32_t>(type), id, (time - startTime).count());
+    }
+    
+private:
+    EventType type;
+    uint32_t id;
+    PerfTime time;
+};
 
 std::string getMethodName(const char* fullFuncName)
 {
@@ -52,77 +205,170 @@ std::string getMethodName(const char* fullFuncName)
     return fullFuncNameStr.substr(classStart + 1, (argStart - 1) - classStart);
 }
 
-PerfEvent::PerfEvent(EventType type, uint32_t id, const std::string& name)
-: m_type(type)
-, m_id(id)
-, m_name(name)
-{
-}
+///////// PerfEvent
 
-void PerfEvent::start()
+class PerfEvent : public IPerfEvent
 {
-    addData(EventOperation::Start);
-}
-
-void PerfEvent::stop()
-{
-    addData(EventOperation::Stop);
-}
-
-void PerfEvent::reset()
-{
-    m_data.clear();
-}
-
-void PerfEvent::addData(EventOperation op)
-{
-#ifdef PERF_TRACE
-    if (PerfLogger::isEnabled())
+public:
+    PerfEvent(EventType type, uint32_t id, const std::string& name)
+    : m_type(type)
+    , m_id(id)
+    , m_name(name)
     {
-        m_data.emplace_back(op, Clock::now());
+        addNameData(name);
     }
-#endif
-}
 
-void PerfEvent::addData(EventOperation op, uint32_t size)
-{
-#ifdef PERF_TRACE
-    if (PerfLogger::isEnabled())
+    virtual void start() override
     {
-        m_data.emplace_back(op, Clock::now(), size);
+        addStartData();
     }
-#endif
-}
 
-std::vector<std::string> PerfEvent::getPerfData(PerfTime startTime) const
-{
-    std::vector<std::string> data;
-    data.emplace_back(fmt::format("NAM {} {} {}", static_cast<uint32_t>(m_type), m_id, m_name));
-    
-    for (auto& d : m_data)
+    virtual void stop() override
     {
-        auto time = d.time - startTime;
-        if (m_type == EventType::Queue)
-        {
-            data.emplace_back(fmt::format("{} {} {} {} {}", toString(d.op), static_cast<uint32_t>(m_type), m_id, time.count(), d.size));
-        }
-        else
-        {
-            data.emplace_back(fmt::format("{} {} {} {}", toString(d.op), static_cast<uint32_t>(m_type), m_id, time.count()));
-        }
+        addStopData();
+    }
+
+    virtual void reset()
+    {
+        m_data.clear();
     }
     
-    return data;
-}
+    std::vector<std::string> getPerfData(PerfTime startTime) const
+    {
+        std::vector<std::string> data;
+        
+        for (auto& d : m_data)
+        {
+             data.emplace_back(d->toString(startTime));
+        }
+        
+        return data;
+    }
+
+protected:
+    void addNameData(const std::string& name)
+    {
+    #ifdef PERF_TRACE
+        if (PerfLogger::isEnabled())
+        {
+            m_data.emplace_back(std::make_unique<NameData>(m_type, m_id, name));
+        }
+    #endif
+    }
+    
+    void addOccurranceData(const std::string& desc)
+    {
+    #ifdef PERF_TRACE
+        if (PerfLogger::isEnabled())
+        {
+            m_data.emplace_back(std::make_unique<OccurranceData>(m_id, Clock::now()));
+        }
+    #endif
+    }
+
+    void addDescriptionData(uint32_t id, const std::string& name)
+    {
+    #ifdef PERF_TRACE
+        if (PerfLogger::isEnabled())
+        {
+            m_data.emplace_back(std::make_unique<DescriptionData>(id, name));
+        }
+    #endif
+    }
+    
+    void addDisplayNameData(uint32_t id, const std::string& name)
+    {
+    #ifdef PERF_TRACE
+        if (PerfLogger::isEnabled())
+        {
+            // The type parameter is ignored
+            m_data.emplace_back(std::make_unique<DisplayNameData>(m_type, id, name));
+        }
+    #endif
+    }
+    
+    void addStartData()
+    {
+    #ifdef PERF_TRACE
+        if (PerfLogger::isEnabled())
+        {
+            m_data.emplace_back(std::make_unique<StartData>(m_type, m_id, Clock::now()));
+        }
+    #endif
+    }
+    
+    void addStopData()
+    {
+    #ifdef PERF_TRACE
+        if (PerfLogger::isEnabled())
+        {
+            m_data.emplace_back(std::make_unique<StopData>(m_type, m_id, Clock::now()));
+        }
+    #endif
+    }
+
+private:
+    EventType                   m_type;
+    uint32_t                    m_id;
+    std::string                 m_name;
+    
+    std::vector<TraceDataPtr>   m_data;
+};
+
+///////// QueueEvent
+
+class QueueEvent : public PerfEvent
+                 , public IQueueEvent
+{
+public:
+    QueueEvent(uint32_t id, const std::string& name)
+    : PerfEvent(EventType::Queue, id, name)
+    {
+    }
+
+    void itemAdded() override
+    {
+        addStartData();
+    }
+
+    void itemRemoved() override
+    {
+        addStopData();
+    }
+};
+
+///////// NoteEvent
+
+class NoteEvent : public PerfEvent
+                , public INoteEvent
+{
+public:
+    NoteEvent(uint32_t id, const std::string& name)
+    : PerfEvent(EventType::Note, id, name)
+    {
+    }
+
+    void addNote(const std::string& desc) override
+    {
+        static std::atomic<uint32_t> id(0);
+        addOccurranceData(desc);
+        addDescriptionData(id, desc);
+        addDisplayNameData(id++, "Info");
+    }
+};
+
+///////// Perflogger
 
 struct PerfLogger::Impl
 {
     std::mutex mutex;
     std::atomic<uint32_t> id;
     std::atomic<bool> enabled;
-    std::vector<PerfEventPtr> items;
+    std::vector<std::shared_ptr<PerfEvent>> items;
     PerfTime start;
 };
+
+std::unique_ptr<PerfLogger::Impl> PerfLogger::m_pimpl;
 
 void PerfLogger::enable()
 {
@@ -153,9 +399,19 @@ bool PerfLogger::isEnabled()
     return m_pimpl->enabled;
 }
 
-PerfEventPtr PerfLogger::createEvent(EventType type, const std::string& name)
+PerfEventPtr PerfLogger::createTask(const std::string& name)
 {
-    auto ptr = std::make_shared<PerfEvent>(type, m_pimpl->id++, name);
+    auto ptr = std::make_shared<PerfEvent>(EventType::Task, m_pimpl->id++, name);
+#ifdef PERF_TRACE
+    std::lock_guard<std::mutex> lock(m_pimpl->mutex);
+    m_pimpl->items.emplace_back(ptr);
+#endif
+    return ptr;
+}
+
+PerfEventPtr PerfLogger::createInterrupt(const std::string& name)
+{
+    auto ptr = std::make_shared<PerfEvent>(EventType::Interrupt, m_pimpl->id++, name);
 #ifdef PERF_TRACE
     std::lock_guard<std::mutex> lock(m_pimpl->mutex);
     m_pimpl->items.emplace_back(ptr);
@@ -166,6 +422,16 @@ PerfEventPtr PerfLogger::createEvent(EventType type, const std::string& name)
 QueueEventPtr PerfLogger::createQueue(const std::string& name)
 {
     auto ptr = std::make_shared<QueueEvent>(m_pimpl->id++, name);
+#ifdef PERF_TRACE
+    std::lock_guard<std::mutex> lock(m_pimpl->mutex);
+    m_pimpl->items.emplace_back(ptr);
+#endif
+    return ptr;
+}
+
+NoteEventPtr PerfLogger::createNote(const std::string& name)
+{
+    auto ptr = std::make_shared<NoteEvent>(m_pimpl->id++, name);
 #ifdef PERF_TRACE
     std::lock_guard<std::mutex> lock(m_pimpl->mutex);
     m_pimpl->items.emplace_back(ptr);
@@ -201,5 +467,15 @@ void PerfLogger::writeToFile(const std::string& filePath)
     }
 }
 
+ScopedPerfTrace::ScopedPerfTrace(const PerfEventPtr& event)
+: m_event(event)
+{
+    m_event->start();
+}
+
+ScopedPerfTrace::~ScopedPerfTrace()
+{
+    m_event->stop();
+}
 
 }

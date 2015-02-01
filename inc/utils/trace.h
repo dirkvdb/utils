@@ -17,58 +17,60 @@
 #ifndef UTILS_TRACE_H
 #define UTILS_TRACE_H
 
-#include <chrono>
-#include <vector>
 #include <string>
 #include <memory>
-#include "utils/format.h"
+#include <vector>
+
 #include "utilsconfig.h"
-#include <iostream>
 
 namespace utils
 {
 
-class PerfEvent;
-class QueueEvent;
+class IPerfEvent;
+class IQueueEvent;
+class INoteEvent;
+
+enum class EventType;
 enum class EventOperation;
 
-using PerfTime = std::chrono::high_resolution_clock::time_point;
+using PerfEventPtr = std::shared_ptr<IPerfEvent>;
+using QueueEventPtr = std::shared_ptr<IQueueEvent>;
+using NoteEventPtr = std::shared_ptr<INoteEvent>;
 
-std::string getMethodName(const char* fullFuncName);
-std::string toString(EventOperation op);
-
-enum class EventType
+class IPerfEvent
 {
-    Task,
-    Interrupt,
-    SemaPhore,
-    Queue,
-    Message
+public:
+    IPerfEvent() = default;
+    virtual ~IPerfEvent() = default;
+    IPerfEvent(const IPerfEvent&) = delete;
+    IPerfEvent& operator=(const IPerfEvent&) = delete;
+
+    virtual void start() = 0;
+    virtual void stop() = 0;
 };
 
-enum class EventOperation
+class IQueueEvent
 {
-    Start,
-    Stop
+public:
+    IQueueEvent() = default;
+    virtual ~IQueueEvent() = default;
+    IQueueEvent(const IQueueEvent&) = delete;
+    IQueueEvent& operator=(const IQueueEvent&) = delete;
+
+    virtual void itemAdded() = 0;
+    virtual void itemRemoved() = 0;
 };
 
-struct PerfData
+class INoteEvent
 {
-    PerfData(EventOperation o, PerfTime t)
-    : op(o), time(t) {}
-    
-    PerfData(EventOperation o, PerfTime t, uint32_t s)
-    : op(o)
-    , time(t)
-    , size(s) {}
+public:
+    INoteEvent() = default;
+    virtual ~INoteEvent() = default;
+    INoteEvent(const INoteEvent&) = delete;
+    INoteEvent& operator=(const INoteEvent&) = delete;
 
-    EventOperation op;
-    PerfTime time;
-    uint32_t size;
+    virtual void addNote(const std::string& desc) = 0;
 };
-
-using PerfEventPtr = std::shared_ptr<PerfEvent>;
-using QueueEventPtr = std::shared_ptr<QueueEvent>;
 
 class PerfLogger
 {
@@ -76,8 +78,10 @@ public:
     static void enable();
     static void disable();
     static bool isEnabled();
-    static PerfEventPtr createEvent(EventType type, const std::string& name);
+    static PerfEventPtr createTask(const std::string& name);
+    static PerfEventPtr createInterrupt(const std::string& name);
     static QueueEventPtr createQueue(const std::string& name);
+    static NoteEventPtr createNote(const std::string& name);
     static std::vector<std::string> getPerfData();
     static void writeToFile(const std::string& filePath);
 
@@ -86,74 +90,28 @@ private:
     static std::unique_ptr<Impl> m_pimpl;
 };
 
-class PerfEvent
-{
-public:
-    PerfEvent(EventType type, uint32_t id, const std::string& name);
-    virtual ~PerfEvent() = default;
-    
-    void start();
-    void stop();
-    void reset();
-    virtual std::vector<std::string> getPerfData(PerfTime startTime) const;
-    
-protected:
-    void addData(EventOperation op);
-    void addData(EventOperation op, uint32_t size);
-
-private:
-    EventType               m_type;
-    uint32_t                m_id;
-    std::string             m_name;
-    
-    std::vector<PerfData>   m_data;
-};
-
-class QueueEvent : public PerfEvent
-{
-public:
-    QueueEvent(uint32_t id, const std::string& name)
-    : PerfEvent(EventType::Queue, id, name)
-    {
-    }
-    
-    void itemAdded()
-    {
-        addData(EventOperation::Start, 1);
-    }
-    
-    void itemRemoved()
-    {
-        addData(EventOperation::Stop, 1);
-    }
-};
-
 class ScopedPerfTrace
 {
 public:
-    ScopedPerfTrace(const PerfEventPtr& event)
-    : m_event(event)
-    {
-        m_event->start();
-    }
+    ScopedPerfTrace(const PerfEventPtr& event);
+    ScopedPerfTrace(const ScopedPerfTrace&) = delete;
+    ~ScopedPerfTrace();
     
-    ~ScopedPerfTrace()
-    {
-        m_event->stop();
-    }
+    ScopedPerfTrace& operator=(const ScopedPerfTrace&) = delete;
     
 private:
     PerfEventPtr    m_event;
 };
 
+std::string getMethodName(const char* fullFuncName);
 #define __METHOD__ getMethodName(__PRETTY_FUNCTION__)
 
 #ifdef PERF_TRACE
 #define TraceMethod() \
-    static auto __perfEv = PerfLogger::createEvent(EventType::Task, __METHOD__); \
+    static auto __perfEv = PerfLogger::createTask(__METHOD__); \
     ScopedPerfTrace __perfTrace(__perfEv);
 #define TraceInterrupt(arg) \
-    static auto __perfEv = PerfLogger::createEvent(EventType::Interrupt, __METHOD__); \
+    static auto __perfEv = PerfLogger::createInterrupt(__METHOD__); \
     ScopedPerfTrace __perfTrace(__perfEv);
 #else
 #define TraceMethod()
