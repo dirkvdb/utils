@@ -57,7 +57,7 @@ public:
     }
 
     template<typename... T>
-    inline static void info(const char* s, const T&... args)
+    inline static void info(const char* s, T&&... args)
     {
         if (m_level <= Level::Info)
         {
@@ -79,7 +79,7 @@ public:
     }
     
     template<typename... T>
-    inline static void warn(const char* s, const T&... args)
+    inline static void warn(const char* s, T&&... args)
     {
         if (m_level <= Level::Warn)
         {
@@ -101,7 +101,7 @@ public:
     }
     
     template<typename... T>
-    inline static void critical(const char* s, const T&... args)
+    inline static void critical(const char* s, T&&... args)
     {
         if (m_level <= Level::Critical)
         {
@@ -123,7 +123,7 @@ public:
     }
     
     template<typename... T>
-    inline static void error(const char* s, const T&... args)
+    inline static void error(const char* s, T&&... args)
     {
         if (m_level <= Level::Error)
         {
@@ -145,7 +145,7 @@ public:
     }
         
     template<typename... T>
-    inline static void debug(const char* s, const T&... args)
+    inline static void debug(const char* s, T&&... args)
     {
 #ifndef NDEBUG
         if (m_level == Level::Debug)

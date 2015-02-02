@@ -222,7 +222,7 @@ public:
     , m_id(id)
     , m_name(name)
     {
-        addNameData(name);
+        addNameData(m_name);
     }
 
     virtual void start() override
@@ -238,6 +238,7 @@ public:
     virtual void reset()
     {
         m_data.clear();
+        addNameData(m_name);
     }
     
     std::vector<std::string> getPerfData(PerfTime startTime) const
@@ -256,65 +257,47 @@ protected:
     void addNameData(const std::string& name)
     {
     #ifdef PERF_TRACE
-        if (PerfLogger::isEnabled())
-        {
-            m_data.emplace_back(std::make_unique<NameData>(m_type, m_id, name));
-        }
+        m_data.emplace_back(std::make_unique<NameData>(m_type, m_id, name));
     #endif
     }
     
     void addOccurranceData(const std::string& desc)
     {
-    #ifdef PERF_TRACE
-        if (PerfLogger::isEnabled())
-        {
-            m_data.emplace_back(std::make_unique<OccurranceData>(m_id, Clock::now()));
-        }
-    #endif
+        addData<OccurranceData>(m_id, Clock::now());
     }
 
     void addDescriptionData(uint32_t id, const std::string& name)
     {
-    #ifdef PERF_TRACE
-        if (PerfLogger::isEnabled())
-        {
-            m_data.emplace_back(std::make_unique<DescriptionData>(id, name));
-        }
-    #endif
+        addData<DescriptionData>(id, name);
     }
     
     void addDisplayNameData(uint32_t id, const std::string& name)
     {
-    #ifdef PERF_TRACE
-        if (PerfLogger::isEnabled())
-        {
-            // The type parameter is ignored
-            m_data.emplace_back(std::make_unique<DisplayNameData>(m_type, id, name));
-        }
-    #endif
+        addData<DisplayNameData>(m_type, id, name);
     }
     
     void addStartData()
     {
-    #ifdef PERF_TRACE
-        if (PerfLogger::isEnabled())
-        {
-            m_data.emplace_back(std::make_unique<StartData>(m_type, m_id, Clock::now()));
-        }
-    #endif
+        addData<StartData>(m_type, m_id, Clock::now());
     }
     
     void addStopData()
     {
-    #ifdef PERF_TRACE
-        if (PerfLogger::isEnabled())
-        {
-            m_data.emplace_back(std::make_unique<StopData>(m_type, m_id, Clock::now()));
-        }
-    #endif
+        addData<StopData>(m_type, m_id, Clock::now());
     }
 
 private:
+    template <typename T, typename... Targs>
+    void addData(Targs&&... args)
+    {
+        #ifdef PERF_TRACE
+        if (PerfLogger::isEnabled())
+        {
+            m_data.emplace_back(std::make_unique<T>(std::forward<Targs>(args)...));
+        }
+        #endif
+    }
+
     EventType                   m_type;
     uint32_t                    m_id;
     std::string                 m_name;
@@ -369,26 +352,19 @@ public:
 struct PerfLogger::Impl
 {
     std::mutex mutex;
-    std::atomic<uint32_t> id;
-    std::atomic<bool> enabled;
+    std::atomic<uint32_t> id = { 0 };
+    std::atomic<bool> enabled = { false };
     std::vector<std::shared_ptr<PerfEvent>> items;
     PerfTime start;
 };
 
-std::unique_ptr<PerfLogger::Impl> PerfLogger::m_pimpl;
+std::unique_ptr<PerfLogger::Impl> PerfLogger::m_pimpl = std::make_unique<PerfLogger::Impl>();
 
 void PerfLogger::enable()
 {
-    if (!m_pimpl)
+    for (auto& item : m_pimpl->items)
     {
-        m_pimpl = std::make_unique<PerfLogger::Impl>();
-    }
-    else
-    {
-        for (auto& item : m_pimpl->items)
-        {
-            item->reset();
-        }
+        item->reset();
     }
     
     m_pimpl->start = Clock::now();
