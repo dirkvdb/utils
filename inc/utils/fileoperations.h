@@ -31,15 +31,15 @@ class Directory
 {
 public:
     class DirectoryHandle;
-    
+
     Directory(const std::string& path);
     Directory(const Directory&) = delete;
     Directory(Directory&&);
-    
+
     std::string path() const;
-    
+
     DirectoryHandle& handle() const;
-    
+
 private:
     std::string                         m_Path;
     std::shared_ptr<DirectoryHandle>    m_DirHandle;
@@ -68,12 +68,12 @@ public:
     FileSystemEntry() = default;
     FileSystemEntry(const std::string& path, FileSystemEntryType type);
     FileSystemEntry(FileSystemEntry&&) = default;
-    
+
     FileSystemEntry& operator=(FileSystemEntry&& other);
-    
+
     const std::string& path() const;
     FileSystemEntryType type() const;
-    
+
 private:
     std::string             m_Path;
     FileSystemEntryType     m_Type;
@@ -86,19 +86,19 @@ public:
     FileSystemIterator(const Directory& path);
     FileSystemIterator(const FileSystemIterator&) = delete;
     FileSystemIterator(FileSystemIterator&&) = default;
-    
+
     FileSystemIterator& operator ++();
     FileSystemIterator& operator =(FileSystemIterator&& other);
     bool operator ==(const FileSystemIterator& other) const;
     bool operator !=(const FileSystemIterator& other) const;
     const FileSystemEntry& operator *();
     const FileSystemEntry* operator ->();
-    
+
 private:
     void nextFile();
-    
+
     const Directory*                m_pDir;
-    
+
     struct IteratorData;
     std::shared_ptr<IteratorData>   m_IterData;
 };
@@ -130,6 +130,7 @@ std::string getFileNameWithoutExtension(const std::string& filepath);
 uint64_t getFileSize(const std::string& filepath);
 FileSystemEntryInfo getFileInfo(const std::string& filepath);
 
+bool isRelativePath(const std::string& filepath);
 bool pathExists(const std::string& filepath);
 void deleteFile(const std::string& filepath);
 std::string getPathFromFilepath(const std::string& filepath);
