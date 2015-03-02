@@ -18,6 +18,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <algorithm>
 #include <stdexcept>
 
 namespace utils

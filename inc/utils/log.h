@@ -17,10 +17,6 @@
 #ifndef UTILS_LOG_H
 #define UTILS_LOG_H
 
-#ifdef WIN32
-#include "winconfig.h"
-#endif
-
 #include <sstream>
 #include <fstream>
 #include <iostream>

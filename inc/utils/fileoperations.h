@@ -27,6 +27,24 @@ namespace utils
 namespace fileops
 {
 
+enum class FileSystemEntryType
+{
+    File,
+    Directory,
+    SymbolicLink,
+    Unknown
+};
+
+struct FileSystemEntryInfo
+{
+    uint64_t                sizeInBytes;
+    uint64_t                accessTime;
+    uint64_t                modifyTime;
+    uint64_t                createTime;
+    FileSystemEntryType     type;
+};
+
+#ifndef WIN32
 class Directory
 {
 public:
@@ -43,23 +61,6 @@ public:
 private:
     std::string                         m_Path;
     std::shared_ptr<DirectoryHandle>    m_DirHandle;
-};
-
-enum class FileSystemEntryType
-{
-    File,
-    Directory,
-    SymbolicLink,
-    Unknown
-};
-
-struct FileSystemEntryInfo
-{
-    uint64_t                sizeInBytes;
-    uint64_t                accessTime;
-    uint64_t                modifyTime;
-    uint64_t                createTime;
-    FileSystemEntryType     type;
 };
 
 class FileSystemEntry
@@ -120,6 +121,8 @@ enum class IterationType
     NonRecursive
 };
 
+#endif
+
 std::string readTextFile(const std::string& filename);
 std::vector<uint8_t> readFile(const std::string& filename);
 void writeFile(const std::vector<uint8_t>& contents, const std::string& filename);
@@ -139,11 +142,13 @@ std::string combinePath(const std::string& left, const std::string& right);
 void createDirectory(const std::string& path);
 void createDirectoryIfNotExists(const std::string& path);
 void deleteDirectory(const std::string& path);
-void deleteDirectoryRecursive(const std::string& path);
 void changeDirectory(const std::string& dir);
 
+#ifndef WIN32
 uint64_t countFilesInDirectory(const std::string& path, IterationType iterType = IterationType::Recursive);
 uint64_t calculateDirectorySize(const std::string& path, IterationType iterType = IterationType::Recursive);
+void deleteDirectoryRecursive(const std::string& path);
+#endif
 
 std::string getHomeDirectory();
 std::string getConfigDirectory();

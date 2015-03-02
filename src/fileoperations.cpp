@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <cstring>
 #include <cstdlib>
+#include <cinttypes>
 #include <sys/stat.h>
 
 #ifndef WIN32
@@ -40,19 +41,20 @@
     #undef max
     #undef DELETE
     #include <shlobj.h>
+    #include <direct.h>
 #endif
 
 #include <string>
 #include <vector>
 
 #include "utils/log.h"
-#include "utils/types.h"
 
 namespace utils
 {
 namespace fileops
 {
 
+#ifndef WIN32
 class Directory::DirectoryHandle
 {
 public:
@@ -286,6 +288,7 @@ bool FileSystemIterator::operator !=(const FileSystemIterator& other) const
 {
     return !(*this == other);
 }
+#endif
 
 std::string readTextFile(const std::string& filename)
 {
@@ -391,6 +394,12 @@ uint64_t getFileSize(const std::string& filepath)
 
     throw std::logic_error("Failed to obtain size for file: " + filepath);
 }
+
+#ifdef WIN32
+#define S_ISREG(mode) (mode & _S_IFREG)
+#define S_ISLNK(mode) (false)
+#define S_ISDIR(mode) (mode & _S_IFDIR)
+#endif
 
 FileSystemEntryInfo getFileInfo(const std::string& filepath)
 {
@@ -535,6 +544,7 @@ void deleteDirectory(const std::string& path)
     }
 }
 
+#ifndef WIN32
 void deleteDirectoryRecursive(const std::string& path)
 {
     for (auto& entry : Directory(path))
@@ -551,6 +561,7 @@ void deleteDirectoryRecursive(const std::string& path)
 
     deleteDirectory(path);
 }
+#endif
 
 void changeDirectory(const std::string& dir)
 {
@@ -564,6 +575,7 @@ void changeDirectory(const std::string& dir)
     }
 }
 
+#ifndef WIN32
 uint64_t countFilesInDirectory(const std::string& path, IterationType iterType)
 {
     uint64_t count = 0;
@@ -608,6 +620,8 @@ uint64_t calculateDirectorySize(const std::string& path, IterationType iterType)
 
     return count;
 }
+
+#endif
 
 std::string getHomeDirectory()
 {

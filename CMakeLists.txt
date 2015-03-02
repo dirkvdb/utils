@@ -29,8 +29,7 @@ IF (BFD_LIBRARY)
     SET(BFD_LIBRARIES ${BFD_LIBRARY})
 ENDIF()
 
-ADD_LIBRARY(utils STATIC
-	inc/utils/backtrace.h      		src/backtrace.cpp
+SET (UTILS_SOURCES
     inc/utils/bufferedreader.h      src/bufferedreader.cpp
     inc/utils/fileoperations.h      src/fileoperations.cpp
     inc/utils/filereader.h          src/filereader.cpp
@@ -48,8 +47,17 @@ ADD_LIBRARY(utils STATIC
     inc/utils/timerthread.h
     inc/utils/threadpool.h          src/threadpool.cpp
     inc/utils/trace.h               src/trace.cpp
-    inc/utils/types.h
     inc/utils/workerthread.h        src/workerthread.cpp
+)
+
+IF (UNIX)
+	LIST(APPEND UTILS_SOURCES
+		inc/utils/backtrace.h      		src/backtrace.cpp
+	)
+ENDIF()
+
+ADD_LIBRARY(utils STATIC
+	${UTILS_SOURCES}
 )
 
 OPTION(COLORED_OUTPUT "Colored output" ON)
@@ -58,16 +66,19 @@ OPTION(COVERAGE "Enable code coverage" OFF)
 OPTION(PERF_TRACE "Enable time doctor performance traces" OFF)
 
 ADD_DEFINITIONS("-DHAVE_UTILS_CONFIG")
-ADD_DEFINITIONS("-std=c++1y")
-IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-ENDIF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
-IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Gcc")
-    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -rdynamic ")
-ENDIF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Gcc")
+IF (NOT MSVC)
+	SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -Wfatal-errors")
+	
+	ADD_DEFINITIONS("-std=c++1y")
+	IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+	ENDIF ()
 
-SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -Wfatal-errors")
+	IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Gcc")
+		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -rdynamic ")
+	ENDIF ()
+ENDIF()
 
 IF (COVERAGE)
     MESSAGE(STATUS "Coverage enabled")
@@ -85,7 +96,7 @@ INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/inc ${XDGBAS
 SET (UTILS_INCLUDE_DIRS utils ${XDGBASEDIR_INCLUDE_DIR})
 
 SET (UTILS_LIBRARIES utils ${BFD_LIBRARIES} ${XDGBASEDIR_LIBRARY})
-IF (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+IF (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Android" AND NOT MSVC)
     LIST(APPEND UTILS_LIBRARIES -lpthread)
 ENDIF ()
 
