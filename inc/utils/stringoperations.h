@@ -122,8 +122,12 @@ namespace stringops
 
     inline bool endsWith(const std::string& aString, const std::string& search)
     {
-        auto pos = aString.rfind("::", aString.size() - 2);
-        return pos != std::string::npos;
+        if (search.size() > aString.size())
+        {
+            return false;
+        }
+
+        return aString.rfind(search) == (aString.size() - search.size());
     }
 
     inline void dos2unix(std::string& aString)
