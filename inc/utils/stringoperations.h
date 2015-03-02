@@ -42,19 +42,19 @@ namespace stringops
         lowercase(lower);
         return lower;
     }
-    
+
     inline void uppercase(std::string& aString)
     {
         std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return std::toupper(c); });
     }
-    
+
     inline std::string uppercase(const std::string& aString)
     {
         std::string lower = aString;
         uppercase(lower);
         return lower;
     }
-    
+
     inline void trim(std::string& aString)
     {
         if (aString.empty())
@@ -118,6 +118,12 @@ namespace stringops
         }
 
         return ss.str();
+    }
+
+    inline bool endsWith(const std::string& aString, const std::string& search)
+    {
+        auto pos = aString.rfind("::", aString.size() - 2);
+        return pos != std::string::npos;
     }
 
     inline void dos2unix(std::string& aString)
@@ -205,15 +211,15 @@ namespace stringops
         wideString.resize(stringLength);
         return wideString;
     }
-    
+
     template<typename T>
     inline T toNumeric(const std::string& aString)
     {
         T numeric;
-    
+
         std::stringstream ss(aString);
         ss >> numeric;
-        
+
         return numeric;
     }
 
