@@ -54,6 +54,14 @@ namespace utils
 namespace fileops
 {
 
+static const std::string g_pathSeperators = "\\/";
+
+#ifdef WIN32
+static const char g_pathSeperator = '\\';
+#else
+static const char g_pathSeperator = '/';
+#endif
+
 #ifndef WIN32
 class Directory::DirectoryHandle
 {
@@ -358,7 +366,7 @@ std::string getFileExtension(const std::string& filepath)
 
 std::string getFileName(const std::string& filepath)
 {
-    auto pos = filepath.find_last_of('/');
+    auto pos = filepath.find_last_of(g_pathSeperators);
     if (pos != std::string::npos && pos != filepath.size())
     {
         return filepath.substr(pos + 1, filepath.size());
@@ -451,7 +459,7 @@ bool isRelativePath(const std::string& filepath)
     }
 #endif
 
-    return filepath.find_first_of('/') != 0;
+    return filepath.find_first_of(g_pathSeperators) != 0;
 }
 
 bool pathExists(const std::string& filepath)
@@ -478,19 +486,19 @@ void deleteFile(const std::string& filepath)
 
 std::string getPathFromFilepath(const std::string& filepath)
 {
-    if (!filepath.empty() && filepath[filepath.length() - 1] == '/')
+    if (!filepath.empty() && (filepath[filepath.length() - 1] == '/' || filepath[filepath.length() - 1] == '\\'))
     {
         throw std::logic_error("Path is not a filename: " + filepath);
     }
 
-    std::string::size_type pos = filepath.find_last_of('/');
+    auto pos = filepath.find_last_of(g_pathSeperators);
     if (pos == std::string::npos)
     {
         return "";
     }
     else if (pos == 0)
     {
-        return "/";
+        return std::string(1, filepath[0]);
     }
 
     return filepath.substr(0, pos);
@@ -504,9 +512,9 @@ std::string combinePath(const std::string& left, const std::string& right)
     }
 
     std::string path = left;
-    if (left[left.length() - 1] != '/')
+    if (left.find_last_of(g_pathSeperators) != (left.length() - 1))
     {
-        path += '/';
+        path += g_pathSeperator;
     }
 
     path += right;
