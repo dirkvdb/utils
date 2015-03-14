@@ -452,6 +452,13 @@ FileSystemEntryInfo getFileInfo(const std::string& filepath)
 
 bool isRelativePath(const std::string& filepath)
 {
+#ifdef WIN32
+    if (filepath.size() >= 2 && filepath[1] == ':')
+    {
+        return false;
+    }
+#endif
+
     return filepath.find_first_of(g_pathSeperators) != 0;
 }
 
