@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <cstring>
 #include <cstdlib>
+#include <cinttypes>
 #include <sys/stat.h>
 
 #ifndef WIN32
@@ -37,22 +38,31 @@
 #else
     #define WIN32_LEAN_AND_MEAN 1
     #include <windows.h>
-    #undef max 
+    #undef max
     #undef DELETE
     #include <shlobj.h>
+    #include <direct.h>
 #endif
 
 #include <string>
 #include <vector>
 
 #include "utils/log.h"
-#include "utils/types.h"
 
 namespace utils
 {
 namespace fileops
 {
-    
+
+static const std::string g_pathSeperators = "\\/";
+
+#ifdef WIN32
+static const char g_pathSeperator = '\\';
+#else
+static const char g_pathSeperator = '/';
+#endif
+
+#ifndef WIN32
 class Directory::DirectoryHandle
 {
 public:
@@ -64,24 +74,24 @@ public:
             throw std::logic_error("Failed to open directory: " + path);
         }
     }
-    
+
     DirectoryHandle(const DirectoryHandle&) = delete;
     DirectoryHandle(DirectoryHandle&& other)
     : m_pDir(std::move(other.m_pDir))
     {
         other.m_pDir = nullptr;
     }
-    
+
     ~DirectoryHandle()
     {
         closedir(m_pDir);
     }
-    
+
     operator DIR*() const
     {
         return m_pDir;
     }
-    
+
 private:
     DIR*            m_pDir;
 };
@@ -132,29 +142,29 @@ FileSystemEntry& FileSystemEntry::operator=(FileSystemEntry&& other)
         m_Path = std::move(other.m_Path);
         m_Type = std::move(other.m_Type);
     }
-    
+
     return *this;
 }
-    
+
 struct FileSystemIterator::IteratorData
 {
     IteratorData() : dirEntry(nullptr) {}
-    
+
     bool operator==(const IteratorData& other)
     {
         if (!dirEntry && !other.dirEntry)
         {
             return true;
         }
-        
+
         if (dirEntry || other.dirEntry)
         {
             return false;
         }
-        
+
         return dirEntry->d_ino == other.dirEntry->d_ino;
     }
-    
+
     dirent*             dirEntry;
     FileSystemEntry     fsEntry;
 };
@@ -177,39 +187,39 @@ void FileSystemIterator::nextFile()
     {
         throw std::logic_error("filesystem iterator out of bounds");
     }
-    
+
     m_IterData->dirEntry = readdir(m_pDir->handle());
     if (!m_IterData->dirEntry)
     {
         m_IterData.reset();
         return;
     }
-    
+
     if (!strcmp(m_IterData->dirEntry->d_name, ".") || !strcmp(m_IterData->dirEntry->d_name, ".."))
     {
         nextFile();
         return;
     }
-    
+
     auto path = combinePath(m_pDir->path(), m_IterData->dirEntry->d_name);
     if (m_IterData->dirEntry->d_type == DT_REG)
     {
         m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::File);
         return;
     }
-    
+
     if (m_IterData->dirEntry->d_type == DT_LNK)
     {
         m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::SymbolicLink);
         return;
     }
-    
+
     if (m_IterData->dirEntry->d_type == DT_DIR)
     {
         m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::Directory);
         return;
     }
-    
+
     if (m_IterData->dirEntry->d_type == DT_UNKNOWN)
     {
         //some filesystem don't support d_type use stat to get type of entry
@@ -221,13 +231,13 @@ void FileSystemIterator::nextFile()
                 m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::File);
                 return;
             }
-            
+
             if (S_ISLNK(statInfo.st_mode))
             {
                 m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::SymbolicLink);
                 return;
             }
-            
+
             if (S_ISDIR(statInfo.st_mode))
             {
                 m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::Directory);
@@ -235,7 +245,7 @@ void FileSystemIterator::nextFile()
             }
         }
     }
-    
+
     // not a file or directory, skip it
     nextFile();
 }
@@ -263,7 +273,7 @@ FileSystemIterator& FileSystemIterator::operator =(FileSystemIterator&& other)
         std::swap(m_pDir, other.m_pDir);
         m_IterData = std::move(other.m_IterData);
     }
-    
+
     return *this;
 }
 
@@ -273,12 +283,12 @@ bool FileSystemIterator::operator ==(const FileSystemIterator& other) const
     {
         return true;
     }
-    
+
     if (!m_IterData || !other.m_IterData)
     {
         return false;
     }
-    
+
     return m_IterData->fsEntry.path() == other.m_IterData->fsEntry.path();
 }
 
@@ -286,6 +296,7 @@ bool FileSystemIterator::operator !=(const FileSystemIterator& other) const
 {
     return !(*this == other);
 }
+#endif
 
 std::string readTextFile(const std::string& filename)
 {
@@ -315,7 +326,7 @@ std::vector<uint8_t> readFile(const std::string& filename)
     {
         throw std::runtime_error("Failed to open file for reading: " + filename);
     }
-    
+
     std::vector<uint8_t> data;
 
     fileStream.seekg(0, std::ios::end);
@@ -343,24 +354,24 @@ void writeFile(const std::vector<uint8_t>& contents, const std::string& filename
 std::string getFileExtension(const std::string& filepath)
 {
     std::string extension;
-    
+
     std::string::size_type pos = filepath.find_last_of('.');
     if (pos != std::string::npos && pos != filepath.size())
     {
         extension = filepath.substr(pos + 1, filepath.size());
     }
-    
+
     return extension;
 }
-    
+
 std::string getFileName(const std::string& filepath)
 {
-    auto pos = filepath.find_last_of('/');
+    auto pos = filepath.find_last_of(g_pathSeperators);
     if (pos != std::string::npos && pos != filepath.size())
     {
         return filepath.substr(pos + 1, filepath.size());
     }
-    
+
     return filepath;
 }
 
@@ -382,7 +393,7 @@ uint64_t getFileSize(const std::string& filepath)
     struct stat statInfo;
     if (stat(filepath.c_str(), &statInfo) == 0)
 #else
-    struct __stat64 statInfo; 
+    struct __stat64 statInfo;
     if (_stat64(filepath.c_str(), &statInfo) == 0)
 #endif
     {
@@ -392,13 +403,19 @@ uint64_t getFileSize(const std::string& filepath)
     throw std::logic_error("Failed to obtain size for file: " + filepath);
 }
 
+#ifdef WIN32
+#define S_ISREG(mode) (mode & _S_IFREG)
+#define S_ISLNK(mode) (false)
+#define S_ISDIR(mode) (mode & _S_IFDIR)
+#endif
+
 FileSystemEntryInfo getFileInfo(const std::string& filepath)
 {
 #ifndef WIN32
     struct stat statInfo;
     if (stat(filepath.c_str(), &statInfo) == 0)
 #else
-    struct __stat64 statInfo; 
+    struct __stat64 statInfo;
     if (_stat64(filepath.c_str(), &statInfo) == 0)
 #endif
     {
@@ -407,7 +424,7 @@ FileSystemEntryInfo getFileInfo(const std::string& filepath)
         info.createTime     = statInfo.st_ctime;
         info.modifyTime     = statInfo.st_mtime;
         info.accessTime     = statInfo.st_atime;
-        
+
         if (S_ISREG(statInfo.st_mode))
         {
             info.type = FileSystemEntryType::File;
@@ -424,13 +441,25 @@ FileSystemEntryInfo getFileInfo(const std::string& filepath)
         {
             info.type = FileSystemEntryType::Unknown;
         }
-        
+
         return info;
     }
     else
     {
         throw std::logic_error(fmt::format("Failed to obtain file info for file: {} ({})", filepath, strerror(errno)));
     }
+}
+
+bool isRelativePath(const std::string& filepath)
+{
+#ifdef WIN32
+    if (filepath.size() >= 2 && filepath[1] == ':')
+    {
+        return false;
+    }
+#endif
+
+    return filepath.find_first_of(g_pathSeperators) != 0;
 }
 
 bool pathExists(const std::string& filepath)
@@ -457,19 +486,19 @@ void deleteFile(const std::string& filepath)
 
 std::string getPathFromFilepath(const std::string& filepath)
 {
-    if (!filepath.empty() && filepath[filepath.length() - 1] == '/')
+    if (!filepath.empty() && (filepath[filepath.length() - 1] == '/' || filepath[filepath.length() - 1] == '\\'))
     {
         throw std::logic_error("Path is not a filename: " + filepath);
     }
-    
-    std::string::size_type pos = filepath.find_last_of('/');
+
+    auto pos = filepath.find_last_of(g_pathSeperators);
     if (pos == std::string::npos)
     {
         return "";
     }
     else if (pos == 0)
     {
-        return "/";
+        return std::string(1, filepath[0]);
     }
 
     return filepath.substr(0, pos);
@@ -481,13 +510,13 @@ std::string combinePath(const std::string& left, const std::string& right)
     {
         throw std::logic_error("Left part of combination is empty");
     }
-    
+
     std::string path = left;
-    if (left[left.length() - 1] != '/')
+    if (left.find_last_of(g_pathSeperators) != (left.length() - 1))
     {
-        path += '/';
+        path += g_pathSeperator;
     }
-    
+
     path += right;
 
     return path;
@@ -501,7 +530,7 @@ void createDirectory(const std::string& path)
     if (CreateDirectory(path.c_str(), nullptr) == 0)
 #endif
     {
-        throw std::logic_error(fmt::format("Failed to create directory: %{} ({})", path, strerror(errno)));
+        throw std::logic_error(fmt::format("Failed to create directory: {} ({})", path, strerror(errno)));
     }
 }
 
@@ -529,7 +558,8 @@ void deleteDirectory(const std::string& path)
         throw std::logic_error("Failed to delete directory: " + path);
     }
 }
-    
+
+#ifndef WIN32
 void deleteDirectoryRecursive(const std::string& path)
 {
     for (auto& entry : Directory(path))
@@ -543,10 +573,11 @@ void deleteDirectoryRecursive(const std::string& path)
             deleteFile(entry.path());
         }
     }
-    
+
     deleteDirectory(path);
 }
-    
+#endif
+
 void changeDirectory(const std::string& dir)
 {
 #ifndef WIN32
@@ -559,10 +590,11 @@ void changeDirectory(const std::string& dir)
     }
 }
 
+#ifndef WIN32
 uint64_t countFilesInDirectory(const std::string& path, IterationType iterType)
 {
     uint64_t count = 0;
-    
+
     for (auto& entry : Directory(path))
     {
         switch(entry.type())
@@ -581,14 +613,14 @@ uint64_t countFilesInDirectory(const std::string& path, IterationType iterType)
                 break;
         };
     }
-    
+
     return count;
 }
 
 uint64_t calculateDirectorySize(const std::string& path, IterationType iterType)
 {
     uint64_t count = 0;
-    
+
     for (auto& entry : Directory(path))
     {
         if (entry.type() == FileSystemEntryType::File)
@@ -598,12 +630,14 @@ uint64_t calculateDirectorySize(const std::string& path, IterationType iterType)
         else if (entry.type() == FileSystemEntryType::Directory && iterType == IterationType::Recursive)
         {
             count += calculateDirectorySize(entry.path(), iterType);
-        }        
+        }
     }
-    
-    return count;   
+
+    return count;
 }
-    
+
+#endif
+
 std::string getHomeDirectory()
 {
 #ifndef WIN32
@@ -628,7 +662,7 @@ std::string getConfigDirectory()
     {
         throw std::logic_error("Failed to get config directory");
     }
-    
+
     std::string dir = xdgConfigHome(&handle);
     xdgWipeHandle(&handle);
     return dir;
@@ -649,7 +683,7 @@ std::string getDataDirectory()
     {
         throw std::logic_error("Failed to get config directory");
     }
-    
+
     std::string dir = xdgDataHome(&handle);
     xdgWipeHandle(&handle);
     return dir;

@@ -17,6 +17,7 @@
 #include "utils/trace.h"
 
 #include <memory>
+#include <functional>
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"

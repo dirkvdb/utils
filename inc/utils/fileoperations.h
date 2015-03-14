@@ -27,24 +27,6 @@ namespace utils
 namespace fileops
 {
 
-class Directory
-{
-public:
-    class DirectoryHandle;
-    
-    Directory(const std::string& path);
-    Directory(const Directory&) = delete;
-    Directory(Directory&&);
-    
-    std::string path() const;
-    
-    DirectoryHandle& handle() const;
-    
-private:
-    std::string                         m_Path;
-    std::shared_ptr<DirectoryHandle>    m_DirHandle;
-};
-
 enum class FileSystemEntryType
 {
     File,
@@ -62,18 +44,37 @@ struct FileSystemEntryInfo
     FileSystemEntryType     type;
 };
 
+#ifndef WIN32
+class Directory
+{
+public:
+    class DirectoryHandle;
+
+    Directory(const std::string& path);
+    Directory(const Directory&) = delete;
+    Directory(Directory&&);
+
+    std::string path() const;
+
+    DirectoryHandle& handle() const;
+
+private:
+    std::string                         m_Path;
+    std::shared_ptr<DirectoryHandle>    m_DirHandle;
+};
+
 class FileSystemEntry
 {
 public:
     FileSystemEntry() = default;
     FileSystemEntry(const std::string& path, FileSystemEntryType type);
     FileSystemEntry(FileSystemEntry&&) = default;
-    
+
     FileSystemEntry& operator=(FileSystemEntry&& other);
-    
+
     const std::string& path() const;
     FileSystemEntryType type() const;
-    
+
 private:
     std::string             m_Path;
     FileSystemEntryType     m_Type;
@@ -86,19 +87,19 @@ public:
     FileSystemIterator(const Directory& path);
     FileSystemIterator(const FileSystemIterator&) = delete;
     FileSystemIterator(FileSystemIterator&&) = default;
-    
+
     FileSystemIterator& operator ++();
     FileSystemIterator& operator =(FileSystemIterator&& other);
     bool operator ==(const FileSystemIterator& other) const;
     bool operator !=(const FileSystemIterator& other) const;
     const FileSystemEntry& operator *();
     const FileSystemEntry* operator ->();
-    
+
 private:
     void nextFile();
-    
+
     const Directory*                m_pDir;
-    
+
     struct IteratorData;
     std::shared_ptr<IteratorData>   m_IterData;
 };
@@ -120,6 +121,8 @@ enum class IterationType
     NonRecursive
 };
 
+#endif
+
 std::string readTextFile(const std::string& filename);
 std::vector<uint8_t> readFile(const std::string& filename);
 void writeFile(const std::vector<uint8_t>& contents, const std::string& filename);
@@ -130,6 +133,7 @@ std::string getFileNameWithoutExtension(const std::string& filepath);
 uint64_t getFileSize(const std::string& filepath);
 FileSystemEntryInfo getFileInfo(const std::string& filepath);
 
+bool isRelativePath(const std::string& filepath);
 bool pathExists(const std::string& filepath);
 void deleteFile(const std::string& filepath);
 std::string getPathFromFilepath(const std::string& filepath);
@@ -138,11 +142,13 @@ std::string combinePath(const std::string& left, const std::string& right);
 void createDirectory(const std::string& path);
 void createDirectoryIfNotExists(const std::string& path);
 void deleteDirectory(const std::string& path);
-void deleteDirectoryRecursive(const std::string& path);
 void changeDirectory(const std::string& dir);
 
+#ifndef WIN32
 uint64_t countFilesInDirectory(const std::string& path, IterationType iterType = IterationType::Recursive);
 uint64_t calculateDirectorySize(const std::string& path, IterationType iterType = IterationType::Recursive);
+void deleteDirectoryRecursive(const std::string& path);
+#endif
 
 std::string getHomeDirectory();
 std::string getConfigDirectory();

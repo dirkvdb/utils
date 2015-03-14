@@ -32,7 +32,7 @@ TEST(StringOperationsTest, LowerCase)
     string testString = "TESTSTRING";
     lowercase(testString);
     EXPECT_EQ("teststring", testString);
-    
+
     testString = "teststring";
     lowercase(testString);
     EXPECT_EQ("teststring", testString);
@@ -40,7 +40,7 @@ TEST(StringOperationsTest, LowerCase)
     testString = "~!@#$%^&*()_1234567890-";
     lowercase(testString);
     EXPECT_EQ("~!@#$%^&*()_1234567890-", testString);
-    
+
     testString = "H_ell_O";
     lowercase(testString);
     EXPECT_EQ("h_ell_o", testString);
@@ -51,11 +51,11 @@ TEST(StringOperationsTest, Dos2Unix)
     string testString = "abcde\r\nfgs\r\r\n";
     dos2unix(testString);
     EXPECT_EQ("abcde\nfgs\r\n", testString);
-    
+
     testString = "\r\n";
     dos2unix(testString);
     EXPECT_EQ("\n", testString);
-    
+
     testString = "teststring";
     dos2unix(testString);
     EXPECT_EQ("teststring", testString);
@@ -66,7 +66,7 @@ TEST(StringOperationsTest, Replace)
     string testString = "abcaabbabbab";
     replace(testString, "ab", "a");
     EXPECT_EQ("acaababa", testString);
-    
+
     testString = "stringstringstring";
     replace(testString, "stringstring", "string");
     EXPECT_EQ("stringstring", testString);
@@ -81,14 +81,14 @@ TEST(StringOperationsTest, Tokenize)
     EXPECT_STREQ("A", tokenized[0].c_str());
     EXPECT_STREQ("B", tokenized[1].c_str());
     EXPECT_STREQ("C", tokenized[2].c_str());
-            
+
     testString = "A_*_B_*_C";
     tokenized = tokenize(testString, "_*_");
     EXPECT_EQ(3u, tokenized.size());
     EXPECT_STREQ("A", tokenized[0].c_str());
     EXPECT_STREQ("B", tokenized[1].c_str());
     EXPECT_STREQ("C", tokenized[2].c_str());
-    
+
     testString = "A_*_B_*_C";
     tokenized = tokenize(testString, "_**_");
     EXPECT_EQ(1u, tokenized.size());
@@ -144,5 +144,20 @@ TEST(StringOperationsTest, Join)
 {
     EXPECT_EQ("one,two,three", join({ "one", "two", "three" }, ","));
     EXPECT_EQ("one", join({ "one" }, ","));
+}
+
+TEST(StringOperationsTest, EndsWith)
+{
+    EXPECT_TRUE(endsWith("TestOne", ""));
+    EXPECT_TRUE(endsWith("TestOne", "e"));
+    EXPECT_TRUE(endsWith("TestOne", "ne"));
+    EXPECT_TRUE(endsWith("TestOne", "One"));
+    EXPECT_TRUE(endsWith("TestOne", "TestOne"));
+
+    EXPECT_FALSE(endsWith("TestOne", "On"));
+    EXPECT_FALSE(endsWith("TestOne", "TestOn"));
+    EXPECT_FALSE(endsWith("TestOne", "TestOne."));
+
+    EXPECT_FALSE(endsWith("", "."));
 }
 

@@ -49,24 +49,24 @@ protected:
         try { fileops::deleteFile(g_testFile); } catch (std::exception&) {}
         std::ofstream file(g_testFile, std::ios::binary);
         EXPECT_TRUE(file.is_open());
-        
+
         data.resize(100);
         for (int i = 0; i < 100; ++i)
         {
             data[i] = i;
         }
-        
+
         file.write(reinterpret_cast<char*>(data.data()), data.size());
         file.close();
-        
+
         EXPECT_NO_THROW(reader.open(g_testFile));
     }
-    
+
     void TearDown()
     {
         EXPECT_NO_THROW(fileops::deleteFile(g_testFile));
     }
-    
+
     BufferedReader          reader;
     std::vector<uint8_t>    data;
 };
@@ -80,7 +80,7 @@ TEST_F(BufferedReaderTest, readFullBuffer)
 {
     std::vector<uint8_t> readData(data.size(), '\0');
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
-    
+
     EXPECT_EQ(0, memcmp(data.data(), readData.data(), data.size()));
     EXPECT_TRUE(reader.eof());
 }
@@ -88,37 +88,37 @@ TEST_F(BufferedReaderTest, readFullBuffer)
 TEST_F(BufferedReaderTest, readSmallData)
 {
     std::array<uint8_t, 2> readData;
-    
+
     reader.seekAbsolute(3);
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(3U, readData[0]);
     EXPECT_EQ(4U, readData[1]);
-    
+
     reader.seekRelative(2);
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(7U, readData[0]);
     EXPECT_EQ(8U, readData[1]);
-    
+
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(9U, readData[0]);
     EXPECT_EQ(10U, readData[1]);
-    
+
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(11U, readData[0]);
     EXPECT_EQ(12U, readData[1]);
-    
+
     reader.seekAbsolute(55);
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(55U, readData[0]);
     EXPECT_EQ(56U, readData[1]);
-    
+
     EXPECT_FALSE(reader.eof());
 }
 
 TEST_F(BufferedReaderTest, readOutsideExistingBuffer)
 {
     std::array<uint8_t, 6> readData;
-    
+
     reader.seekRelative(5);
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(5U,  readData[0]);
@@ -127,7 +127,7 @@ TEST_F(BufferedReaderTest, readOutsideExistingBuffer)
     EXPECT_EQ(8U,  readData[3]);
     EXPECT_EQ(9U,  readData[4]);
     EXPECT_EQ(10U, readData[5]);
-    
+
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(11U, readData[0]);
     EXPECT_EQ(12U, readData[1]);
@@ -135,27 +135,27 @@ TEST_F(BufferedReaderTest, readOutsideExistingBuffer)
     EXPECT_EQ(14U, readData[3]);
     EXPECT_EQ(15U, readData[4]);
     EXPECT_EQ(16U, readData[5]);
-    
+
     EXPECT_FALSE(reader.eof());
 }
 
 TEST_F(BufferedReaderTest, bigReadAfterSmallRead)
 {
     std::array<uint8_t, 2> readData;
-    
+
     reader.seekAbsolute(50);
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(50U,  readData[0]);
     EXPECT_EQ(51U,  readData[1]);
-    
+
     std::array<uint8_t, 12> bigReadData;
     EXPECT_EQ(bigReadData.size(), reader.read(bigReadData.data(), bigReadData.size()));
     EXPECT_EQ(0, memcmp(data.data() + 52, bigReadData.data(), bigReadData.size()));
-    
+
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(64U,  readData[0]);
     EXPECT_EQ(65U,  readData[1]);
-    
+
     EXPECT_FALSE(reader.eof());
 }
 
@@ -164,28 +164,28 @@ TEST_F(BufferedReaderTest, readAfterSeek)
     std::array<uint8_t, 2> readData;
     std::array<uint8_t, 10> bigReadData;
     std::array<uint8_t, 20> biggerReadData;
-    
+
     reader.seekAbsolute(0);
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(0U,  readData[0]);
     EXPECT_EQ(1U,  readData[1]);
-    
+
     reader.seekAbsolute(0);
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(0U,  readData[0]);
     EXPECT_EQ(1U,  readData[1]);
-    
+
     EXPECT_EQ(bigReadData.size(), reader.read(bigReadData.data(), bigReadData.size()));
     EXPECT_EQ(0, memcmp(data.data() + 2, bigReadData.data(), bigReadData.size()));
-    
+
     reader.seekAbsolute(0);
     EXPECT_EQ(biggerReadData.size(), reader.read(biggerReadData.data(), biggerReadData.size()));
     EXPECT_EQ(0, memcmp(data.data(), biggerReadData.data(), biggerReadData.size()));
-    
+
     reader.seekAbsolute(0);
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(0, memcmp(data.data(), readData.data(), readData.size()));
-    
+
     reader.seekAbsolute(20);
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(0, memcmp(data.data() + 20, readData.data(), readData.size()));
@@ -193,21 +193,21 @@ TEST_F(BufferedReaderTest, readAfterSeek)
     reader.seekAbsolute(0);
     EXPECT_EQ(readData.size(), reader.read(readData.data(), readData.size()));
     EXPECT_EQ(0, memcmp(data.data(), readData.data(), readData.size()));
-    
+
     EXPECT_EQ(biggerReadData.size(), reader.read(biggerReadData.data(), biggerReadData.size()));
     EXPECT_EQ(0, memcmp(data.data() + 2, biggerReadData.data(), biggerReadData.size()));
-    
+
     EXPECT_FALSE(reader.eof());
 }
 
 TEST_F(BufferedReaderTest, endOfFile)
 {
     std::array<uint8_t, 2> readData;
-    
+
     reader.seekAbsolute(99);
     EXPECT_EQ(1U, reader.read(readData.data(), readData.size()));
     EXPECT_EQ(99U,  readData[0]);
-    
+
     EXPECT_TRUE(reader.eof());
 }
 

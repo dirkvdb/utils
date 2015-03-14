@@ -30,12 +30,12 @@ TEST(FileOperationsTest, ReadTextFile)
     ofstream file("testfile.txt");
     file << "line1\nline2\nline3\n";
     file.close();
-    
+
     string contents = readTextFile("testfile.txt");
     EXPECT_EQ("line1\nline2\nline3\n", contents);
     deleteFile("testfile.txt");
 }
-        
+
 TEST(FileOperationsTest, GetFileExtension)
 {
     EXPECT_EQ("txt", getFileExtension("file.txt"));
@@ -48,6 +48,14 @@ TEST(FileOperationsTest, GetFileNameWithoutExtension)
 {
     EXPECT_EQ("fi.le", getFileNameWithoutExtension("/path/to/fi.le.txt"));
     EXPECT_EQ("file", getFileNameWithoutExtension("/path/to/file"));
+    EXPECT_EQ("fi.le", getFileNameWithoutExtension("fi.le.txt"));
+    EXPECT_EQ("file", getFileNameWithoutExtension("file.txt"));
+}
+
+TEST(FileOperationsTest, GetFileNameWithoutExtensionWindows)
+{
+    EXPECT_EQ("fi.le", getFileNameWithoutExtension("C:\\path\\to\\fi.le.txt"));
+    EXPECT_EQ("file", getFileNameWithoutExtension("C:\\path\\to\\file"));
     EXPECT_EQ("fi.le", getFileNameWithoutExtension("fi.le.txt"));
     EXPECT_EQ("file", getFileNameWithoutExtension("file.txt"));
 }
@@ -95,7 +103,7 @@ TEST(FileOperationsTest, GetPathFromFilePath)
     EXPECT_EQ("/temp", getPathFromFilepath("/temp/file.txt"));
     EXPECT_EQ("/virtualDir", getPathFromFilepath("/virtualDir/testfile.txt"));
     EXPECT_EQ("temp", getPathFromFilepath("temp/aFile"));
-    
+
     EXPECT_THROW(getPathFromFilepath("/temp/"), logic_error);
 }
 
@@ -146,7 +154,7 @@ TEST(FileOperationsTest, IterateDirectory)
     ofstream file3("temp/temp/afile.txt");
     file3.close();
 
-    
+
     std::vector<std::string> files;
     for (auto& entry : Directory("temp"))
     {
@@ -154,7 +162,7 @@ TEST(FileOperationsTest, IterateDirectory)
 	}
 
     deleteDirectoryRecursive("temp");
-    
+
     ASSERT_EQ(3u, files.size());
     sort(files.begin(), files.end());
     EXPECT_EQ("temp/afile1.txt", files[0]);
