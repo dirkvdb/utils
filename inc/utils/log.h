@@ -41,7 +41,7 @@ public:
         Error,
         Critical
     };
-    
+
     inline static void setFilter(Level level)
     {
         m_level = level;
@@ -68,12 +68,12 @@ public:
             fmt::print_colored(fmt::GREEN, "INFO:  [{}] {}\n", timeops::getTimeString(), s);
         }
     }
-    
+
     inline static void warn(const std::string& s)
     {
         warn(s.c_str());
     }
-    
+
     template<typename... T>
     inline static void warn(const char* s, T&&... args)
     {
@@ -90,12 +90,12 @@ public:
             fmt::print_colored(fmt::YELLOW, "WARN:  [{}] {}\n", timeops::getTimeString(), s);
         }
     }
-    
+
     inline static void critical(const std::string& s)
     {
         critical(s.c_str());
     }
-    
+
     template<typename... T>
     inline static void critical(const char* s, T&&... args)
     {
@@ -112,12 +112,12 @@ public:
             fmt::print_colored(fmt::MAGENTA, "CRIT:  [{}] {}\n", timeops::getTimeString(), s);
         }
     }
-    
+
     inline static void error(const std::string& s)
     {
         error(s.c_str());
     }
-    
+
     template<typename... T>
     inline static void error(const char* s, T&&... args)
     {
@@ -134,12 +134,12 @@ public:
             fmt::print_colored(fmt::RED, "ERROR: [{}] {}\n", timeops::getTimeString(), s);
         }
     }
-    
+
     inline static void debug(const std::string& s)
     {
         debug(s.c_str());
     }
-        
+
     template<typename... T>
     inline static void debug(const char* s, T&&... args)
     {

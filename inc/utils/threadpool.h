@@ -33,7 +33,7 @@ class ThreadPool
 public:
     ThreadPool(uint32_t maxNumThreads = 4);
     ~ThreadPool();
-    ThreadPool(ThreadPool&) = delete;
+    ThreadPool(const ThreadPool&) = delete;
     ThreadPool& operator=(const ThreadPool&) = delete;
 
     void start();
@@ -46,7 +46,7 @@ public:
 private:
     bool hasJobs();
     std::function<void()> getJob();
-    
+
     class Task;
     friend class Task;
 

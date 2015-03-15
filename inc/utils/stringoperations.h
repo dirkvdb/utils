@@ -120,6 +120,11 @@ namespace stringops
         return ss.str();
     }
 
+    inline bool startsWith(const std::string& aString, const std::string& search)
+    {
+        return aString.find(search) != std::string::npos;
+    }
+
     inline bool endsWith(const std::string& aString, const std::string& search)
     {
         if (search.size() > aString.size())
