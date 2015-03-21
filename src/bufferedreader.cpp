@@ -88,11 +88,11 @@ uint64_t BufferedReader::read(uint8_t* pData, uint64_t size)
         {
             m_Reader->seekAbsolute(m_CurrentPosition);
             auto read = m_Reader->read(m_Buffer.data(), m_Buffer.size());
-            
+
             if (read > 0)
             {
                 auto advance = std::min(read, size);
-                
+
                 memcpy(pData, m_Buffer.data(), size);
                 m_BufferStartPosition = m_CurrentPosition;
                 m_BufferFilled = true;
@@ -116,14 +116,14 @@ uint64_t BufferedReader::read(uint8_t* pData, uint64_t size)
     else
     {
         auto bytesInBuffer = m_Buffer.size() - m_BufferOffset;
-    
+
         if (size < bytesInBuffer)
         {
             // sufficient data in the buffer
             memcpy(pData, &m_Buffer[m_BufferOffset], size);
             m_CurrentPosition += size;
             m_BufferOffset += size;
-            
+
             return size;
         }
         else
@@ -131,27 +131,27 @@ uint64_t BufferedReader::read(uint8_t* pData, uint64_t size)
             // first copy the existing data from the buffer
             memcpy(pData, &m_Buffer[m_BufferOffset], bytesInBuffer);
             m_CurrentPosition += bytesInBuffer;
-            
+
             // we are going to make a read, make sure the read pointer is ok
             m_Reader->seekAbsolute(m_CurrentPosition);
-        
+
             if (size - bytesInBuffer < m_Buffer.size())
             {
                 // one bufferfill is sufficient to provide the data
-                
+
                 // fill the buffer with fresh data
                 auto read = m_Reader->read(m_Buffer.data(), m_Buffer.size());
                 auto bytesToRead = std::min(read, size - bytesInBuffer);
-                
+
                 if (bytesToRead > 0)
                 {
                     // copy the reaming data from the buffer
                     memcpy(pData + bytesInBuffer, m_Buffer.data(), bytesToRead);
-                    
+
                     m_BufferStartPosition = m_CurrentPosition;
                     m_CurrentPosition += bytesToRead;
                     m_BufferOffset = bytesToRead;
-                    
+
                     assert(m_BufferOffset <= m_Buffer.size());
                     if (m_BufferOffset == m_Buffer.size())
                     {
@@ -164,7 +164,7 @@ uint64_t BufferedReader::read(uint8_t* pData, uint64_t size)
                     // buffer is not filled as we could not obtain extra data
                     m_BufferFilled = false;
                 }
-                
+
                 return bytesInBuffer + bytesToRead;
             }
             else
@@ -173,7 +173,7 @@ uint64_t BufferedReader::read(uint8_t* pData, uint64_t size)
                 auto read = m_Reader->read(pData + bytesInBuffer, size - bytesInBuffer);
                 m_CurrentPosition += read;
                 m_BufferFilled = false;
-                
+
                 return read + bytesInBuffer;
             }
         }
@@ -202,7 +202,7 @@ void BufferedReader::updateOffsetsAfterSeek(uint64_t newPosition)
         // seek is not in the buffer range, so buffer is not valid
         m_BufferFilled = false;
     }
-    
+
     m_CurrentPosition = newPosition;
 }
 

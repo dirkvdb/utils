@@ -29,8 +29,8 @@ public:
     virtual ~ISubscriber() {}
 
     virtual void onItem(Subject subject, void* pData = nullptr) = 0;
-    virtual void finalItemReceived(void* pData = nullptr) {}
-    virtual void onError(const std::string& message) {}
+    virtual void finalItemReceived(void* /*pData*/ = nullptr) {}
+    virtual void onError(const std::string& /*message*/) {}
 };
 
 }

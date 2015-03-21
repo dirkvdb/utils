@@ -94,7 +94,7 @@ public:
     , name(n)
     {
     }
-    
+
     DescriptionData(uint32_t i, double n)
     : valueType(Number)
     , id(i)
@@ -107,7 +107,7 @@ public:
         auto value = valueType == String ? name : std::to_string(number);
         return fmt::format("DSC {} {} {}", static_cast<uint32_t>(valueType), id, value);
     }
-    
+
 private:
     Type valueType;
     uint32_t id;
@@ -149,7 +149,7 @@ public:
     {
         return fmt::format("OCC 7 {} {}", id, (time - startTime).count());
     }
-    
+
 private:
     uint32_t id;
     PerfTime time;
@@ -190,7 +190,7 @@ public:
     {
         return fmt::format("STO {} {} {}", static_cast<uint32_t>(type), id, (time - startTime).count());
     }
-    
+
 private:
     EventType type;
     uint32_t id;
@@ -240,16 +240,16 @@ public:
         m_data.clear();
         addNameData(m_name);
     }
-    
+
     std::vector<std::string> getPerfData(PerfTime startTime) const
     {
         std::vector<std::string> data;
-        
+
         for (auto& d : m_data)
         {
              data.emplace_back(d->toString(startTime));
         }
-        
+
         return data;
     }
 
@@ -258,10 +258,12 @@ protected:
     {
     #ifdef PERF_TRACE
         m_data.emplace_back(std::make_unique<NameData>(m_type, m_id, name));
+    #else
+        (void) name;
     #endif
     }
-    
-    void addOccurranceData(const std::string& desc)
+
+    void addOccurranceData(const std::string& /*desc*/)
     {
         addData<OccurranceData>(m_id, Clock::now());
     }
@@ -270,17 +272,17 @@ protected:
     {
         addData<DescriptionData>(id, name);
     }
-    
+
     void addDisplayNameData(uint32_t id, const std::string& name)
     {
         addData<DisplayNameData>(m_type, id, name);
     }
-    
+
     void addStartData()
     {
         addData<StartData>(m_type, m_id, Clock::now());
     }
-    
+
     void addStopData()
     {
         addData<StopData>(m_type, m_id, Clock::now());
@@ -288,20 +290,23 @@ protected:
 
 private:
     template <typename T, typename... Targs>
+    #ifdef PERF_TRACE
     void addData(Targs&&... args)
     {
-        #ifdef PERF_TRACE
         if (PerfLogger::isEnabled())
         {
             m_data.emplace_back(std::make_unique<T>(std::forward<Targs>(args)...));
         }
-        #endif
+    #else
+    void addData(Targs&&... /*args*/)
+    {
+    #endif
     }
 
     EventType                   m_type;
     uint32_t                    m_id;
     std::string                 m_name;
-    
+
     std::vector<TraceDataPtr>   m_data;
 };
 
@@ -366,7 +371,7 @@ void PerfLogger::enable()
     {
         item->reset();
     }
-    
+
     m_pimpl->start = Clock::now();
     m_pimpl->id = 0;
     m_pimpl->enabled = true;
@@ -427,14 +432,14 @@ std::vector<std::string> PerfLogger::getPerfData()
     std::vector<std::string> data;
     data.emplace_back(fmt::format("SPEED {}", Clock::period::den));
     data.emplace_back(fmt::format("TIME {}", Clock::period::den));
-    
+
     std::lock_guard<std::mutex> lock(m_pimpl->mutex);
     for (auto& item : m_pimpl->items)
     {
         auto pd = item->getPerfData(m_pimpl->start);
         data.insert(data.end(), pd.begin(), pd.end());
     }
-    
+
     data.emplace_back("END");
     return data;
 }
