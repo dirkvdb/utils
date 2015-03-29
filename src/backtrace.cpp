@@ -15,18 +15,27 @@
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "utils/backtrace.h"
+#include "utilsconfig.h"
+
+#define PACKAGE "Utils"
+#define PACKAGE_VERSION "1.0.0"
+
+#ifdef BACKWARD
 #include "backward-cpp/backward.hpp"
+#endif
 
 namespace utils
 {
 
 void printBackTrace()
 {
+#ifdef BACKWARD
     backward::StackTrace st;
     st.load_here();
-    
+
     backward::Printer p;
     p.print(st, stderr);
+#endif
 }
 
 }
