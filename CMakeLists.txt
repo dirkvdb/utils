@@ -9,6 +9,7 @@ OPTION(STANDALONE "Not used as a submodule of another project" OFF)
 OPTION(COVERAGE "Enable code coverage" OFF)
 OPTION(PERF_TRACE "Enable time doctor performance traces" OFF)
 OPTION(BREAKPAD "Enable breakpad crashdump collection" OFF)
+OPTION(BACKWARD "enable backtrace support" OFF)
 
 FIND_PACKAGE(PkgConfig)
 
@@ -62,15 +63,6 @@ IF (NOT DISABLE_XDGBASEDIR)
     ENDIF ()
 ENDIF ()
 
-FIND_LIBRARY(BFD_LIBRARY
-    NAMES bfd
-)
-
-IF (BFD_LIBRARY)
-    ADD_DEFINITIONS(-DBACKWARD_HAS_BFD=1)
-    SET(BFD_LIBRARIES ${BFD_LIBRARY})
-ENDIF()
-
 SET (UTILS_SOURCES
     inc/utils/bufferedreader.h      src/bufferedreader.cpp
     inc/utils/fileoperations.h      src/fileoperations.cpp
@@ -90,11 +82,13 @@ SET (UTILS_SOURCES
     inc/utils/threadpool.h          src/threadpool.cpp
     inc/utils/trace.h               src/trace.cpp
     inc/utils/workerthread.h        src/workerthread.cpp
+    inc/utils/backtrace.h           src/backtrace.cpp
 )
 
-IF (UNIX)
+IF (BACKWARD)
+    ADD_SUBDIRECTORY(src/backward-cpp)
     LIST(APPEND UTILS_SOURCES
-        inc/utils/backtrace.h           src/backtrace.cpp
+        ${backward_ENABLE}
     )
 ENDIF()
 
