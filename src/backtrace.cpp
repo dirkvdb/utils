@@ -15,7 +15,7 @@
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "utils/backtrace.h"
-#include "backward-cpp/backward.hpp"
+#include <backward.hpp>
 
 namespace utils
 {
@@ -24,7 +24,7 @@ void printBackTrace()
 {
     backward::StackTrace st;
     st.load_here();
-    
+
     backward::Printer p;
     p.print(st, stderr);
 }
