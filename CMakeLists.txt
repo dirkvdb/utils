@@ -4,6 +4,7 @@ ENABLE_TESTING()
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
 
 OPTION(DISABLE_XDGBASEDIR "disable searching for libxdg-basedir" OFF)
+OPTION(BACKWARD "enable backtrace support" OFF)
 
 FIND_PACKAGE(PkgConfig)
 
@@ -24,15 +25,6 @@ IF (NOT DISABLE_XDGBASEDIR)
     ENDIF ()
 ENDIF ()
 
-FIND_LIBRARY(BFD_LIBRARY
-    NAMES bfd
-)
-
-IF (BFD_LIBRARY)
-    ADD_DEFINITIONS(-DBACKWARD_HAS_BFD=1)
-    SET(BFD_LIBRARIES ${BFD_LIBRARY})
-ENDIF()
-
 SET (UTILS_SOURCES
     inc/utils/bufferedreader.h      src/bufferedreader.cpp
     inc/utils/fileoperations.h      src/fileoperations.cpp
@@ -52,16 +44,18 @@ SET (UTILS_SOURCES
     inc/utils/threadpool.h          src/threadpool.cpp
     inc/utils/trace.h               src/trace.cpp
     inc/utils/workerthread.h        src/workerthread.cpp
+    inc/utils/backtrace.h           src/backtrace.cpp
 )
 
-IF (UNIX)
-	LIST(APPEND UTILS_SOURCES
-		inc/utils/backtrace.h      		src/backtrace.cpp
-	)
+IF (BACKWARD)
+    ADD_SUBDIRECTORY(src/backward-cpp)
+    LIST(APPEND UTILS_SOURCES
+        ${backward_ENABLE}
+    )
 ENDIF()
 
 ADD_LIBRARY(utils STATIC
-	${UTILS_SOURCES}
+    ${UTILS_SOURCES}
 )
 
 OPTION(COLORED_OUTPUT "Colored output" ON)
@@ -72,16 +66,16 @@ OPTION(PERF_TRACE "Enable time doctor performance traces" OFF)
 ADD_DEFINITIONS("-DHAVE_UTILS_CONFIG")
 
 IF (NOT MSVC)
-	SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -Wfatal-errors")
+    SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -Wfatal-errors")
 
-	ADD_DEFINITIONS("-std=c++1y")
-	IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-	ENDIF ()
+    ADD_DEFINITIONS("-std=c++1y")
+    IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    ENDIF ()
 
-	IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Gcc")
-		SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -rdynamic ")
-	ENDIF ()
+    IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Gcc")
+        SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -rdynamic ")
+    ENDIF ()
 ENDIF()
 
 IF (COVERAGE)
