@@ -140,26 +140,35 @@ public:
         debug(s.c_str());
     }
 
+#ifndef NDEBUG
     template<typename... T>
     inline static void debug(const char* s, T&&... args)
     {
-#ifndef NDEBUG
         if (m_level == Level::Debug)
         {
             debug(fmt::format(s, std::forward<const T>(args)...).c_str());
         }
-#endif
     }
+#else
+    template<typename... T>
+    inline static void debug(const char*, T&&...)
+    {
+    }
+#endif
 
+#ifndef NDEBUG
     inline static void debug(const char* s)
     {
-#ifndef NDEBUG
         if (m_level == Level::Debug)
         {
             fmt::print_colored(fmt::WHITE, "DEBUG: [{}] [{}] {}\n", std::this_thread::get_id(), timeops::getTimeString(), s);
         }
-#endif
     }
+#else
+    inline static void debug(const char*)
+    {
+    }
+#endif
 
 private:
     static Level            m_level;
