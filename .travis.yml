@@ -32,7 +32,7 @@ install:
   - sudo pip install cpp-coveralls
 
 script:
-  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=gcov-4.9 .
+  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=/usr/bin/gcov-4.9 .
   - make -j4
   - make -j4 check
   - CTEST_OUTPUT_ON_FAILURE=1 make test
