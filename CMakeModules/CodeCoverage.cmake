@@ -60,29 +60,24 @@ ENDIF() # NOT CMAKE_COMPILER_IS_GNUCXX
 SET(CMAKE_CXX_FLAGS_COVERAGE
     "-g -O0 --coverage -fprofile-arcs -ftest-coverage"
     CACHE STRING "Flags used by the C++ compiler during coverage builds."
-    FORCE )
+    FORCE PARENT_SCOPE)
 SET(CMAKE_C_FLAGS_COVERAGE
     "-g -O0 --coverage -fprofile-arcs -ftest-coverage"
     CACHE STRING "Flags used by the C compiler during coverage builds."
-    FORCE )
+    FORCE PARENT_SCOPE)
 SET(CMAKE_EXE_LINKER_FLAGS_COVERAGE
     ""
     CACHE STRING "Flags used for linking binaries during coverage builds."
-    FORCE )
+    FORCE PARENT_SCOPE)
 SET(CMAKE_SHARED_LINKER_FLAGS_COVERAGE
     ""
     CACHE STRING "Flags used by the shared libraries linker during coverage builds."
-    FORCE )
+    FORCE PARENT_SCOPE)
 MARK_AS_ADVANCED(
     CMAKE_CXX_FLAGS_COVERAGE
     CMAKE_C_FLAGS_COVERAGE
     CMAKE_EXE_LINKER_FLAGS_COVERAGE
     CMAKE_SHARED_LINKER_FLAGS_COVERAGE )
-
-IF ( NOT (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Coverage"))
-  MESSAGE( WARNING "Code coverage results with an optimized (non-Debug) build may be misleading" )
-ENDIF() # NOT CMAKE_BUILD_TYPE STREQUAL "Debug"
-
 
 # Param _targetname     The name of new the custom make target
 # Param _testrunner     The name of the target which runs the tests.
