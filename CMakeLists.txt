@@ -65,7 +65,7 @@ OPTION(PERF_TRACE "Enable time doctor performance traces" OFF)
 
 ADD_DEFINITIONS("-DHAVE_UTILS_CONFIG")
 
-IF (NOT MSVC)
+IF (STANDALONE AND NOT MSVC)
     SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -Wfatal-errors")
 
     ADD_DEFINITIONS("-std=c++1y")
