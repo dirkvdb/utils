@@ -122,7 +122,12 @@ namespace stringops
 
     inline bool startsWith(const std::string& aString, const std::string& search)
     {
-        return aString.find(search) != std::string::npos;
+        return aString.compare(0, search.size(), search) == 0;
+    }
+
+    inline bool startsWith(const std::string& aString, const char* search)
+    {
+        return aString.compare(0, strlen(search), search) == 0;
     }
 
     inline bool endsWith(const std::string& aString, const std::string& search)
