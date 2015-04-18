@@ -28,7 +28,7 @@ install:
   - sudo pip install cpp-coveralls
 
 script:
-  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON .
+  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON .
   - make -j4
   - make -j4 check
   - CTEST_OUTPUT_ON_FAILURE=1 make test
