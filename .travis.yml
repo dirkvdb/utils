@@ -31,6 +31,7 @@ install:
   - cd ..
   - sudo easy_install3 pip
   - sudo pip3 install cpp-coveralls requests
+  - easy_install --upgrade requests
 
 script:
   - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=/usr/bin/gcov-4.9 .
