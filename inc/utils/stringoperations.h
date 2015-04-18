@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cwchar>
+#include <cstring>
 #include <stdexcept>
 #include <cassert>
 #include <iostream>
