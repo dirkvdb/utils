@@ -29,7 +29,7 @@ install:
   - tar xf lcov-1.11.tar.gz
   - cd lcov-1.11 && sudo make install
   - cd ..
-  - sudo pip3 install cpp-coveralls pyopenssl ndg-httpsclient pyasn1
+  - sudo pip install cpp-coveralls pyopenssl ndg-httpsclient pyasn1
 
 script:
   - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=/usr/bin/gcov-4.9 .
