@@ -22,7 +22,7 @@ before_install:
 
 install:
   - sudo apt-get -qq install build-essential
-  - sudo apt-get -qq --allow-unauthenticated install clang-3.6 libc++-dev
+  - sudo apt-get -qq --allow-unauthenticated install clang-3.6 gcc-4.9
 
 script:
   - cmake -DCMAKE_CXX_COMPILER=clang++-3.6 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON .
