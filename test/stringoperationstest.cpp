@@ -95,6 +95,22 @@ TEST(StringOperationsTest, Tokenize)
     EXPECT_STREQ("A_*_B_*_C", tokenized[0].c_str());
 }
 
+TEST(StringOperationsTest, ToString)
+{
+    EXPECT_STREQ("42", toString(42).c_str());
+    EXPECT_STREQ("-42", toString(-42).c_str());
+    EXPECT_STREQ("42.0001", toString(42.0001f).c_str());
+    EXPECT_STREQ("-42.0001", toString(-42.0001).c_str());
+}
+
+TEST(StringOperationsTest, ToWstring)
+{
+    EXPECT_EQ(std::wstring(L"42"), toWstring(42));
+    EXPECT_EQ(std::wstring(L"-42"), toWstring(-42));
+    EXPECT_EQ(std::wstring(L"42.0001"), toWstring(42.0001f));
+    EXPECT_EQ(std::wstring(L"-42.0001"), toWstring(-42.0001));
+}
+
 TEST(StringOperationsTest, ToNumeric)
 {
     EXPECT_EQ(42, toNumeric<int>("42"));
@@ -144,6 +160,23 @@ TEST(StringOperationsTest, Join)
 {
     EXPECT_EQ("one,two,three", join({ "one", "two", "three" }, ","));
     EXPECT_EQ("one", join({ "one" }, ","));
+}
+
+TEST(StringOperationsTest, StartsWith)
+{
+    EXPECT_TRUE(startsWith("TestOne", ""));
+    EXPECT_TRUE(startsWith("TestOne", "T"));
+    EXPECT_TRUE(startsWith("TestOne", "Te"));
+    EXPECT_TRUE(startsWith("TestOne", "TestOn"));
+    EXPECT_TRUE(startsWith("TestOne", "TestOne"));
+
+    EXPECT_TRUE(startsWith("TestOne", std::string("TestOn")));
+    EXPECT_TRUE(startsWith("TestOne", std::string("TestOne")));
+
+    EXPECT_FALSE(startsWith("TestOne", "es"));
+    EXPECT_FALSE(startsWith("TestOne", "t"));
+
+    EXPECT_FALSE(startsWith("", "."));
 }
 
 TEST(StringOperationsTest, EndsWith)

@@ -239,7 +239,7 @@ namespace stringops
     }
 
     template<typename T>
-    inline std::string toString(T& numeric)
+    inline std::string toString(T numeric)
     {
         std::stringstream ss;
         ss << numeric;
@@ -247,7 +247,7 @@ namespace stringops
     }
 
     template<typename T>
-    inline std::wstring toWstring(T& numeric)
+    inline std::wstring toWstring(T numeric)
     {
         std::wstringstream ss;
         ss << numeric;
