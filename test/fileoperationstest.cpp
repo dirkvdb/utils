@@ -170,6 +170,22 @@ TEST(FileOperationsTest, IterateDirectory)
     EXPECT_EQ("temp/temp", files[2]);
 }
 
+TEST(FileOperationsTest, MoveConstuctDirectory)
+{
+    createDirectory("temp");
+
+    auto dir = Directory("temp");
+    Directory dir2(std::move(dir));
+    EXPECT_STREQ("temp", dir2.path().c_str());
+
+    deleteDirectoryRecursive("temp");
+}
+
+TEST(FileOperationsTest, IterateInvalidDirectory)
+{
+    EXPECT_THROW(Directory("doesnotexist"), std::runtime_error);
+}
+
 TEST(FileOperationsTest, GetFileSize)
 {
     ofstream file("test.file");

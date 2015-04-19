@@ -71,7 +71,7 @@ public:
     {
         if (m_pDir == nullptr)
         {
-            throw std::logic_error("Failed to open directory: " + path);
+            throw std::runtime_error("Failed to open directory: " + path);
         }
     }
 
