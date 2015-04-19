@@ -115,6 +115,13 @@ TEST_F(BufferedReaderTest, readSmallData)
     EXPECT_FALSE(reader.eof());
 }
 
+TEST_F(BufferedReaderTest, readAllData)
+{
+    auto readData = reader.readAllData();
+    EXPECT_EQ(data, readData);
+    EXPECT_TRUE(reader.eof());
+}
+
 TEST_F(BufferedReaderTest, readOutsideExistingBuffer)
 {
     std::array<uint8_t, 6> readData;

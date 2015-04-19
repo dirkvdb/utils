@@ -182,6 +182,7 @@ uint64_t BufferedReader::read(uint8_t* pData, uint64_t size)
 
 std::vector<uint8_t> BufferedReader::readAllData()
 {
+    m_CurrentPosition = m_ContentLength;
     return m_Reader->readAllData();
 }
 
