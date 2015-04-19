@@ -108,7 +108,7 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 
 		# Capturing lcov counters and generating report
 		COMMAND ${LCOV_PATH} --gcov-tool=${GCOV_PATH} --directory . --capture --output-file ${_outputname}.info
-		COMMAND ${LCOV_PATH} --gcov-tool=${GCOV_PATH} --remove ${_outputname}.info 'test/*' '/usr/*' 'c++/*' --output-file ${_outputname}.info
+		COMMAND ${LCOV_PATH} --gcov-tool=${GCOV_PATH} --remove ${_outputname}.info 'test/*' '/usr/*' 'c++/*' 'format.*' --output-file ${_outputname}.info
 		COMMAND ${GENHTML_PATH} -o ${_outputname} ${_outputname}.info
 
 		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
