@@ -31,7 +31,7 @@ public:
     , m_Thread(&Task::run, this)
     {
     }
-    
+
     ~Task()
     {
         if (m_Thread.joinable())
@@ -39,7 +39,7 @@ public:
             m_Thread.join();
         }
     }
-    
+
     void stop()
     {
         m_Stop = true;
@@ -49,7 +49,7 @@ public:
     {
         m_StopFinish = true;
     }
-    
+
     void run()
     {
         for (;;)
@@ -59,12 +59,12 @@ public:
             {
                 m_Pool.m_Condition.wait(lock, [this] () { return m_Pool.hasJobs() || m_Stop || m_StopFinish; });
             }
-            
+
             if (m_Stop || (m_StopFinish && !m_Pool.hasJobs()))
             {
                 break;
             }
-            
+
             lock.unlock();
 
             auto job = m_Pool.getJob();
@@ -76,9 +76,9 @@ public:
                 }
                 catch (...)
                 {
-                    m_Pool.ErrorOccurred(std::make_exception_ptr(std::current_exception()));
+                    m_Pool.ErrorOccurred(std::current_exception());
                 }
-                
+
                 job = m_Pool.getJob();
             }
         }
@@ -102,12 +102,12 @@ ThreadPool::~ThreadPool() = default;
 void ThreadPool::start()
 {
     std::lock_guard<std::mutex> lock(m_PoolMutex);
-    
+
     if (!m_Threads.empty())
     {
         return;
     }
-    
+
     for (auto i = 0u; i < m_MaxNumThreads; ++i)
     {
         m_Threads.push_back(std::make_unique<Task>(*this));
@@ -162,7 +162,7 @@ void ThreadPool::addJob(std::function<void()> job)
         std::lock_guard<std::mutex> lock(m_JobsMutex);
         m_QueuedJobs.push_back(job);
     }
-    
+
     {
         std::lock_guard<std::mutex> lock(m_PoolMutex);
         m_Condition.notify_one();
@@ -181,7 +181,7 @@ std::function<void()> ThreadPool::getJob()
             m_QueuedJobs.pop_front();
         }
     }
-    
+
     return job;
 }
 

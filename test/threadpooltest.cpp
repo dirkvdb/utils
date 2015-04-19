@@ -19,6 +19,7 @@
 
 #include <chrono>
 #include <thread>
+#include <future>
 
 using namespace utils;
 using namespace std;
@@ -38,12 +39,12 @@ protected:
     {
         tp.start();
     }
-    
+
     void TearDown()
     {
         tp.stop();
     }
-    
+
     ThreadPool tp;
 };
 
@@ -65,7 +66,7 @@ TEST_F(ThreadPoolTest, RunJobs)
 
     std::mutex mutex;
     std::condition_variable cond;
-    
+
     uint32_t count = 0;
     std::set<std::thread::id> threadIds;
 
@@ -87,10 +88,10 @@ TEST_F(ThreadPoolTest, RunJobs)
             }
         });
     }
-    
+
     std::unique_lock<std::mutex> lock(mutex);
     cond.wait(lock, [&] () { return count == jobCount; });
-    
+
     EXPECT_EQ(g_poolSize, static_cast<uint32_t>(threadIds.size()));
 }
 
@@ -108,10 +109,29 @@ TEST_F(ThreadPoolTest, StopFinishJobs)
             ++count;
         });
     }
-    
-    
+
+
     tp.stopFinishJobs();
     EXPECT_EQ(jobCount, count);
+}
+
+TEST_F(ThreadPoolTest, ErrorInjob)
+{
+    std::promise<void> prom;
+
+    tp.ErrorOccurred.connect([&] (std::exception_ptr ex) {
+        prom.set_exception(ex);
+    }, this);
+
+    tp.addJob([] () {
+        throw std::runtime_error("Oops");
+    });
+
+    auto fut = prom.get_future();
+    EXPECT_EQ(std::future_status::ready, fut.wait_for(std::chrono::seconds(3)));
+    EXPECT_THROW(fut.get(), std::runtime_error);
+
+    tp.stopFinishJobs();
 }
 
 TEST_F(ThreadPoolTest, StartStopFinishJobs)
