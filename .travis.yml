@@ -29,7 +29,7 @@ install:
   - tar xf lcov-1.11.tar.gz
   - cd lcov-1.11 && sudo make install
   - cd ..
-  - sudo pip install cpp-coveralls pyopenssl ndg-httpsclient pyasn1
+  - gem install coveralls-lcov
 
 script:
   - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=/usr/bin/gcov-4.9 .
@@ -39,4 +39,4 @@ script:
 
 after_success:
   - lcov -v
-  - if [ "$BUILD_TYPE" = "Debug" ] && [ "$CXX" = "g++-4.9" ]; then make utils_coverage && coveralls --exclude test --gcov-options '\-lp'; fi
+  - if [ "$BUILD_TYPE" = "Debug" ] && [ "$CXX" = "g++-4.9" ]; then make utils_coverage && coveralls-lcov --repo-token X6q6ZWshmjbZ8jKMVfwkeDdbA1v8vd7UX coverage.info; fi
