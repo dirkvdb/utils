@@ -44,6 +44,29 @@ TEST(StringOperationsTest, LowerCase)
     testString = "H_ell_O";
     lowercase(testString);
     EXPECT_EQ("h_ell_o", testString);
+
+    EXPECT_EQ(std::string("hello"), lowercase("HeLLo"));
+}
+
+TEST(StringOperationsTest, UpperCase)
+{
+    string testString = "teststring";
+    uppercase(testString);
+    EXPECT_EQ("TESTSTRING", testString);
+
+    testString = "teststring";
+    uppercase(testString);
+    EXPECT_EQ("TESTSTRING", testString);
+
+    testString = "~!@#$%^&*()_1234567890-";
+    uppercase(testString);
+    EXPECT_EQ("~!@#$%^&*()_1234567890-", testString);
+
+    testString = "H_ell_O";
+    uppercase(testString);
+    EXPECT_EQ("H_ELL_O", testString);
+
+    EXPECT_EQ(std::string("HELLO"), uppercase("HeLLo"));
 }
 
 TEST(StringOperationsTest, Dos2Unix)
@@ -142,6 +165,7 @@ TEST(StringOperationsTest, Trim)
     string s = "  a a  a ";
     trim(s);
     EXPECT_EQ("a a  a", s);
+    EXPECT_EQ(std::string("a a  a"), trim("  a a  a "));
 
     s = "  \r \n\t\r\n a \r\t\n a  a \t\t\t";
     trim(s);
