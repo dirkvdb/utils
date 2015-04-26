@@ -4,7 +4,12 @@ ENABLE_TESTING()
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
 
 OPTION(DISABLE_XDGBASEDIR "disable searching for libxdg-basedir" OFF)
+OPTION(ENABLE_TESTS "build unit tests" ON)
 OPTION(BACKWARD "enable backtrace support" OFF)
+OPTION(COLORED_OUTPUT "Colored output" ON)
+OPTION(STANDALONE "Not used as a submodule of another project" OFF)
+OPTION(COVERAGE "Enable code coverage" OFF)
+OPTION(PERF_TRACE "Enable time doctor performance traces" OFF)
 
 FIND_PACKAGE(PkgConfig)
 
@@ -58,11 +63,6 @@ ADD_LIBRARY(utils STATIC
     ${UTILS_SOURCES}
 )
 
-OPTION(COLORED_OUTPUT "Colored output" ON)
-OPTION(STANDALONE "Not used as a submodule of another project" OFF)
-OPTION(COVERAGE "Enable code coverage" OFF)
-OPTION(PERF_TRACE "Enable time doctor performance traces" OFF)
-
 ADD_DEFINITIONS("-DHAVE_UTILS_CONFIG")
 
 IF (STANDALONE AND NOT MSVC)
@@ -99,4 +99,7 @@ ENDIF (UNIX OR APPLE)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/utilsconfig.h)
 
-ADD_SUBDIRECTORY(test)
+IF (ENABLE_TESTS)
+    ADD_SUBDIRECTORY(test)
+ENDIF ()
+
