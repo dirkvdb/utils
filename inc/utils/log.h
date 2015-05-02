@@ -42,135 +42,189 @@ public:
         Critical
     };
 
-    inline static void setFilter(Level level)
+    inline static void setFilter(Level level) noexcept
     {
         m_level = level;
     }
 
-    inline static void info(const std::string& s)
+    inline static void info(const std::string& s) noexcept
     {
         info(s.c_str());
     }
 
     template<typename... T>
-    inline static void info(const char* s, T&&... args)
+    inline static void info(const char* s, T&&... args) noexcept
     {
         if (m_level <= Level::Info)
         {
-            info(fmt::format(s, std::forward<const T>(args)...).c_str());
+            try
+            {
+                info(fmt::format(s, std::forward<const T>(args)...).c_str());
+            }
+            catch (fmt::FormatError&)
+            {
+                assert(false && "Formatting error");
+            }
         }
     }
 
-    inline static void info(const char* s)
+    inline static void info(const char* s) noexcept
     {
         if (m_level <= Level::Info)
         {
-            fmt::print_colored(fmt::GREEN, "INFO:  [{}] {}\n", timeops::getTimeString(), s);
+            print_colored(fmt::GREEN, "INFO", s);
         }
     }
 
-    inline static void warn(const std::string& s)
+    inline static void warn(const std::string& s) noexcept
     {
         warn(s.c_str());
     }
 
     template<typename... T>
-    inline static void warn(const char* s, T&&... args)
+    inline static void warn(const char* s, T&&... args) noexcept
     {
         if (m_level <= Level::Warn)
         {
-            warn(fmt::format(s, std::forward<const T>(args)...).c_str());
+            try
+            {
+                warn(fmt::format(s, std::forward<const T>(args)...).c_str());
+            }
+            catch (fmt::FormatError&)
+            {
+                assert(false && "Formatting error");
+            }
         }
     }
 
-    inline static void warn(const char* s)
+    inline static void warn(const char* s) noexcept
     {
         if (m_level <= Level::Warn)
         {
-            fmt::print_colored(fmt::YELLOW, "WARN:  [{}] {}\n", timeops::getTimeString(), s);
+            print_colored(fmt::YELLOW, "WARN", s);
         }
     }
 
-    inline static void critical(const std::string& s)
+    inline static void critical(const std::string& s) noexcept
     {
         critical(s.c_str());
     }
 
     template<typename... T>
-    inline static void critical(const char* s, T&&... args)
+    inline static void critical(const char* s, T&&... args) noexcept
     {
         if (m_level <= Level::Critical)
         {
-            critical(fmt::format(s, std::forward<const T>(args)...).c_str());
+            try
+            {
+                critical(fmt::format(s, std::forward<const T>(args)...).c_str());
+            }
+            catch (fmt::FormatError&)
+            {
+                assert(false && "Formatting error");
+            }
         }
     }
 
-    inline static void critical(const char* s)
+    inline static void critical(const char* s) noexcept
     {
         if (m_level <= Level::Critical)
         {
-            fmt::print_colored(fmt::MAGENTA, "CRIT:  [{}] {}\n", timeops::getTimeString(), s);
+            print_colored(fmt::MAGENTA, "CRIT", s);
         }
     }
 
-    inline static void error(const std::string& s)
+    inline static void error(const std::string& s) noexcept
     {
         error(s.c_str());
     }
 
     template<typename... T>
-    inline static void error(const char* s, T&&... args)
+    inline static void error(const char* s, T&&... args) noexcept
     {
         if (m_level <= Level::Error)
         {
-            error(fmt::format(s, std::forward<const T>(args)...).c_str());
+            try
+            {
+                error(fmt::format(s, std::forward<const T>(args)...).c_str());
+            }
+            catch (fmt::FormatError&)
+            {
+                assert(false && "Formatting error");
+            }
         }
     }
 
-    inline static void error(const char* s)
+    inline static void error(const char* s) noexcept
     {
         if (m_level <= Level::Error)
         {
-            fmt::print_colored(fmt::RED, "ERROR: [{}] {}\n", timeops::getTimeString(), s);
+            print_colored(fmt::RED, "ERROR", s);
         }
     }
 
-    inline static void debug(const std::string& s)
+    inline static void debug(const std::string& s) noexcept
     {
         debug(s.c_str());
     }
 
 #ifndef NDEBUG
     template<typename... T>
-    inline static void debug(const char* s, T&&... args)
+    inline static void debug(const char* s, T&&... args) noexcept
     {
         if (m_level == Level::Debug)
         {
-            debug(fmt::format(s, std::forward<const T>(args)...).c_str());
+            try
+            {
+                debug(fmt::format(s, std::forward<const T>(args)...).c_str());
+            }
+            catch (fmt::FormatError&)
+            {
+                assert(false && "Formatting error");
+            }
         }
     }
 #else
     template<typename... T>
-    inline static void debug(const char*, T&&...)
+    inline static void debug(const char*, T&&...) noexcept
     {
     }
 #endif
 
 #ifndef NDEBUG
-    inline static void debug(const char* s)
+    inline static void debug(const char* s) noexcept
     {
         if (m_level == Level::Debug)
         {
-            fmt::print_colored(fmt::WHITE, "DEBUG: [{}] [{}] {}\n", std::this_thread::get_id(), timeops::getTimeString(), s);
+            try
+            {
+                fmt::print_colored(fmt::WHITE, "DEBUG: [{}] [{}] {}\n", std::this_thread::get_id(), timeops::getTimeString(), s);
+            }
+            catch (const fmt::FormatError&)
+            {
+                assert(false && "Format error");
+            }
         }
     }
 #else
-    inline static void debug(const char*)
+    inline static void debug(const char*) noexcept
     {
     }
 #endif
 
 private:
+    inline static void print_colored(fmt::Color c, const char* level, const char* s) noexcept
+    {
+        try
+        {
+            fmt::print_colored(c, "{}: [{}] {}\n", level, timeops::getTimeString(), s);
+        }
+        catch (const fmt::FormatError&)
+        {
+            assert(false && "Format error");
+        }
+    }
+
     static Level            m_level;
     static std::mutex       m_mutex;
 };

@@ -92,6 +92,7 @@ public:
     : valueType(String)
     , id(i)
     , name(n)
+    , number(0.0)
     {
     }
 
