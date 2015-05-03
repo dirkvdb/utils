@@ -40,7 +40,7 @@ SET (UTILS_SOURCES
     numericoperations.h
     readerinterface.h
     readerfactory.h       readerfactory.cpp
-    signal.h
+    utilssignal.h
     simplesubscriber.h
     stringoperations.h
     subscriber.h

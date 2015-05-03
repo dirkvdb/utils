@@ -21,7 +21,7 @@
 #include <memory>
 #include <condition_variable>
 
-#include "signal.h"
+#include "utilssignal.h"
 
 namespace utils
 {
