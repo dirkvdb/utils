@@ -14,7 +14,7 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "utils/workerthread.h"
+#include "workerthread.h"
 
 #include <thread>
 
@@ -30,7 +30,7 @@ public:
     , m_Thread(&Task::run, this)
     {
     }
-    
+
     ~Task()
     {
         {
@@ -38,19 +38,19 @@ public:
             m_Stop = true;
             m_Condition.notify_one();
         }
-    
+
         if (m_Thread.joinable())
         {
             m_Thread.join();
         }
     }
-    
+
     void signalJobAvailable()
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
         m_Condition.notify_one();
     }
-    
+
     void run()
     {
         for (;;)
@@ -60,12 +60,12 @@ public:
             {
                 m_Condition.wait(lock, [this] () { return m_Worker.hasJobs() || m_Stop; });
             }
-            
+
             if (m_Stop)
             {
                 break;
             }
-            
+
             lock.unlock();
 
             auto job = m_Worker.nextJob();
@@ -79,7 +79,7 @@ public:
                 {
                     m_Worker.ErrorOccurred(std::current_exception());
                 }
-                
+
                 job = m_Worker.nextJob();
             }
         }
@@ -88,7 +88,7 @@ public:
 private:
     bool                                        m_Stop;
     WorkerThread&                               m_Worker;
-    
+
     std::mutex                                  m_Mutex;
     std::condition_variable                     m_Condition;
     std::thread                                 m_Thread;
@@ -96,7 +96,7 @@ private:
 
 WorkerThread::WorkerThread() = default;
 WorkerThread::~WorkerThread() = default;
-    
+
 void WorkerThread::start()
 {
     std::lock_guard<std::mutex> lock(m_Mutex);
@@ -121,10 +121,10 @@ void WorkerThread::addJob(const std::function<void()>& job)
         std::lock_guard<std::mutex> lock(m_Mutex);
         m_JobQueue.push_back(job);
     }
-    
+
     m_Thread->signalJobAvailable();
 }
-    
+
 void WorkerThread::clearJobs()
 {
     std::lock_guard<std::mutex> lock(m_Mutex);
@@ -147,8 +147,8 @@ std::function<void()> WorkerThread::nextJob()
         job = m_JobQueue.front();
         m_JobQueue.pop_front();
     }
-    
+
     return job;
 }
-    
+
 }

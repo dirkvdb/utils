@@ -14,7 +14,7 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "utils/signal.h"
+#include "signal.h"
 
 #include <memory>
 
@@ -64,12 +64,12 @@ TEST_F(SignalTest, ConnectDisconnect)
 
     EXPECT_CALL(m_Mock1, onItem()).Times(0);
     EXPECT_CALL(m_Mock2, onItem()).Times(1);
-    
+
     sig.disconnect(&m_Mock1);
     sig();
     Mock::VerifyAndClearExpectations(&m_Mock1);
     Mock::VerifyAndClearExpectations(&m_Mock2);
-    
+
     EXPECT_CALL(m_Mock1, onItem()).Times(0);
     EXPECT_CALL(m_Mock2, onItem()).Times(0);
 
@@ -100,12 +100,12 @@ TEST_F(SignalTest, ConnectDisconnect1)
 
     EXPECT_CALL(m_Mock1, onItem1(_)).Times(0);
     EXPECT_CALL(m_Mock2, onItem1(2)).Times(1);
-    
+
     sig.disconnect(&m_Mock1);
     sig(2);
     Mock::VerifyAndClearExpectations(&m_Mock1);
     Mock::VerifyAndClearExpectations(&m_Mock2);
-    
+
     EXPECT_CALL(m_Mock1, onItem1(_)).Times(0);
     EXPECT_CALL(m_Mock2, onItem1(_)).Times(0);
 
@@ -136,12 +136,12 @@ TEST_F(SignalTest, ConnectDisconnect2)
 
     EXPECT_CALL(m_Mock1, onItem2(_, _)).Times(0);
     EXPECT_CALL(m_Mock2, onItem2(2, 7)).Times(1);
-    
+
     sig.disconnect(&m_Mock1);
     sig(2, 7);
     Mock::VerifyAndClearExpectations(&m_Mock1);
     Mock::VerifyAndClearExpectations(&m_Mock2);
-    
+
     EXPECT_CALL(m_Mock1, onItem2(_, _)).Times(0);
     EXPECT_CALL(m_Mock2, onItem2(_, _)).Times(0);
 
@@ -172,12 +172,12 @@ TEST_F(SignalTest, ConnectDisconnect3)
 
     EXPECT_CALL(m_Mock1, onItem3(_, _, _)).Times(0);
     EXPECT_CALL(m_Mock2, onItem3(2, 7, 0)).Times(1);
-    
+
     sig.disconnect(&m_Mock1);
     sig(2, 7, 0);
     Mock::VerifyAndClearExpectations(&m_Mock1);
     Mock::VerifyAndClearExpectations(&m_Mock2);
-    
+
     EXPECT_CALL(m_Mock1, onItem3(_, _, _)).Times(0);
     EXPECT_CALL(m_Mock2, onItem3(_, _, _)).Times(0);
 

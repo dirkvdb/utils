@@ -14,8 +14,8 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "utils/trace.h"
-#include "utils/format.h"
+#include "trace.h"
+#include "format.h"
 
 #include <fstream>
 #include <mutex>

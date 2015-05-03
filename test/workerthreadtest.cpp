@@ -14,7 +14,7 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "utils/workerthread.h"
+#include "workerthread.h"
 #include "gtest/gtest.h"
 
 #include <thread>
@@ -30,12 +30,12 @@ protected:
     {
         wt.start();
     }
-    
+
     void TearDown()
     {
         wt.stop();
     }
-    
+
     WorkerThread wt;
 };
 
@@ -57,7 +57,7 @@ TEST_F(WorkerThreadTest, RunJobs)
 
     std::mutex mutex;
     std::condition_variable cond;
-    
+
     uint32_t count = 0;
     std::set<std::thread::id> threadIds;
 
@@ -72,10 +72,10 @@ TEST_F(WorkerThreadTest, RunJobs)
             }
         });
     }
-    
+
     std::unique_lock<std::mutex> lock(mutex);
     cond.wait(lock, [&] () { return count == jobCount; });
-    
+
     EXPECT_EQ(1u, threadIds.size());
 }
 
@@ -84,7 +84,7 @@ TEST_F(WorkerThreadTest, RunJobThatFails)
     std::mutex mutex;
     std::condition_variable cond;
     std::exception_ptr ex;
-    
+
     wt.ErrorOccurred.connect([&] (std::exception_ptr e) {
         ex = e;
         std::lock_guard<std::mutex> lock(mutex);
@@ -94,14 +94,14 @@ TEST_F(WorkerThreadTest, RunJobThatFails)
     wt.addJob([&] () {
         throw std::runtime_error("Error");
     });
-    
+
     {
         std::unique_lock<std::mutex> lock(mutex);
         cond.wait(lock, [&] () { return ex != nullptr; });
     }
-    
+
     wt.stop();
-    
+
     EXPECT_THROW(std::rethrow_exception(ex), std::runtime_error);
 }
 

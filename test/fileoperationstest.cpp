@@ -19,7 +19,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "utils/fileoperations.h"
+#include "fileoperations.h"
 #include "gtest/gtest.h"
 
 using namespace std;

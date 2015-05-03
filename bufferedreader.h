@@ -21,7 +21,7 @@
 #include <vector>
 #include <memory>
 
-#include "utils/readerinterface.h"
+#include "readerinterface.h"
 
 namespace utils
 {

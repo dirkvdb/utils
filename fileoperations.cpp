@@ -14,8 +14,8 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "utils/fileoperations.h"
-#include "utils/stringoperations.h"
+#include "fileoperations.h"
+#include "stringoperations.h"
 
 #ifdef HAVE_UTILS_CONFIG
     #include "utilsconfig.h"
@@ -47,7 +47,7 @@
 #include <string>
 #include <vector>
 
-#include "utils/log.h"
+#include "format.h"
 
 namespace utils
 {

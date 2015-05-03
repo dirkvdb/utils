@@ -14,7 +14,7 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "utils/trace.h"
+#include "trace.h"
 
 #include <memory>
 #include <functional>
@@ -41,42 +41,42 @@ TEST_F(TraceTest, PerformTrace)
         , m_note(PerfLogger::createNote("TestDetails"))
         {
         }
-    
+
         void m1()
         {
             TraceMethod();
         }
-        
+
         void m2()
         {
             TraceMethod();
         }
-        
+
         void interrupt()
         {
             TraceInterrupt();
         }
-        
+
         void queueAdd()
         {
             m_note->addNote("QAdd");
             m_queuePerf->itemAdded();
             m_note->addNote("QAddDone");
         }
-        
+
         void queueRemove()
         {
             m_queuePerf->itemRemoved();
         }
-        
+
     private:
         ScopedPerfTrace m_ev;
         QueueEventPtr m_queuePerf;
         NoteEventPtr m_note;
     };
-    
+
     PerfLogger::enable();
-    
+
     {
         TestTracer t;
         t.m1();
@@ -88,7 +88,7 @@ TEST_F(TraceTest, PerformTrace)
         t.queueRemove();
         t.m2();
     }
-    
+
     PerfLogger::disable();
     PerfLogger::writeToFile("trace.tdi");
 }
