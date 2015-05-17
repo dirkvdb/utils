@@ -19,7 +19,7 @@
 #include <iostream>
 
 #include "gtest/gtest.h"
-#include "stringoperations.h"
+#include "utils/stringoperations.h"
 
 using std::string;
 using std::wstring;

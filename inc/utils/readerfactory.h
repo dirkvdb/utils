@@ -1,4 +1,4 @@
-//    Copyright (C) 2012 Dirk Vanden Boer <dirk.vdb@gmail.com>
+//    Copyright (C) 2014 Dirk Vanden Boer <dirk.vdb@gmail.com>
 //
 //    This program is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -14,13 +14,28 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef UTILS_BACK_TRACE_H
-#define UTILS_BACK_TRACE_H
+#ifndef UTILS_READER_FACTORY_H
+#define UTILS_READER_FACTORY_H
+
+#include <string>
+#include <vector>
+#include <memory>
+
+#include "utils/readerinterface.h"
 
 namespace utils
 {
 
-void printBackTrace();
+class ReaderFactory
+{
+public:
+    static void registerBuilder(std::unique_ptr<IReaderBuilder> builder);
+    static utils::IReader* create(const std::string& uri);
+    static utils::IReader* createBuffered(const std::string& filepath, uint32_t bufferSize);
+    
+private:
+    static std::vector<std::unique_ptr<IReaderBuilder>>  m_Builders;
+};
 
 }
 

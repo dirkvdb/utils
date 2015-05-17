@@ -21,9 +21,9 @@
 #include <algorithm>
 
 
-#include "bufferedreader.h"
-#include "filereader.h"
-#include "fileoperations.h"
+#include "utils/bufferedreader.h"
+#include "utils/filereader.h"
+#include "utils/fileoperations.h"
 
 using namespace utils;
 using namespace testing;

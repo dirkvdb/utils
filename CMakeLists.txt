@@ -1,3 +1,18 @@
+IF (BIICODE)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/utilsconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/utilsconfig.h)
+
+    ADD_BII_TARGETS()
+
+    TARGET_INCLUDE_DIRECTORIES(${BII_LIB_TARGET} INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
+
+    IF (APPLE)
+        TARGET_COMPILE_OPTIONS(${BII_BLOCK_TARGET} INTERFACE -std=c++14 -stdlib=libc++)
+    ELSEIF (WIN32 OR UNIX)
+        TARGET_COMPILE_OPTIONS(${BII_BLOCK_TARGET} INTERFACE -std=c++14)
+    ENDIF ()
+    RETURN ()
+ELSE ()
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 ENABLE_TESTING()
 
@@ -31,32 +46,32 @@ IF (NOT DISABLE_XDGBASEDIR)
 ENDIF ()
 
 SET (UTILS_SOURCES
-    bufferedreader.h      bufferedreader.cpp
-    fileoperations.h      fileoperations.cpp
-    filereader.h          filereader.cpp
-    format.h              format.cpp
-    functiontraits.h
-    log.h                 log.cpp
-    numericoperations.h
-    readerinterface.h
-    readerfactory.h       readerfactory.cpp
-    utilssignal.h
-    simplesubscriber.h
-    stringoperations.h
-    subscriber.h
-    timeoperations.h
-    timerthread.h
-    threadpool.h          threadpool.cpp
-    trace.h               trace.cpp
-    workerthread.h        workerthread.cpp
-    backtrace.h           backtrace.cpp
+    inc/utils/bufferedreader.h      src/bufferedreader.cpp
+    inc/utils/fileoperations.h      src/fileoperations.cpp
+    inc/utils/filereader.h          src/filereader.cpp
+    inc/utils/format.h              src/format.cpp
+    inc/utils/functiontraits.h
+    inc/utils/log.h                 src/log.cpp
+    inc/utils/numericoperations.h
+    inc/utils/readerinterface.h
+    inc/utils/readerfactory.h       src/readerfactory.cpp
+    inc/utils/signal.h
+    inc/utils/simplesubscriber.h
+    inc/utils/stringoperations.h
+    inc/utils/subscriber.h
+    inc/utils/timeoperations.h
+    inc/utils/timerthread.h
+    inc/utils/threadpool.h          src/threadpool.cpp
+    inc/utils/trace.h               src/trace.cpp
+    inc/utils/workerthread.h        src/workerthread.cpp
+    inc/utils/backtrace.h           src/backtrace.cpp
 )
 
 IF (BACKWARD)
-    ADD_SUBDIRECTORY(src/backward-cpp)
-    LIST(APPEND UTILS_SOURCES
-        ${backward_ENABLE}
-    )
+    #ADD_SUBDIRECTORY(src/backward-cpp)
+    #LIST(APPEND UTILS_SOURCES
+    #    ${backward_ENABLE}
+    #)
 ENDIF()
 
 ADD_LIBRARY(utils STATIC
@@ -93,23 +108,9 @@ IF (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Android" AND NOT MSVC)
 ENDIF ()
 TARGET_LINK_LIBRARIES(utils ${UTILS_LIBRARIES})
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/utilsconfig.h)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/utilsconfig.h.in ${CMAKE_BINARY_DIR}/utilsconfig.h)
 
 IF (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND ENABLE_TESTS)
     ADD_SUBDIRECTORY(test)
 ENDIF ()
-
-IF (BIICODE)
-  SET (BII_LIB_SRC)
-
-  ADD_BII_TARGETS()
-
-  TARGET_INCLUDE_DIRECTORIES(${BII_LIB_TARGET} INTERFACE ${CMAKE_BINARY_DIR})
-
-  # Apply biicode dependencies to my library
-  TARGET_LINK_LIBRARIES(utils PUBLIC ${BII_LIB_DEPS})
-  # Also the interface properties
-  TARGET_LINK_LIBRARIES(utils PUBLIC ${BII_BLOCK_TARGET})
-  # Wire your lib to ${BII_LIB_TARGET} so biicode can use it
-  TARGET_LINK_LIBRARIES(${BII_LIB_TARGET} INTERFACE utils)
-ENDIF()
+ENDIF ()

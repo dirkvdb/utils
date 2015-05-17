@@ -14,47 +14,50 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef UTILS_WORKER_THREAD_H
-#define UTILS_WORKER_THREAD_H
+#ifndef UTILS_THREAD_POOL_H
+#define UTILS_THREAD_POOL_H
 
+#include <vector>
 #include <deque>
 #include <memory>
+#include <functional>
 #include <condition_variable>
 
-#include "utilssignal.h"
+#include "utils/signal.h"
 
 namespace utils
 {
 
-class WorkerThread
+class ThreadPool
 {
 public:
-    WorkerThread();
-    ~WorkerThread();
-    WorkerThread(const WorkerThread&) = delete;
-    WorkerThread& operator=(const WorkerThread&) = delete;
+    ThreadPool(uint32_t maxNumThreads = 4);
+    ~ThreadPool();
+    ThreadPool(const ThreadPool&) = delete;
+    ThreadPool& operator=(const ThreadPool&) = delete;
 
     void start();
     void stop();
-
-    void addJob(const std::function<void()>& job);
+    void stopFinishJobs();
+    void addJob(std::function<void()> job);
 
     utils::Signal<std::exception_ptr> ErrorOccurred;
 
 private:
-    class Task;
-
     bool hasJobs();
-    std::function<void()> nextJob();
-    void clearJobs();
+    std::function<void()> getJob();
 
-    std::deque<std::function<void()>>     		m_JobQueue;
-    std::mutex                                  m_Mutex;
-    std::unique_ptr<Task>                       m_Thread;
-
+    class Task;
     friend class Task;
-};
 
+    std::mutex                                  m_JobsMutex;
+    std::mutex                                  m_PoolMutex;
+    std::condition_variable                     m_Condition;
+    std::deque<std::function<void()>>           m_QueuedJobs;
+    std::vector<std::unique_ptr<Task>>          m_Threads;
+
+    uint32_t                                    m_MaxNumThreads;
+};
 }
 
 #endif

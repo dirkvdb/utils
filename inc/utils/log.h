@@ -24,8 +24,8 @@
 #include <thread>
 #include <mutex>
 
-#include "format.h"
-#include "timeoperations.h"
+#include "utils/format.h"
+#include "utils/timeoperations.h"
 
 namespace utils
 {

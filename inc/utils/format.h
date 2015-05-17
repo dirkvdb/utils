@@ -199,7 +199,7 @@ void format(BasicFormatter<Char> &f, const Char *&format_str, const T &value);
   \rst
   A string reference. It can be constructed from a C string or
   ``std::string``.
-  
+
   You can use one of the following typedefs for common character types:
 
   +------------+-------------------------+
@@ -776,7 +776,7 @@ class IsConvertibleToInt {
 
   static yes &check(fmt::ULongLong);
   static no &check(...);
-  
+
  public:
   enum { value = (sizeof(check(get())) == sizeof(yes)) };
 };
@@ -1187,7 +1187,7 @@ class BasicFormatter : private internal::FormatterBase {
  private:
   BasicWriter<Char> &writer_;
   const Char *start_;
-  
+
   FMT_DISALLOW_COPY_AND_ASSIGN(BasicFormatter);
 
   // Parses argument index and returns corresponding argument.
@@ -1609,7 +1609,7 @@ class SystemError : public internal::RuntimeError {
    *error_code* is a system error code as given by ``errno``.
    If *error_code* is not a valid error code such as -1, the system message
    may look like "Unknown error -1" and is platform-dependent.
-   
+
    **Example**::
 
      // This throws a SystemError with the description
@@ -1771,7 +1771,7 @@ class BasicWriter {
   /**
     \rst
     Writes formatted data.
-    
+
     *args* is an argument list representing arbitrary arguments.
 
     **Example**::
@@ -2284,7 +2284,7 @@ typedef BasicMemoryWriter<wchar_t> WMemoryWriter;
   This class template provides operations for formatting and writing data
   into a fixed-size array. For writing into a dynamically growing buffer
   use :class:`fmt::BasicMemoryWriter`.
-  
+
   Any write method will throw ``std::runtime_error`` if the output doesn't fit
   into the array.
 
@@ -2753,10 +2753,6 @@ FMT_VARIADIC(int, fprintf, std::FILE *, StringRef)
 
 #ifdef __clang__
 # pragma clang diagnostic pop
-#endif
-
-#ifdef FMT_HEADER_ONLY
-# include "format.cc"
 #endif
 
 #endif  // FMT_FORMAT_H_
