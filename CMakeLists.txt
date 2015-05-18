@@ -75,10 +75,10 @@ SET (UTILS_SOURCES
 )
 
 IF (BACKWARD)
-    #ADD_SUBDIRECTORY(src/backward-cpp)
-    #LIST(APPEND UTILS_SOURCES
-    #    ${backward_ENABLE}
-    #)
+    ADD_SUBDIRECTORY(src/backward-cpp)
+    LIST(APPEND UTILS_SOURCES
+        ${backward_ENABLE}
+    )
 ENDIF()
 
 ADD_LIBRARY(utils STATIC
