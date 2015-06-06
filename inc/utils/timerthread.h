@@ -31,82 +31,82 @@ namespace utils
 class TimerThread
 {
 public:
-    TimerThread() : m_Stop(false) {}
+    TimerThread() : m_stop(false) {}
     TimerThread(const TimerThread&) = delete;
     TimerThread& operator=(const TimerThread) = delete;
-    
+
     ~TimerThread()
     {
         cancel();
     }
-    
+
     void run(const std::chrono::milliseconds& interval, std::function<void()> cb)
     {
-        std::lock_guard<std::mutex> lock(m_Mutex);
-        m_Stop = false;
-        m_Thread = std::make_unique<std::thread>(std::bind(&TimerThread::timerThread, this, interval, cb));
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_stop = false;
+        m_thread = std::make_unique<std::thread>(std::bind(&TimerThread::timerThread, this, interval, cb));
     }
-    
+
     void cancel()
     {
         {
-            std::lock_guard<std::mutex> lock(m_Mutex);
-            if (!m_Thread)
+            std::lock_guard<std::mutex> lock(m_mutex);
+            if (!m_thread)
             {
                 return;
             }
-            
-            m_Stop = true;
-            m_Condition.notify_all();
+
+            m_stop = true;
+            m_condition.notify_all();
         }
-        
-        if (m_Thread->joinable())
+
+        if (m_thread->joinable())
         {
-            m_Thread->join();
+            m_thread->join();
         }
-        
-        m_Thread.reset();
+
+        m_thread.reset();
     }
-    
+
     void cancelDontWait()
     {
         {
-            std::lock_guard<std::mutex> lock(m_Mutex);
-            if (!m_Thread)
+            std::lock_guard<std::mutex> lock(m_mutex);
+            if (!m_thread)
             {
                 return;
             }
-            
-            m_Stop = true;
-            m_Condition.notify_all();
+
+            m_stop = true;
+            m_condition.notify_all();
         }
-    
-        m_Thread->detach();
-        m_Thread.reset();
+
+        m_thread->detach();
+        m_thread.reset();
     }
-    
+
 private:
     void timerThread(const std::chrono::milliseconds& interval, std::function<void()> cb)
     {
-        while (!m_Stop)
+        while (!m_stop)
         {
-            std::unique_lock<std::mutex> lock(m_Mutex);
-            m_Condition.wait_for(lock, interval);
-            if (m_Stop)
+            std::unique_lock<std::mutex> lock(m_mutex);
+            m_condition.wait_for(lock, interval);
+            if (m_stop)
             {
                 continue;
             }
-            
-            m_Mutex.unlock();
-            
+
+            m_mutex.unlock();
+
             cb();
         }
     }
 
-    std::mutex                                          m_Mutex;
-    std::condition_variable                             m_Condition;
-    std::unique_ptr<std::thread>                        m_Thread;
-    bool                                                m_Stop;
+    std::mutex                                          m_mutex;
+    std::condition_variable                             m_condition;
+    std::unique_ptr<std::thread>                        m_thread;
+    bool                                                m_stop;
 };
 
 }
