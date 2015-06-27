@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <mutex>
+#include <algorithm>
 #include <functional>
 
 namespace utils
