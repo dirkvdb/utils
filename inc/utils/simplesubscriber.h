@@ -28,16 +28,16 @@ class SimpleSubscriber : public ISubscriber<const T&>
 public:
 	T& getItem()
 	{
-		return m_Item;
+		return m_item;
 	}
 
 	void onItem(const T& item, void* pData = nullptr)
 	{
-		m_Item = item;
+		m_item = item;
 	}
 
 private:
-	T m_Item;
+	T m_item;
 };
 
 }

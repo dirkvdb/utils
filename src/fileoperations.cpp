@@ -97,50 +97,50 @@ private:
 };
 
 Directory::Directory(const std::string& path)
-: m_Path(path)
-, m_DirHandle(std::make_shared<DirectoryHandle>(path))
+: m_path(path)
+, m_dirHandle(std::make_shared<DirectoryHandle>(path))
 {
 }
 
 Directory::Directory(Directory&& other)
-: m_Path(std::move(other.path()))
-, m_DirHandle(std::move(other.m_DirHandle))
+: m_path(std::move(other.path()))
+, m_dirHandle(std::move(other.m_dirHandle))
 {
 }
 
 std::string Directory::path() const
 {
-    return m_Path;
+    return m_path;
 }
 
 Directory::DirectoryHandle& Directory::handle() const
 {
-    assert(m_DirHandle);
-    return *m_DirHandle;
+    assert(m_dirHandle);
+    return *m_dirHandle;
 }
 
 FileSystemEntry::FileSystemEntry(const std::string& path, FileSystemEntryType type)
-: m_Path(path)
-, m_Type(type)
+: m_path(path)
+, m_type(type)
 {
 }
 
 const std::string& FileSystemEntry::path() const
 {
-    return m_Path;
+    return m_path;
 }
 
 FileSystemEntryType FileSystemEntry::type() const
 {
-    return m_Type;
+    return m_type;
 }
 
 FileSystemEntry& FileSystemEntry::operator=(FileSystemEntry&& other)
 {
     if (this != &other)
     {
-        m_Path = std::move(other.m_Path);
-        m_Type = std::move(other.m_Type);
+        m_path = std::move(other.m_path);
+        m_type = std::move(other.m_type);
     }
 
     return *this;
@@ -176,51 +176,51 @@ FileSystemIterator::FileSystemIterator()
 
 FileSystemIterator::FileSystemIterator(const Directory& dir)
 : m_pDir(&dir)
-, m_IterData(std::make_shared<IteratorData>())
+, m_iterData(std::make_shared<IteratorData>())
 {
     nextFile();
 }
 
 void FileSystemIterator::nextFile()
 {
-    if (!m_IterData)
+    if (!m_iterData)
     {
         throw std::logic_error("filesystem iterator out of bounds");
     }
 
-    m_IterData->dirEntry = readdir(m_pDir->handle());
-    if (!m_IterData->dirEntry)
+    m_iterData->dirEntry = readdir(m_pDir->handle());
+    if (!m_iterData->dirEntry)
     {
-        m_IterData.reset();
+        m_iterData.reset();
         return;
     }
 
-    if (!strcmp(m_IterData->dirEntry->d_name, ".") || !strcmp(m_IterData->dirEntry->d_name, ".."))
+    if (!strcmp(m_iterData->dirEntry->d_name, ".") || !strcmp(m_iterData->dirEntry->d_name, ".."))
     {
         nextFile();
         return;
     }
 
-    auto path = combinePath(m_pDir->path(), m_IterData->dirEntry->d_name);
-    if (m_IterData->dirEntry->d_type == DT_REG)
+    auto path = combinePath(m_pDir->path(), m_iterData->dirEntry->d_name);
+    if (m_iterData->dirEntry->d_type == DT_REG)
     {
-        m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::File);
+        m_iterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::File);
         return;
     }
 
-    if (m_IterData->dirEntry->d_type == DT_LNK)
+    if (m_iterData->dirEntry->d_type == DT_LNK)
     {
-        m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::SymbolicLink);
+        m_iterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::SymbolicLink);
         return;
     }
 
-    if (m_IterData->dirEntry->d_type == DT_DIR)
+    if (m_iterData->dirEntry->d_type == DT_DIR)
     {
-        m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::Directory);
+        m_iterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::Directory);
         return;
     }
 
-    if (m_IterData->dirEntry->d_type == DT_UNKNOWN)
+    if (m_iterData->dirEntry->d_type == DT_UNKNOWN)
     {
         //some filesystem don't support d_type use stat to get type of entry
         struct stat statInfo;
@@ -228,19 +228,19 @@ void FileSystemIterator::nextFile()
         {
             if (S_ISREG(statInfo.st_mode))
             {
-                m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::File);
+                m_iterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::File);
                 return;
             }
 
             if (S_ISLNK(statInfo.st_mode))
             {
-                m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::SymbolicLink);
+                m_iterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::SymbolicLink);
                 return;
             }
 
             if (S_ISDIR(statInfo.st_mode))
             {
-                m_IterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::Directory);
+                m_iterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::Directory);
                 return;
             }
         }
@@ -252,12 +252,12 @@ void FileSystemIterator::nextFile()
 
 const FileSystemEntry& FileSystemIterator::operator*()
 {
-    return m_IterData->fsEntry;
+    return m_iterData->fsEntry;
 }
 
 const FileSystemEntry* FileSystemIterator::operator->()
 {
-    return &m_IterData->fsEntry;
+    return &m_iterData->fsEntry;
 }
 
 FileSystemIterator& FileSystemIterator::operator++()
@@ -271,7 +271,7 @@ FileSystemIterator& FileSystemIterator::operator =(FileSystemIterator&& other)
     if (this != &other)
     {
         std::swap(m_pDir, other.m_pDir);
-        m_IterData = std::move(other.m_IterData);
+        m_iterData = std::move(other.m_iterData);
     }
 
     return *this;
@@ -279,17 +279,17 @@ FileSystemIterator& FileSystemIterator::operator =(FileSystemIterator&& other)
 
 bool FileSystemIterator::operator ==(const FileSystemIterator& other) const
 {
-    if (!m_IterData && !other.m_IterData)
+    if (!m_iterData && !other.m_iterData)
     {
         return true;
     }
 
-    if (!m_IterData || !other.m_IterData)
+    if (!m_iterData || !other.m_iterData)
     {
         return false;
     }
 
-    return m_IterData->fsEntry.path() == other.m_IterData->fsEntry.path();
+    return m_iterData->fsEntry.path() == other.m_iterData->fsEntry.path();
 }
 
 bool FileSystemIterator::operator !=(const FileSystemIterator& other) const

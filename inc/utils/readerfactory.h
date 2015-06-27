@@ -32,9 +32,9 @@ public:
     static void registerBuilder(std::unique_ptr<IReaderBuilder> builder);
     static utils::IReader* create(const std::string& uri);
     static utils::IReader* createBuffered(const std::string& filepath, uint32_t bufferSize);
-    
+
 private:
-    static std::vector<std::unique_ptr<IReaderBuilder>>  m_Builders;
+    static std::vector<std::unique_ptr<IReaderBuilder>>  m_builders;
 };
 
 }

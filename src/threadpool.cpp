@@ -17,6 +17,7 @@
 #include "utils/threadpool.h"
 
 #include <thread>
+#include <cassert>
 
 namespace utils
 {
@@ -25,50 +26,48 @@ class ThreadPool::Task
 {
 public:
     Task(ThreadPool& pool)
-    : m_Stop(false)
-    , m_StopFinish(false)
-    , m_Pool(pool)
-    , m_Thread(&Task::run, this)
+    : m_stop(false)
+    , m_stopFinish(false)
+    , m_pool(pool)
+    , m_thread(&Task::run, this)
     {
     }
 
     ~Task()
     {
-        if (m_Thread.joinable())
-        {
-            m_Thread.join();
-        }
+        assert(m_thread.joinable());
+        m_thread.join();
     }
 
     void stop()
     {
-        m_Stop = true;
+        m_stop = true;
     }
 
     void stopFinishJobs()
     {
-        m_StopFinish = true;
+        m_stopFinish = true;
     }
 
     void run()
     {
         for (;;)
         {
-            std::unique_lock<std::mutex> lock(m_Pool.m_PoolMutex);
-            if (!m_Pool.hasJobs() || !m_Stop)
+            std::unique_lock<std::mutex> lock(m_pool.m_poolMutex);
+            if (!m_pool.hasJobs() || !m_stop)
             {
-                m_Pool.m_Condition.wait(lock, [this] () { return m_Pool.hasJobs() || m_Stop || m_StopFinish; });
+                m_pool.m_condition.wait(lock, [this] () { return m_pool.hasJobs() || m_stop || m_stopFinish; });
             }
 
-            if (m_Stop || (m_StopFinish && !m_Pool.hasJobs()))
+            if (m_stop || (m_stopFinish && !m_pool.hasJobs()))
             {
                 break;
             }
 
             lock.unlock();
 
-            auto job = m_Pool.getJob();
-            while (job && !m_Stop)
+            auto job = m_pool.getJob();
+            while (job && !m_stop)
             {
                 try
                 {
@@ -76,24 +75,24 @@ public:
                 }
                 catch (...)
                 {
-                    m_Pool.ErrorOccurred(std::current_exception());
+                    m_pool.ErrorOccurred(std::current_exception());
                 }
 
-                job = m_Pool.getJob();
+                job = m_pool.getJob();
             }
         }
     }
 
 private:
-    bool            m_Stop;
-    bool            m_StopFinish;
-    ThreadPool&     m_Pool;
+    bool            m_stop;
+    bool            m_stopFinish;
+    ThreadPool&     m_pool;
 
-    std::thread     m_Thread;
+    std::thread     m_thread;
 };
 
 ThreadPool::ThreadPool(uint32_t maxNumThreads)
-: m_MaxNumThreads(maxNumThreads)
+: m_maxNumThreads(maxNumThreads)
 {
 }
 
@@ -101,71 +100,70 @@ ThreadPool::~ThreadPool() = default;
 
 void ThreadPool::start()
 {
-    std::lock_guard<std::mutex> lock(m_PoolMutex);
+    std::lock_guard<std::mutex> lock(m_poolMutex);
 
-    if (!m_Threads.empty())
+    if (!m_threads.empty())
     {
         return;
     }
 
-    for (auto i = 0u; i < m_MaxNumThreads; ++i)
+    for (auto i = 0u; i < m_maxNumThreads; ++i)
     {
-        m_Threads.push_back(std::make_unique<Task>(*this));
+        m_threads.push_back(std::make_unique<Task>(*this));
     }
 }
 
 void ThreadPool::stop()
 {
     {
-        std::lock_guard<std::mutex> lock(m_JobsMutex);
-        m_QueuedJobs.clear();
+        std::lock_guard<std::mutex> lock(m_jobsMutex);
+        m_queuedJobs.clear();
     }
 
     {
-        std::lock_guard<std::mutex> lock(m_PoolMutex);
-        for (auto& t : m_Threads)
+        std::lock_guard<std::mutex> lock(m_poolMutex);
+        for (auto& t : m_threads)
         {
             t->stop();
         }
-        m_Condition.notify_all();
+        m_condition.notify_all();
     }
 
     // Will cause joining of the threads
-    m_Threads.clear();
+    m_threads.clear();
 }
 
 void ThreadPool::stopFinishJobs()
 {
-    for (auto& t : m_Threads)
     {
-        t->stopFinishJobs();
-    }
-
-    {
-        std::lock_guard<std::mutex> lock(m_PoolMutex);
-        m_Condition.notify_all();
+        std::lock_guard<std::mutex> lock(m_poolMutex);
+        for (auto& t : m_threads)
+        {
+            t->stopFinishJobs();
+        }
+        m_condition.notify_all();
     }
 
     // Will cause joining of the threads
-    m_Threads.clear();
+    m_threads.clear();
 }
 
 bool ThreadPool::hasJobs()
 {
-    std::lock_guard<std::mutex> lock(m_JobsMutex);
-    return !m_QueuedJobs.empty();
+    std::lock_guard<std::mutex> lock(m_jobsMutex);
+    return !m_queuedJobs.empty();
 }
 
 void ThreadPool::addJob(std::function<void()> job)
 {
     {
-        std::lock_guard<std::mutex> lock(m_JobsMutex);
-        m_QueuedJobs.push_back(job);
+        std::lock_guard<std::mutex> lock(m_jobsMutex);
+        m_queuedJobs.push_back(job);
     }
 
     {
-        std::lock_guard<std::mutex> lock(m_PoolMutex);
-        m_Condition.notify_one();
+        std::lock_guard<std::mutex> lock(m_poolMutex);
+        m_condition.notify_one();
     }
 }
 
@@ -174,11 +172,11 @@ std::function<void()> ThreadPool::getJob()
     std::function<void()> job;
 
     {
-        std::lock_guard<std::mutex> lock(m_JobsMutex);
-        if (!m_QueuedJobs.empty())
+        std::lock_guard<std::mutex> lock(m_jobsMutex);
+        if (!m_queuedJobs.empty())
         {
-            job = m_QueuedJobs.front();
-            m_QueuedJobs.pop_front();
+            job = m_queuedJobs.front();
+            m_queuedJobs.pop_front();
         }
     }
 

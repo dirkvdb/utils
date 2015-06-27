@@ -24,16 +24,16 @@
 namespace utils
 {
 
-std::vector<std::unique_ptr<IReaderBuilder>> ReaderFactory::m_Builders;
+std::vector<std::unique_ptr<IReaderBuilder>> ReaderFactory::m_builders;
 
 void ReaderFactory::registerBuilder(std::unique_ptr<IReaderBuilder> builder)
 {
-    m_Builders.push_back(std::move(builder));
+    m_builders.push_back(std::move(builder));
 }
 
 IReader* ReaderFactory::create(const std::string& uri)
 {
-    for (auto& builder : m_Builders)
+    for (auto& builder : m_builders)
     {
         if (builder->supportsUri(uri))
         {

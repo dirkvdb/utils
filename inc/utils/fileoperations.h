@@ -59,8 +59,8 @@ public:
     DirectoryHandle& handle() const;
 
 private:
-    std::string                         m_Path;
-    std::shared_ptr<DirectoryHandle>    m_DirHandle;
+    std::string                         m_path;
+    std::shared_ptr<DirectoryHandle>    m_dirHandle;
 };
 
 class FileSystemEntry
@@ -76,8 +76,8 @@ public:
     FileSystemEntryType type() const;
 
 private:
-    std::string             m_Path;
-    FileSystemEntryType     m_Type;
+    std::string             m_path;
+    FileSystemEntryType     m_type;
 };
 
 class FileSystemIterator
@@ -101,7 +101,7 @@ private:
     const Directory*                m_pDir;
 
     struct IteratorData;
-    std::shared_ptr<IteratorData>   m_IterData;
+    std::shared_ptr<IteratorData>   m_iterData;
 };
 
 // support for range based for loops

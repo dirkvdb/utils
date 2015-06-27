@@ -50,13 +50,13 @@ private:
     class Task;
     friend class Task;
 
-    std::mutex                                  m_JobsMutex;
-    std::mutex                                  m_PoolMutex;
-    std::condition_variable                     m_Condition;
-    std::deque<std::function<void()>>           m_QueuedJobs;
-    std::vector<std::unique_ptr<Task>>          m_Threads;
+    std::mutex                                  m_jobsMutex;
+    std::mutex                                  m_poolMutex;
+    std::condition_variable                     m_condition;
+    std::deque<std::function<void()>>           m_queuedJobs;
+    std::vector<std::unique_ptr<Task>>          m_threads;
 
-    uint32_t                                    m_MaxNumThreads;
+    uint32_t                                    m_maxNumThreads;
 };
 }
 

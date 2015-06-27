@@ -25,51 +25,51 @@ class WorkerThread::Task
 {
 public:
     Task(WorkerThread& worker)
-    : m_Stop(false)
-    , m_Worker(worker)
-    , m_Thread(&Task::run, this)
+    : m_stop(false)
+    , m_worker(worker)
+    , m_thread(&Task::run, this)
     {
     }
 
     ~Task()
     {
         {
-            std::lock_guard<std::mutex> lock(m_Mutex);
-            m_Stop = true;
-            m_Condition.notify_one();
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_stop = true;
+            m_condition.notify_one();
         }
 
-        if (m_Thread.joinable())
+        if (m_thread.joinable())
         {
-            m_Thread.join();
+            m_thread.join();
         }
     }
 
     void signalJobAvailable()
     {
-        std::lock_guard<std::mutex> lock(m_Mutex);
-        m_Condition.notify_one();
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_condition.notify_one();
     }
 
     void run()
     {
         for (;;)
         {
-            std::unique_lock<std::mutex> lock(m_Mutex);
-            if (!m_Worker.hasJobs() || !m_Stop)
+            std::unique_lock<std::mutex> lock(m_mutex);
+            if (!m_worker.hasJobs() || !m_stop)
             {
-                m_Condition.wait(lock, [this] () { return m_Worker.hasJobs() || m_Stop; });
+                m_condition.wait(lock, [this] () { return m_worker.hasJobs() || m_stop; });
             }
 
-            if (m_Stop)
+            if (m_stop)
             {
                 break;
             }
 
             lock.unlock();
 
-            auto job = m_Worker.nextJob();
-            while (job && !m_Stop)
+            auto job = m_worker.nextJob();
+            while (job && !m_stop)
             {
                 try
                 {
@@ -77,21 +77,21 @@ public:
                 }
                 catch (...)
                 {
-                    m_Worker.ErrorOccurred(std::current_exception());
+                    m_worker.ErrorOccurred(std::current_exception());
                 }
 
-                job = m_Worker.nextJob();
+                job = m_worker.nextJob();
             }
         }
     }
 
 private:
-    bool                                        m_Stop;
-    WorkerThread&                               m_Worker;
+    bool                                        m_stop;
+    WorkerThread&                               m_worker;
 
-    std::mutex                                  m_Mutex;
-    std::condition_variable                     m_Condition;
-    std::thread                                 m_Thread;
+    std::mutex                                  m_mutex;
+    std::condition_variable                     m_condition;
+    std::thread                                 m_thread;
 };
 
 WorkerThread::WorkerThread() = default;
@@ -99,53 +99,53 @@ WorkerThread::~WorkerThread() = default;
 
 void WorkerThread::start()
 {
-    std::lock_guard<std::mutex> lock(m_Mutex);
-    if (!m_Thread)
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (!m_thread)
     {
-        m_Thread = std::make_unique<Task>(*this);
+        m_thread = std::make_unique<Task>(*this);
     }
 }
 
 void WorkerThread::stop()
 {
-    if (m_Thread)
+    if (m_thread)
     {
         clearJobs();
-        m_Thread.reset();
+        m_thread.reset();
     }
 }
 
 void WorkerThread::addJob(const std::function<void()>& job)
 {
     {
-        std::lock_guard<std::mutex> lock(m_Mutex);
-        m_JobQueue.push_back(job);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_jobQueue.push_back(job);
     }
 
-    m_Thread->signalJobAvailable();
+    m_thread->signalJobAvailable();
 }
 
 void WorkerThread::clearJobs()
 {
-    std::lock_guard<std::mutex> lock(m_Mutex);
-    m_JobQueue.clear();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_jobQueue.clear();
 }
 
 bool WorkerThread::hasJobs()
 {
-    std::lock_guard<std::mutex> lock(m_Mutex);
-    return !m_JobQueue.empty();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return !m_jobQueue.empty();
 }
 
 std::function<void()> WorkerThread::nextJob()
 {
     std::function<void()> job;
 
-    std::lock_guard<std::mutex> lock(m_Mutex);
-    if (!m_JobQueue.empty())
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (!m_jobQueue.empty())
     {
-        job = m_JobQueue.front();
-        m_JobQueue.pop_front();
+        job = m_jobQueue.front();
+        m_jobQueue.pop_front();
     }
 
     return job;

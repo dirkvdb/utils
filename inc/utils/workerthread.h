@@ -48,9 +48,9 @@ private:
     std::function<void()> nextJob();
     void clearJobs();
 
-    std::deque<std::function<void()>>     		m_JobQueue;
-    std::mutex                                  m_Mutex;
-    std::unique_ptr<Task>                       m_Thread;
+    std::deque<std::function<void()>>     		m_jobQueue;
+    std::mutex                                  m_mutex;
+    std::unique_ptr<Task>                       m_thread;
 
     friend class Task;
 };

@@ -50,13 +50,13 @@ public:
 private:
     void updateOffsetsAfterSeek(uint64_t newPosition);
 
-    std::unique_ptr<IReader> m_Reader;
-    std::vector<uint8_t> m_Buffer;
-    uint64_t m_BufferStartPosition;
-    uint64_t m_BufferOffset;
-    uint64_t m_CurrentPosition;
-    uint64_t m_ContentLength;
-    bool m_BufferFilled;
+    std::unique_ptr<IReader> m_reader;
+    std::vector<uint8_t> m_buffer;
+    uint64_t m_bufferStartPosition;
+    uint64_t m_bufferOffset;
+    uint64_t m_currentPosition;
+    uint64_t m_contentLength;
+    bool m_bufferFilled;
 };
 }
 
