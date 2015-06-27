@@ -17,7 +17,7 @@
 #ifndef UTILS_SIGNAL_H
 #define UTILS_SIGNAL_H
 
-#include <map>
+#include <vector>
 #include <mutex>
 #include <functional>
 
@@ -31,34 +31,53 @@ public:
     ~Signal()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_slots.clear();
+        m_subscribers.clear();
     }
 
-    void connect(std::function<void(Args...)> func, const void* receiver)
+    void connect(const std::function<void(Args...)>& func, const void* receiver)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_slots.insert(std::make_pair(receiver, func));
+        m_subscribers.push_back(Subscriber(receiver, func));
     }
 
     void disconnect(const void* receiver)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_slots.erase(receiver);
+        auto iter = std::find_if(m_subscribers.begin(), m_subscribers.end(), [=] (const auto& sub) {
+            return sub.receiver == receiver;
+        });
+
+        if (iter != m_subscribers.end())
+        {
+            m_subscribers.erase(iter);
+        }
     }
 
     template <typename... CallArgs>
     void operator()(CallArgs&&... args)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        for (auto& func : m_slots)
+        for (auto& sub : m_subscribers)
         {
-            func.second(std::forward<CallArgs>(args)...);
+            sub.callback(std::forward<CallArgs>(args)...);
         }
     }
 
 private:
-    std::map<const void*, std::function<void(Args...)>> m_slots;
-    std::mutex                                          m_mutex;
+    struct Subscriber
+    {
+        Subscriber(const void* rcv, const std::function<void(Args...)>& cb)
+        : receiver(rcv)
+        , callback(cb)
+        {
+        }
+
+        const void* receiver;
+        std::function<void(Args...)> callback;
+    };
+
+    std::vector<Subscriber>     m_subscribers;
+    std::mutex                  m_mutex;
 };
 
 }
