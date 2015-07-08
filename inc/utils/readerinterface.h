@@ -27,7 +27,7 @@ namespace utils
 class IReader
 {
 public:
-    virtual ~IReader() {};
+    virtual ~IReader() = default;
 
     virtual void open(const std::string& uri) = 0;
     virtual void close() = 0;
@@ -37,17 +37,19 @@ public:
     virtual bool eof() = 0;
     virtual std::string uri() = 0;
     virtual void clearErrors() = 0;
-    
+
     virtual void seekAbsolute(uint64_t position) = 0;
-    virtual void seekRelative(uint64_t offset) = 0;    
+    virtual void seekRelative(uint64_t offset) = 0;
     virtual uint64_t read(uint8_t* pData, uint64_t size) = 0;
-    
+
     virtual std::vector<uint8_t> readAllData() = 0;
 };
 
 class IReaderBuilder
 {
 public:
+    virtual ~IReaderBuilder() = default;
+
     virtual bool supportsUri(const std::string& uri) = 0;
     virtual IReader* build(const std::string& uri) = 0;
 };
