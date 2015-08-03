@@ -27,7 +27,6 @@ LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
 
 OPTION(DISABLE_XDGBASEDIR "disable searching for libxdg-basedir" OFF)
 OPTION(ENABLE_TESTS "build unit tests" ON)
-OPTION(BACKWARD "enable backtrace support" OFF)
 OPTION(COLORED_OUTPUT "Colored output" ON)
 OPTION(STANDALONE "Not used as a submodule of another project" OFF)
 OPTION(COVERAGE "Enable code coverage" OFF)
@@ -74,11 +73,23 @@ SET (UTILS_SOURCES
     inc/utils/backtrace.h           src/backtrace.cpp
 )
 
-IF (BACKWARD)
-    ADD_SUBDIRECTORY(src/backward-cpp)
-    LIST(APPEND UTILS_SOURCES
-        ${backward_ENABLE}
-    )
+MESSAGE(STATUS "checking for module 'libunwind'")
+FIND_PATH(LIBUNWIND_INCLUDE_DIR
+    NAMES libunwind.h
+    PATHS ${PULSEAUDIO_PKG_INCLUDE_DIRS}
+)
+
+FIND_LIBRARY(LIBUNWIND_LIBRARY
+    NAMES unwind
+    PATHS /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/usr/lib/system
+)
+
+IF (LIBUNWIND_INCLUDE_DIR AND LIBUNWIND_LIBRARY)
+    OPTION(HAVE_LIBUNWIND "backtrace support" ON)
+    MESSAGE(STATUS "package 'libunwind' found")
+ELSE ()
+    MESSAGE(STATUS "  ${LIBUNWIND_INCLUDE_DIR} ${LIBUNWIND_LIBRARY}")
+    MESSAGE(STATUS "  package 'libunwind' not found")
 ENDIF()
 
 ADD_LIBRARY(utils STATIC

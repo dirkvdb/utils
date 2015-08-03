@@ -16,12 +16,13 @@
 
 #include "utils/backtrace.h"
 #include "utilsconfig.h"
+#include "utils/log.h"
 
-#define PACKAGE "Utils"
-#define PACKAGE_VERSION "1.0.0"
+#include <array>
 
-#ifdef BACKWARD
-#include "backward-cpp/backward.hpp"
+#ifdef HAVE_LIBUNWIND
+#include <libunwind.h>
+#include <cxxabi.h>
 #endif
 
 namespace utils
@@ -29,12 +30,42 @@ namespace utils
 
 void printBackTrace()
 {
-#ifdef BACKWARD
-    backward::StackTrace st;
-    st.load_here();
+#ifdef HAVE_LIBUNWIND
+    unw_cursor_t cursor;
+    unw_context_t context;
 
-    backward::Printer p;
-    p.print(st, stderr);
+    // Initialize cursor to current frame for local unwinding.
+    unw_getcontext(&context);
+    unw_init_local(&cursor, &context);
+
+    // Unwind frames one by one, going up the frame stack.
+    while (unw_step(&cursor) > 0)
+    {
+        unw_word_t offset, pc;
+        unw_get_reg(&cursor, UNW_REG_IP, &pc);
+        if (pc == 0)
+        {
+            break;
+        }
+
+        std::array<char, 256> sym;
+        if (unw_get_proc_name(&cursor, sym.data(), sym.size(), &offset) == 0)
+        {
+            char* nameptr = sym.data();
+            int status;
+            char* demangled = abi::__cxa_demangle(sym.data(), nullptr, nullptr, &status);
+            if (status == 0)
+            {
+                nameptr = demangled;
+            }
+
+            log::critical("{0:x} ({1}+{2:x})", pc, nameptr, offset);
+        }
+        else
+        {
+            log::critical("{#x} -- error: unable to obtain symbol name for this frame", pc);
+        }
+    }
 #endif
 }
 

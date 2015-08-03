@@ -2,8 +2,8 @@
 #define UTILS_CONFIG_H
 
 #cmakedefine HAVE_XDGBASEDIR 1
+#cmakedefine HAVE_LIBUNWIND 1
 #cmakedefine COLORED_OUTPUT 1
 #cmakedefine PERF_TRACE 1
-#cmakedefine BACKWARD 1
 
 #endif
