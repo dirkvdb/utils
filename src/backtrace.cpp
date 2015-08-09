@@ -63,7 +63,7 @@ void printBackTrace()
         }
         else
         {
-            log::critical("{#x} -- error: unable to obtain symbol name for this frame", pc);
+            log::critical("{0:#x} -- error: unable to obtain symbol name for this frame", pc);
         }
     }
 #endif
