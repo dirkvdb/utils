@@ -1,4 +1,5 @@
 box: dirkvdb/cxx14
+box: dirkvdb/archlinux:2015.06.01
 no-response-timeout: 10
 build:
     steps:
