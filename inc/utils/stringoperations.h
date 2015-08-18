@@ -26,7 +26,6 @@
 #include <cstring>
 #include <stdexcept>
 #include <cassert>
-#include <iostream>
 
 namespace utils
 {
@@ -200,30 +199,32 @@ namespace stringops
     inline std::string wideCharToUtf8(const std::wstring& wideString)
     {
         size_t stringLength = wcstombs(nullptr, wideString.c_str(), 0);
+        if (stringLength == (std::numeric_limits<size_t>::max() - 1))
+        {
+            throw std::logic_error("Invalid multibyte character encountered");
+        }
+
         std::string utf8String(stringLength + 1, '\0');
 
         size_t len = wcstombs(&utf8String[0], wideString.c_str(), stringLength + 1);
-        if (len == static_cast<size_t>(-1))
-        {
-            throw std::logic_error("Failed to convert wideString to UTF-8");
-        }
-
-        utf8String.resize(stringLength);
+        assert(len == stringLength);
+        utf8String.resize(len);
         return utf8String;
     }
 
     inline std::wstring utf8ToWideChar(const std::string& utf8String)
     {
         size_t stringLength = mbstowcs(nullptr, utf8String.c_str(), 0);
+        if (stringLength == (std::numeric_limits<size_t>::max() - 1))
+        {
+            throw std::logic_error("Invalid multibyte character encountered");
+        }
+
         std::wstring wideString(stringLength + 1, '\0');
 
         size_t len = mbstowcs(&wideString[0], utf8String.c_str(), stringLength + 1);
-        if (len == static_cast<size_t>(-1))
-        {
-            throw std::logic_error("Failed to convert wideString to UTF-8");
-        }
-
-        wideString.resize(stringLength);
+        assert(len == stringLength);
+        wideString.resize(len);
         return wideString;
     }
 
