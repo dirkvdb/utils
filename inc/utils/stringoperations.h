@@ -198,7 +198,7 @@ namespace stringops
 
     inline std::string wideCharToUtf8(const std::wstring& wideString)
     {
-        size_t stringLength = wcstombs(nullptr, wideString.c_str(), 0);
+        size_t stringLength = std::wcstombs(nullptr, wideString.c_str(), 0);
         if (stringLength == std::numeric_limits<size_t>::max())
         {
             throw std::logic_error("Invalid multibyte character encountered");
@@ -206,7 +206,7 @@ namespace stringops
 
         std::string utf8String(stringLength + 1, '\0');
 
-        size_t len = wcstombs(&utf8String[0], wideString.c_str(), stringLength + 1);
+        size_t len = std::wcstombs(&utf8String[0], wideString.c_str(), stringLength + 1);
         assert(len == stringLength);
         utf8String.resize(len);
         return utf8String;
@@ -214,7 +214,7 @@ namespace stringops
 
     inline std::wstring utf8ToWideChar(const std::string& utf8String)
     {
-        size_t stringLength = mbstowcs(nullptr, utf8String.c_str(), 0);
+        size_t stringLength = std::mbstowcs(nullptr, utf8String.c_str(), 0);
         if (stringLength == std::numeric_limits<size_t>::max())
         {
             throw std::logic_error("Invalid multibyte character encountered");
@@ -222,7 +222,7 @@ namespace stringops
 
         std::wstring wideString(stringLength + 1, '\0');
 
-        size_t len = mbstowcs(&wideString[0], utf8String.c_str(), stringLength + 1);
+        size_t len = std::mbstowcs(&wideString[0], utf8String.c_str(), stringLength + 1);
         assert(len == stringLength);
         wideString.resize(len);
         return wideString;
