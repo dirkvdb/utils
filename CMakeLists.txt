@@ -51,32 +51,10 @@ IF (NOT DISABLE_XDGBASEDIR)
     ENDIF ()
 ENDIF ()
 
-SET (UTILS_SOURCES
-    inc/utils/bufferedreader.h      src/bufferedreader.cpp
-    inc/utils/fileoperations.h      src/fileoperations.cpp
-    inc/utils/filereader.h          src/filereader.cpp
-    inc/utils/format.h              src/format.cpp
-    inc/utils/functiontraits.h
-    inc/utils/log.h                 src/log.cpp
-    inc/utils/numericoperations.h
-    inc/utils/readerinterface.h
-    inc/utils/readerfactory.h       src/readerfactory.cpp
-    inc/utils/signal.h
-    inc/utils/simplesubscriber.h
-    inc/utils/stringoperations.h
-    inc/utils/subscriber.h
-    inc/utils/timeoperations.h
-    inc/utils/timerthread.h
-    inc/utils/threadpool.h          src/threadpool.cpp
-    inc/utils/trace.h               src/trace.cpp
-    inc/utils/workerthread.h        src/workerthread.cpp
-    inc/utils/backtrace.h           src/backtrace.cpp
-)
-
 PKG_CHECK_MODULES(LIBUNWIND_PKG libunwind)
 IF (LIBUNWIND_PKG_FOUND)
     FIND_PATH(LIBUNWIND_INCLUDE_DIR
-        NAMES basedir.h
+        NAMES libunwind.h
         PATHS ${LIBUNWIND_PKG_INCLUDE_DIRS}
     )
 
@@ -98,6 +76,28 @@ IF (LIBUNWIND_PKG_FOUND)
         ENDIF ()
     ENDIF ()
 ENDIF ()
+
+SET (UTILS_SOURCES
+    inc/utils/bufferedreader.h      src/bufferedreader.cpp
+    inc/utils/fileoperations.h      src/fileoperations.cpp
+    inc/utils/filereader.h          src/filereader.cpp
+    inc/utils/format.h              src/format.cpp
+    inc/utils/functiontraits.h
+    inc/utils/log.h                 src/log.cpp
+    inc/utils/numericoperations.h
+    inc/utils/readerinterface.h
+    inc/utils/readerfactory.h       src/readerfactory.cpp
+    inc/utils/signal.h
+    inc/utils/simplesubscriber.h
+    inc/utils/stringoperations.h
+    inc/utils/subscriber.h
+    inc/utils/timeoperations.h
+    inc/utils/timerthread.h
+    inc/utils/threadpool.h          src/threadpool.cpp
+    inc/utils/trace.h               src/trace.cpp
+    inc/utils/workerthread.h        src/workerthread.cpp
+    inc/utils/backtrace.h           src/backtrace.cpp
+)
 
 ADD_LIBRARY(utils STATIC
     ${UTILS_SOURCES}
