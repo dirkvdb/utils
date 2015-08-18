@@ -5,7 +5,7 @@ build:
         - script:
             name: Setup environnement variables
             code: |
-                SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+                SRC_DIR=pwd"
                 BUILD_DIR="${SRC_DIR}/build"
                 echo "SRC_DIR ${SRC_DIR}"
                 echo "BUILD_DIR ${BUILD_DIR}"
