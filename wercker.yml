@@ -14,8 +14,6 @@ build:
             name: Compile Utils
             code: |
                 mkdir -p "${BUILD_DIR}"
-                cd "${SRC_DIR}"
-                git submodule update --init --recursive
                 cd "${BUILD_DIR}"
                 cmake -DSTANDALONE=1 -DCMAKE_BUILD_TYPE=Release "${SRC_DIR}"
                 make -j8
