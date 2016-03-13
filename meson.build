@@ -1,6 +1,6 @@
 project('utils', 'cpp', default_options : ['cpp_std=c++14'])
 
-inc = include_directories('inc')
+utilsinc = include_directories('inc')
 
 utilsfiles = files(
     'inc/utils/bufferedreader.h',      'src/bufferedreader.cpp',
@@ -35,6 +35,6 @@ configure_file(input : 'utilsconfigmeson.h.in', output : 'utilsconfig.h', config
 
 utilslib = static_library('utils',
                           utilsfiles,
-                          include_directories : inc)
+                          include_directories : utilsinc)
 
 subdir('test')
