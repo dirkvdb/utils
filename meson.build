@@ -1,0 +1,40 @@
+project('utils', 'cpp', default_options : ['cpp_std=c++14'])
+
+inc = include_directories('inc')
+
+utilsfiles = files(
+    'inc/utils/bufferedreader.h',      'src/bufferedreader.cpp',
+    'inc/utils/fileoperations.h',      'src/fileoperations.cpp',
+    'inc/utils/filereader.h',          'src/filereader.cpp',
+    'inc/utils/format.h',              'src/format.cpp',
+    'inc/utils/functiontraits.h',
+    'inc/utils/log.h',                 'src/log.cpp',
+    'inc/utils/numericoperations.h',
+    'inc/utils/readerinterface.h',
+    'inc/utils/readerfactory.h',       'src/readerfactory.cpp',
+    'inc/utils/signal.h',
+    'inc/utils/simplesubscriber.h',
+    'inc/utils/stringoperations.h',
+    'inc/utils/subscriber.h',
+    'inc/utils/timeoperations.h',
+    'inc/utils/timerthread.h',
+    'inc/utils/threadpool.h',          'src/threadpool.cpp',
+    'inc/utils/trace.h',               'src/trace.cpp',
+    'inc/utils/workerthread.h',        'src/workerthread.cpp',
+    'inc/utils/backtrace.h',           'src/backtrace.cpp'
+)
+
+libxdgbasedir = dependency('libxdg-basedir', required : false)
+libunwind = dependency('libunwind', required : false)
+
+config = configuration_data()
+config.set10('HAVE_XDGBASEDIR', libxdgbasedir.found())
+config.set10('HAVE_LIBUNWIND', libunwind.found())
+
+configure_file(input : 'utilsconfigmeson.h.in', output : 'utilsconfig.h', configuration : config)
+
+utilslib = static_library('utils',
+                          utilsfiles,
+                          include_directories : inc)
+
+subdir('test')

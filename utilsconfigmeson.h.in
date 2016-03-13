@@ -1,0 +1,7 @@
+#ifndef UTILS_CONFIG_H
+#define UTILS_CONFIG_H
+
+#mesondefine HAVE_XDGBASEDIR
+#mesondefine HAVE_LIBUNWIND
+
+#endif
