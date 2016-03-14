@@ -1,6 +1,6 @@
 project('utils', 'cpp', default_options : ['cpp_std=c++14'])
 
-utilsinc = include_directories('inc')
+utilsinc = include_directories(meson.current_source_dir() + '/inc')
 
 utilsfiles = files(
     'inc/utils/bufferedreader.h',      'src/bufferedreader.cpp',
@@ -24,18 +24,20 @@ utilsfiles = files(
     'inc/utils/backtrace.h',           'src/backtrace.cpp'
 )
 
-libxdgbasedir = dependency('libxdg-basedir', required : false)
-libunwind = dependency('libunwind', required : false)
+libxdgbasedir_dep = dependency('libxdg-basedir', required : false)
+libunwind_dep = dependency('libunwind', required : false)
 
 config = configuration_data()
-config.set10('HAVE_XDGBASEDIR', libxdgbasedir.found())
-config.set10('HAVE_LIBUNWIND', libunwind.found())
+config.set10('HAVE_XDGBASEDIR', libxdgbasedir_dep.found())
+config.set10('HAVE_LIBUNWIND', libunwind_dep.found())
 
 configure_file(input : 'utilsconfigmeson.h.in', output : 'utilsconfig.h', configuration : config)
 
 utilslib = static_library('utils',
                           utilsfiles,
-                          include_directories : utilsinc)
+                          include_directories : utilsinc,
+                          dependencies: [libxdgbasedir_dep, libunwind_dep],
+                          cpp_args : '-DHAVE_UTILS_CONFIG')
 
 utils_dep = declare_dependency(link_with : utilslib, include_directories : utilsinc)
 

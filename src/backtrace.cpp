@@ -20,7 +20,7 @@
 
 #include <array>
 
-#ifdef HAVE_LIBUNWIND
+#if HAVE_LIBUNWIND
 #include <libunwind.h>
 #include <cxxabi.h>
 #endif
@@ -30,7 +30,7 @@ namespace utils
 
 void printBackTrace()
 {
-#ifdef HAVE_LIBUNWIND
+#if HAVE_LIBUNWIND
     unw_cursor_t cursor;
     unw_context_t context;
 
