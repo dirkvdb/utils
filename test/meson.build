@@ -14,7 +14,7 @@ testinc = include_directories(meson.current_build_dir() + '/..')
 
 utilstest = executable('utilstest',
                        utilstestfiles,
-                       include_directories : [utilsinc, testinc],
-                       link_with : utilslib)
+                       include_directories : testinc,
+                       dependencies : utils_dep)
 
 test('utils test', utilstest)

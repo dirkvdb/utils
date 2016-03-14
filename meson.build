@@ -37,4 +37,6 @@ utilslib = static_library('utils',
                           utilsfiles,
                           include_directories : utilsinc)
 
+utils_dep = declare_dependency(link_with : utilslib, include_directories : utilsinc)
+
 subdir('test')
