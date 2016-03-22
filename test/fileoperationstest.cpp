@@ -131,6 +131,7 @@ TEST(FileOperationsTest, CreateDirectoryThatExists)
     deleteDirectory("temp");
 }
 
+#if !defined(WIN32) && !defined(__MINGW32__)
 TEST(FileOperationsTest, DeleteDirectory)
 {
     createDirectory("temp");
@@ -196,6 +197,7 @@ TEST(FileOperationsTest, GetFileSize)
     EXPECT_EQ(4, size);
     deleteFile("test.file");
 }
+#endif
 
 TEST(FileOperationsTest, GetFileSizeBadFile)
 {

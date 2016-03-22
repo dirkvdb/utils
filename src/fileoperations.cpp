@@ -63,7 +63,7 @@ static const char g_pathSeperator = '\\';
 static const char g_pathSeperator = '/';
 #endif
 
-#ifndef WIN32
+#if !defined(WIN32) and !defined(__MINGW32__)
 class Directory::DirectoryHandle
 {
 public:
@@ -563,7 +563,7 @@ void deleteDirectory(const std::string& path)
     }
 }
 
-#ifndef WIN32
+#if !defined(WIN32) and !defined(__MINGW32__)
 void deleteDirectoryRecursive(const std::string& path)
 {
     for (auto& entry : Directory(path))
@@ -594,7 +594,7 @@ void changeDirectory(const std::string& dir)
     }
 }
 
-#ifndef WIN32
+#if !defined(WIN32) and !defined(__MINGW32__)
 uint64_t countFilesInDirectory(const std::string& path, IterationType iterType)
 {
     uint64_t count = 0;

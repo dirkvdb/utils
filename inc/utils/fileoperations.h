@@ -44,7 +44,7 @@ struct FileSystemEntryInfo
     FileSystemEntryType     type;
 };
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__MINGW32__)
 class Directory
 {
 public:
@@ -145,7 +145,7 @@ void createDirectoryIfNotExists(const std::string& path);
 void deleteDirectory(const std::string& path);
 void changeDirectory(const std::string& dir);
 
-#ifndef WIN32
+#if !defined(WIN32) and !defined(__MINGW32__)
 uint64_t countFilesInDirectory(const std::string& path, IterationType iterType = IterationType::Recursive);
 uint64_t calculateDirectorySize(const std::string& path, IterationType iterType = IterationType::Recursive);
 void deleteDirectoryRecursive(const std::string& path);
