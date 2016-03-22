@@ -127,6 +127,7 @@ std::string readTextFile(const std::string& filename);
 std::vector<uint8_t> readFile(const std::string& filename);
 void writeFile(const std::vector<uint8_t>& contents, const std::string& filename);
 
+std::string getFileExtension(const char* filepath);
 std::string getFileExtension(const std::string& filepath);
 std::string getFileName(const std::string& filepath);
 std::string getFileNameWithoutExtension(const std::string& filepath);
