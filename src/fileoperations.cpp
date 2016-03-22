@@ -104,7 +104,7 @@ Directory::Directory(const std::string& path)
 }
 
 Directory::Directory(Directory&& other)
-: m_path(std::move(other.path()))
+: m_path(other.path())
 , m_dirHandle(std::move(other.m_dirHandle))
 {
 }
