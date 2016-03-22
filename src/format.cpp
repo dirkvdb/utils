@@ -38,6 +38,9 @@
 #ifdef _WIN32
 # ifdef __MINGW32__
 #  include <cstring>
+  int strerror_r(int errnum, char *buf, size_t buflen) {
+    return strerror_s(buf, buflen, errnum);
+  }
 # endif
 # if defined(NOMINMAX) || defined(FMT_WIN_MINMAX)
 #  include <windows.h>

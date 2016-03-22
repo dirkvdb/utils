@@ -28,13 +28,14 @@
 #include <cinttypes>
 #include <sys/stat.h>
 
-#ifndef WIN32
-    #include <unistd.h>
-    #include <sys/types.h>
-    #include <dirent.h>
 #if HAVE_XDGBASEDIR
     #include <basedir.h>
 #endif
+
+#if !defined(WIN32) || defined(__MINGW32__)
+    #include <unistd.h>
+    #include <sys/types.h>
+    #include <dirent.h>
 #else
     #define WIN32_LEAN_AND_MEAN 1
     #include <windows.h>
@@ -232,11 +233,13 @@ void FileSystemIterator::nextFile()
                 return;
             }
 
+#ifndef __MINGW32__
             if (S_ISLNK(statInfo.st_mode))
             {
                 m_iterData->fsEntry = FileSystemEntry(path, FileSystemEntryType::SymbolicLink);
                 return;
             }
+#endif
 
             if (S_ISDIR(statInfo.st_mode))
             {
@@ -351,6 +354,11 @@ void writeFile(const std::vector<uint8_t>& contents, const std::string& filename
     fileStream.write(reinterpret_cast<const char*>(contents.data()), contents.size());
 }
 
+std::string getFileExtension(const char* filepath)
+{
+    return getFileExtension(std::string(filepath));
+}
+
 std::string getFileExtension(const std::string& filepath)
 {
     std::string extension;
@@ -403,7 +411,7 @@ uint64_t getFileSize(const std::string& filepath)
     throw std::logic_error("Failed to obtain size for file: " + filepath);
 }
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #define S_ISREG(mode) (mode & _S_IFREG)
 #define S_ISLNK(mode) (false)
 #define S_ISDIR(mode) (mode & _S_IFDIR)
@@ -429,10 +437,12 @@ FileSystemEntryInfo getFileInfo(const std::string& filepath)
         {
             info.type = FileSystemEntryType::File;
         }
+#ifndef __MINGW32__
         else if (S_ISLNK(statInfo.st_mode))
         {
             info.type = FileSystemEntryType::SymbolicLink;
         }
+#endif
         else if (S_ISDIR(statInfo.st_mode))
         {
             info.type = FileSystemEntryType::Directory;
@@ -524,8 +534,9 @@ std::string combinePath(const std::string& left, const std::string& right)
 
 void createDirectory(const std::string& path)
 {
-#ifndef WIN32
-    if (mkdir(path.c_str(), 0755) != 0)
+#ifdef __MINGW32__
+#elif !defined(WIN32)
+    if (mkdir(path.c_str()) != 0)
 #else
     if (CreateDirectory(path.c_str(), nullptr) == 0)
 #endif
@@ -541,14 +552,7 @@ void createDirectoryIfNotExists(const std::string& path)
         return;
     }
 
-#ifndef WIN32
-    if (mkdir(path.c_str(), 0755) != 0)
-#else
-    if (CreateDirectory(path.c_str(), nullptr) == 0)
-#endif
-    {
-        throw std::logic_error(fmt::format("Failed to create directory: {} ({})", path, strerror(errno)));
-    }
+    return createDirectory(path);
 }
 
 void deleteDirectory(const std::string& path)
