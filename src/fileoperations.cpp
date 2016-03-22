@@ -534,9 +534,8 @@ std::string combinePath(const std::string& left, const std::string& right)
 
 void createDirectory(const std::string& path)
 {
-#ifdef __MINGW32__
-#elif !defined(WIN32)
-    if (mkdir(path.c_str()) != 0)
+#ifndef WIN32
+    if (mkdir(path.c_str(), 0755) != 0)
 #else
     if (CreateDirectory(path.c_str(), nullptr) == 0)
 #endif
