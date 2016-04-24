@@ -86,6 +86,13 @@ namespace stringops
         aString = begin > end ? "" : aString.substr(begin, ++end - begin);
     }
 
+    inline std::string trim(const char* aString)
+    {
+        std::string trimmed(aString);
+        trim(trimmed);
+        return trimmed;
+    }
+
     inline std::string trim(const std::string& aString)
     {
         std::string trimmed = aString;
@@ -174,6 +181,26 @@ namespace stringops
         }
 
         return result.str();
+    }
+
+    inline std::vector<std::string> tokenize(const std::string& str, char delimiter)
+    {
+        std::vector<std::string>    tokens;
+        size_t                      pos = 0;
+        size_t                      index = 0;
+
+        while ((pos = str.find(delimiter, index)) != std::string::npos)
+        {
+            tokens.push_back(str.substr(index, pos - index));
+            index = pos + 1;
+        }
+
+        if (index < str.size())
+        {
+            tokens.push_back(str.substr(index));
+        }
+
+        return tokens;
     }
 
     inline std::vector<std::string> tokenize(const std::string& str, const std::string& delimiter)
