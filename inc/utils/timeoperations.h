@@ -53,16 +53,17 @@ namespace timeops
         const auto t        = system_clock::now();
         time_t time         = system_clock::to_time_t(t);
         auto tRounded       = system_clock::from_time_t(time);
-        auto* timePtr       = std::localtime(&time);
-
-        if (!timePtr)
-        {
-            throw std::runtime_error("Failed to obtain localtime");
-        }
+        const tm timePtr    = *std::localtime(&time);
         
+        //not yet supported even in gcc 4.9.0
+        //std::stringstream ss;
+        //ss << std::put_time(&tm, "%T.") << std::setw(3) << std::setfill('0')
+        //   << duration_cast<milliseconds>(t - tRounded).count();
+        
+        char timeString[128];
+        std::strftime(timeString, 127, "%H:%M:%S.", &timePtr);
         std::stringstream ss;
-        ss << std::put_time(timePtr, "%T.") << std::setw(3) << std::setfill('0')
-           << duration_cast<milliseconds>(t - tRounded).count();
+        ss << timeString << std::setw(3) << std::setfill('0') << duration_cast<milliseconds>(t - tRounded).count();
         return ss.str();
     }
 }
