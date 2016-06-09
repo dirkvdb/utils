@@ -77,7 +77,7 @@ public:
 
 private:
     std::string             m_path;
-    FileSystemEntryType     m_type;
+    FileSystemEntryType     m_type = FileSystemEntryType::Unknown;
 };
 
 class FileSystemIterator
