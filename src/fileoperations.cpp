@@ -32,7 +32,7 @@
     #include <basedir.h>
 #endif
 
-#if !defined(WIN32) || defined(__MINGW32__)
+#if !defined(WIN32) && !defined(__MINGW32__)
     #include <unistd.h>
     #include <sys/types.h>
     #include <dirent.h>
@@ -534,7 +534,7 @@ std::string combinePath(const std::string& left, const std::string& right)
 
 void createDirectory(const std::string& path)
 {
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__MINGW32__)
     if (mkdir(path.c_str(), 0755) != 0)
 #else
     if (CreateDirectory(path.c_str(), nullptr) == 0)
@@ -562,7 +562,7 @@ void deleteDirectory(const std::string& path)
     }
 }
 
-#if !defined(WIN32) and !defined(__MINGW32__)
+#if !defined(WIN32) && !defined(__MINGW32__)
 void deleteDirectoryRecursive(const std::string& path)
 {
     for (auto& entry : Directory(path))
