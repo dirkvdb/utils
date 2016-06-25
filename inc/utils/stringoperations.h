@@ -223,11 +223,6 @@ namespace stringops
         return tokens;
     }
 
-    inline std::string wideCharToUtf8(const std::wstring& wideString)
-    {
-        return wideCharToUtf8(wideString.c_str());
-    }
-
     inline std::string wideCharToUtf8(const wchar_t* wideString)
     {
         size_t stringLength = std::wcstombs(nullptr, wideString, 0);
@@ -242,6 +237,11 @@ namespace stringops
         assert(len == stringLength);
         utf8String.resize(len);
         return utf8String;
+    }
+
+    inline std::string wideCharToUtf8(const std::wstring& wideString)
+    {
+        return wideCharToUtf8(wideString.c_str());
     }
 
     inline std::wstring utf8ToWideChar(const std::string& utf8String)
