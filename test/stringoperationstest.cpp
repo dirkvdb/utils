@@ -182,8 +182,8 @@ TEST(StringOperationsTest, Trim)
 
 TEST(StringOperationsTest, Join)
 {
-    EXPECT_EQ("one,two,three", join({ "one", "two", "three" }, ","));
-    EXPECT_EQ("one", join({ "one" }, ","));
+    EXPECT_EQ("one,two,three", join<std::vector<string>>({ "one", "two", "three" }, ","));
+    EXPECT_EQ("one", join<std::vector<string>>({ "one" }, ","));
 }
 
 TEST(StringOperationsTest, StartsWith)

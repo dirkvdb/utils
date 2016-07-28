@@ -112,15 +112,16 @@ namespace stringops
         }
     }
 
-    inline std::string join(const std::vector<std::string>& items, const std::string& join)
+    template <typename Iterable>
+    inline std::string join(const Iterable& items, const std::string& joinString)
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         for (auto iter = items.cbegin(); iter != items.cend(); ++iter)
         {
             ss << *iter;
             if (iter + 1 != items.cend())
             {
-                ss << join;
+                ss << joinString;
             }
         }
 
