@@ -1,22 +1,22 @@
-ADD_DEFINITIONS("-DHAVE_UTILS_CONFIG")
+add_definitions("-DHAVE_UTILS_CONFIG")
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-ENABLE_TESTING()
+cmake_minimum_required(VERSION 2.8)
+enable_testing()
 
-LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
 
-OPTION(DISABLE_XDGBASEDIR "disable searching for libxdg-basedir" OFF)
-OPTION(ENABLE_TESTS "build unit tests" ON)
-OPTION(COLORED_OUTPUT "Colored output" ON)
-OPTION(STANDALONE "Not used as a submodule of another project" OFF)
-OPTION(COVERAGE "Enable code coverage" OFF)
-OPTION(PERF_TRACE "Enable time doctor performance traces" OFF)
+option(DISABLE_XDGBASEDIR "disable searching for libxdg-basedir" OFF)
+option(ENABLE_TESTS "build unit tests" ON)
+option(COLORED_OUTPUT "Colored output" ON)
+option(STANDALONE "Not used as a submodule of another project" OFF)
+option(COVERAGE "Enable code coverage" OFF)
+option(PERF_TRACE "Enable time doctor performance traces" OFF)
 
-FIND_PACKAGE(PkgConfig)
+find_package(PkgConfig)
 
-IF (NOT DISABLE_XDGBASEDIR)
+if (NOT DISABLE_XDGBASEDIR)
     PKG_CHECK_MODULES(XDGBASEDIR_PKG libxdg-basedir)
-    IF (XDGBASEDIR_PKG_FOUND)
+    if (XDGBASEDIR_PKG_FOUND)
         OPTION(HAVE_XDGBASEDIR "xdg-basedir support" ON)
 
         FIND_PATH(XDGBASEDIR_INCLUDE_DIR
@@ -28,11 +28,11 @@ IF (NOT DISABLE_XDGBASEDIR)
             NAMES ${XDGBASEDIR_PKG_LIBRARIES}
             PATHS ${XDGBASEDIR_PKG_LIBRARY_DIRS}
         )
-    ENDIF ()
-ENDIF ()
+    endif ()
+endif ()
 
 PKG_CHECK_MODULES(LIBUNWIND_PKG libunwind)
-IF (LIBUNWIND_PKG_FOUND)
+if (LIBUNWIND_PKG_FOUND)
     FIND_PATH(LIBUNWIND_INCLUDE_DIR
         NAMES libunwind.h
         PATHS ${LIBUNWIND_PKG_INCLUDE_DIRS}
@@ -48,7 +48,7 @@ IF (LIBUNWIND_PKG_FOUND)
         PATHS ${LIBUNWIND_PKG_LIBRARY_DIRS}
     )
 
-    IF ("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+    if ("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
         FIND_LIBRARY(LIBUNWINDNATIVE_LIBRARY
             NAMES unwind-x86_64
             PATHS ${LIBUNWIND_PKG_LIBRARY_DIRS}
@@ -60,18 +60,18 @@ IF (LIBUNWIND_PKG_FOUND)
         )
     ENDIF()
 
-    IF (NOT APPLE)
+    if (NOT APPLE)
         OPTION(HAVE_LIBUNWIND "libunwind support" ON)
         SET(LIBUNWIND_LIBRARIES ${LIBUNWIND_LIBRARY})
         # insert native library before generic library to avoid linker errors
-        IF (LIBUNWINDARM_LIBRARY)
+        if (LIBUNWINDARM_LIBRARY)
             LIST(INSERT LIBUNWIND_LIBRARIES 0 ${LIBUNWINDARM_LIBRARY})
-        ENDIF ()
-        IF (LIBUNWINDNATIVE_LIBRARY)
+        endif ()
+        if (LIBUNWINDNATIVE_LIBRARY)
             LIST(INSERT LIBUNWIND_LIBRARIES 0 ${LIBUNWINDNATIVE_LIBRARY})
-        ENDIF ()
-    ENDIF ()
-ENDIF ()
+        endif ()
+    endif ()
+endif ()
 
 SET (UTILS_SOURCES
     inc/utils/bufferedreader.h      src/bufferedreader.cpp
@@ -99,37 +99,35 @@ ADD_LIBRARY(utils STATIC
     ${UTILS_SOURCES}
 )
 
-IF (STANDALONE AND NOT MSVC)
+if (STANDALONE AND NOT MSVC)
     SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
     SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
-    ADD_DEFINITIONS("-std=c++14")
+    set(CMAKE_CXX_STANDARD 14)
 ENDIF()
 
-IF (COVERAGE)
+if (COVERAGE)
     MESSAGE(STATUS "Coverage enabled")
     INCLUDE(CodeCoverage)
     SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_COVERAGE}")
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS_COVERAGE}")
 ENDIF()
 
-INCLUDE_DIRECTORIES(
-    ${CMAKE_BINARY_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc
+target_include_directories(utils PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+    $<INSTALL_INTERFACE:include>
+    PRIVATE ${CMAKE_BINARY_DIR}
 )
 
-INCLUDE_DIRECTORIES(SYSTEM
+target_include_directories(utils SYSTEM PRIVATE
     ${XDGBASEDIR_INCLUDE_DIR}
     ${LIBUNWIND_INCLUDE_DIR}
 )
 
-SET (UTILS_LIBRARIES ${BFD_LIBRARIES} ${XDGBASEDIR_LIBRARY} ${LIBUNWIND_LIBRARIES})
-IF (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Android" AND NOT MSVC)
-    LIST(APPEND UTILS_LIBRARIES -lpthread)
-ENDIF ()
-TARGET_LINK_LIBRARIES(utils ${UTILS_LIBRARIES})
+find_package(Threads)
+target_link_libraries(utils ${BFD_LIBRARIES} ${XDGBASEDIR_LIBRARY} ${LIBUNWIND_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/utilsconfig.h.in ${CMAKE_BINARY_DIR}/utilsconfig.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/utilsconfig.h.in ${CMAKE_BINARY_DIR}/utilsconfig.h)
 
-IF (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND ENABLE_TESTS)
-    ADD_SUBDIRECTORY(test)
-ENDIF ()
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND ENABLE_TESTS)
+    add_subdirectory(test)
+endif ()
