@@ -21,8 +21,6 @@
 #include <memory>
 #include <vector>
 
-#include "utilsconfig.h"
-
 namespace utils
 {
 
