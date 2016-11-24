@@ -119,11 +119,6 @@ before_install:
       export PATH=${DEPS_DIR}/cmake/bin:${PATH}
     fi
 
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      brew install cmake libuv libupnp
-    fi
-
   ############################################################################
   # Install clang on linux
   ############################################################################
