@@ -12,6 +12,17 @@ option(STANDALONE "Not used as a submodule of another project" OFF)
 option(COVERAGE "Enable code coverage" OFF)
 option(PERF_TRACE "Enable time doctor performance traces" OFF)
 
+if (STANDALONE)
+    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+    if (NOT MSVC)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
+    endif ()
+endif()
+
 find_package(PkgConfig)
 
 if (NOT DISABLE_XDGBASEDIR)
@@ -98,17 +109,6 @@ SET (UTILS_SOURCES
 ADD_LIBRARY(utils STATIC
     ${UTILS_SOURCES}
 )
-
-if (STANDALONE)
-    set(CMAKE_CXX_STANDARD 14)
-    set(CMAKE_CXX_EXTENSIONS OFF)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-    if (NOT MSVC)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
-    endif ()
-endif()
 
 if (COVERAGE)
     message(STATUS "Coverage enabled")
