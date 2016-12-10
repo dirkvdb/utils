@@ -168,7 +168,7 @@ public:
         debug(s.c_str());
     }
 
-#ifndef NDEBUG
+#ifdef COMPILE_DEBUG_LOG
     template<typename... T>
     inline static void debug(const char* s, T&&... args) noexcept
     {
@@ -191,7 +191,7 @@ public:
     }
 #endif
 
-#ifndef NDEBUG
+#ifdef COMPILE_DEBUG_LOG
     inline static void debug(const char* s) noexcept
     {
         if (m_level == Level::Debug)
