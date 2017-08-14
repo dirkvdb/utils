@@ -132,6 +132,15 @@ before_install:
       export CXX="clang-${COMPILER}" CC="clang-${COMPILER}"
       ${CXX} -v
     fi
+
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      git clone --single-branch https://github.com/fmtlib/fmt.git --branch 4.0.0
+      cd fmt
+      cmake -DFMT_DOC=OFF -DFMT_INSTALL=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${DEPS_DIR}/local
+      make install
+    fi
+
   - if [ "$CXX" = "g++" ]; then export CXX="g++-${COMPILER}" CC="gcc-${COMPILER}"; fi
 
 install:
@@ -144,7 +153,7 @@ install:
 script:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=/usr/bin/gcov-5 .
+      cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=/usr/bin/gcov-5 -DCMAKE_PREFIX_PATH=${DEPS_DIR}/local .
     else
       cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON .
     fi
