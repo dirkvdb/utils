@@ -24,7 +24,7 @@ if (STANDALONE)
 endif()
 
 find_package(PkgConfig)
-find_package(fmt)
+find_package(fmt CONFIG REQUIRED)
 
 if (NOT DISABLE_XDGBASEDIR)
     pkg_check_modules(XDGBASEDIR_PKG libxdg-basedir)
