@@ -13,7 +13,7 @@ option(COVERAGE "Enable code coverage" OFF)
 option(PERF_TRACE "Enable time doctor performance traces" OFF)
 
 if (STANDALONE)
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_EXTENSIONS OFF)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -24,6 +24,7 @@ if (STANDALONE)
 endif()
 
 find_package(PkgConfig)
+find_package(fmt)
 
 if (NOT DISABLE_XDGBASEDIR)
     pkg_check_modules(XDGBASEDIR_PKG libxdg-basedir)
@@ -88,7 +89,7 @@ SET (UTILS_SOURCES
     inc/utils/bufferedreader.h      src/bufferedreader.cpp
     inc/utils/fileoperations.h      src/fileoperations.cpp
     inc/utils/filereader.h          src/filereader.cpp
-    inc/utils/format.h              src/format.cpp
+    inc/utils/format.h
     inc/utils/functiontraits.h
     inc/utils/log.h                 src/log.cpp
     inc/utils/numericoperations.h
@@ -129,7 +130,7 @@ target_include_directories(utils SYSTEM PRIVATE
 )
 
 find_package(Threads)
-target_link_libraries(utils ${BFD_LIBRARIES} ${XDGBASEDIR_LIBRARY} ${LIBUNWIND_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(utils fmt::fmt ${BFD_LIBRARIES} ${XDGBASEDIR_LIBRARY} ${LIBUNWIND_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/utilsconfig.h.in ${CMAKE_BINARY_DIR}/utilsconfig.h)
 

@@ -26,7 +26,7 @@
 #include <cstring>
 #include <stdexcept>
 #include <cassert>
-#include <experimental/string_view>
+#include <string_view>
 
 namespace utils
 {
@@ -129,12 +129,12 @@ namespace stringops
         return ss.str();
     }
 
-    inline bool startsWith(const std::experimental::string_view& aString, const std::string& search)
+    inline bool startsWith(std::string_view aString, const std::string& search)
     {
         return aString.compare(0, search.size(), search) == 0;
     }
 
-    inline bool startsWith(const std::experimental::string_view& aString, const char* search)
+    inline bool startsWith(std::string_view aString, const char* search)
     {
         return aString.compare(0, strlen(search), search) == 0;
     }
@@ -185,7 +185,7 @@ namespace stringops
         return result.str();
     }
 
-    inline std::vector<std::string> tokenize(const std::experimental::string_view& str, char delimiter)
+    inline std::vector<std::string> tokenize(const std::string_view str, char delimiter)
     {
         std::vector<std::string>    tokens;
         size_t                      pos = 0;
@@ -193,19 +193,19 @@ namespace stringops
 
         while ((pos = str.find(delimiter, index)) != std::string::npos)
         {
-            tokens.push_back(str.substr(index, pos - index).to_string());
+            tokens.emplace_back(str.substr(index, pos - index));
             index = pos + 1;
         }
 
         if (index < str.size())
         {
-            tokens.push_back(str.substr(index).to_string());
+            tokens.emplace_back(str.substr(index));
         }
 
         return tokens;
     }
 
-    inline std::vector<std::string> tokenize(const std::experimental::string_view& str, const std::string& delimiter)
+    inline std::vector<std::string> tokenize(const std::string_view str, const std::string& delimiter)
     {
         std::vector<std::string>    tokens;
         size_t                      pos = 0;
@@ -213,13 +213,13 @@ namespace stringops
 
         while ((pos = str.find(delimiter, index)) != std::string::npos)
         {
-            tokens.push_back(str.substr(index, pos - index).to_string());
+            tokens.emplace_back(str.substr(index, pos - index));
             index = pos + delimiter.size();
         }
 
         if (index < str.size())
         {
-            tokens.push_back(str.substr(index).to_string());
+            tokens.emplace_back(str.substr(index));
         }
 
         return tokens;
