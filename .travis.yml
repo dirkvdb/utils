@@ -52,7 +52,7 @@ matrix:
             - libxdg-basedir-dev
             - lcov
       env:
-        - COMPILER=5 BUILD_TYPE=Debug
+        - COMPILER=6 BUILD_TYPE=Debug
     - compiler: gcc
       addons:
         apt:
@@ -74,7 +74,7 @@ matrix:
             - libxdg-basedir-dev
             - lcov
       env:
-        - COMPILER=6 BUILD_TYPE=Debug
+        - COMPILER=7 BUILD_TYPE=Debug
     - compiler: gcc
       addons:
         apt:
@@ -153,7 +153,7 @@ install:
 script:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=/usr/bin/gcov-5 -DCMAKE_PREFIX_PATH=${DEPS_DIR}/local .
+      cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=/usr/bin/gcov-6 -DCMAKE_PREFIX_PATH=${DEPS_DIR}/local .
     else
       cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON .
     fi
