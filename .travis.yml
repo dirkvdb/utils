@@ -4,24 +4,24 @@ language: cpp
 
 matrix:
   include:
-    # - compiler: clang
-    #   addons:
-    #     apt:
-    #       packages:
-    #         - libxdg-basedir-dev
-    #         - lcov
-    #   env:
-    #     - COMPILER=3.9 LLVM_VERSION=3.9.1 BUILD_TYPE=Debug
-    # - compiler: clang
-    #   addons:
-    #     apt:
-    #       sources:
-    #         - ubuntu-toolchain-r-test
-    #       packages:
-    #         - libxdg-basedir-dev
-    #         - lcov
-    #   env:
-    #     - COMPILER=3.9 LLVM_VERSION=3.9.1 BUILD_TYPE=Release
+    - compiler: clang
+      addons:
+        apt:
+          packages:
+            - libxdg-basedir-dev
+            - lcov
+      env:
+        - COMPILER=5.0 LLVM_VERSION=5.0.0 BUILD_TYPE=Debug
+    - compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - libxdg-basedir-dev
+            - lcov
+      env:
+        - COMPILER=5.0 LLVM_VERSION=5.0.0 BUILD_TYPE=Release
     - compiler: clang
       addons:
         apt:
