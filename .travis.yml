@@ -1,4 +1,3 @@
-sudo: required
 dist: trusty
 language: cpp
 
@@ -154,10 +153,10 @@ install:
 
 script:
   - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" && "${CXX}" != "clang++" ]]; then
+    if [ "${TRAVIS_OS_NAME}" == "linux"] && ["${CXX}" != "clang++" ]; then
       cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=/usr/bin/gcov-6 -DCMAKE_PREFIX_PATH=${DEPS_DIR}/local .
     else
-      cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DGCOV_PATH=/usr/bin/gcov-6 -DCMAKE_PREFIX_PATH=${DEPS_DIR}/local .
+      cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCMAKE_PREFIX_PATH=${DEPS_DIR}/local .
     fi
   - make -j4
   - CTEST_OUTPUT_ON_FAILURE=1 make test
