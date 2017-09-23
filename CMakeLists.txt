@@ -3,7 +3,7 @@ add_definitions("-DHAVE_UTILS_CONFIG")
 cmake_minimum_required(VERSION 3.1)
 enable_testing()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 option(DISABLE_XDGBASEDIR "disable searching for libxdg-basedir" OFF)
 option(ENABLE_TESTS "build unit tests" ON)
@@ -25,6 +25,7 @@ endif()
 
 find_package(PkgConfig)
 find_package(fmt CONFIG REQUIRED)
+find_package(Libunwind)
 
 if (NOT DISABLE_XDGBASEDIR)
     pkg_check_modules(XDGBASEDIR_PKG libxdg-basedir)
@@ -43,46 +44,8 @@ if (NOT DISABLE_XDGBASEDIR)
     endif ()
 endif ()
 
-pkg_check_modules(LIBUNWIND_PKG libunwind)
-if (LIBUNWIND_PKG_FOUND)
-    find_path(LIBUNWIND_INCLUDE_DIR
-        NAMES libunwind.h
-        PATHS ${LIBUNWIND_PKG_INCLUDE_DIRS}
-    )
-
-    find_library(LIBUNWIND_LIBRARY
-        NAMES ${LIBUNWIND_PKG_LIBRARIES}
-        PATHS ${LIBUNWIND_PKG_LIBRARY_DIRS}
-    )
-
-    find_library(LIBUNWINDARM_LIBRARY
-        NAMES unwind-arm
-        PATHS ${LIBUNWIND_PKG_LIBRARY_DIRS}
-    )
-
-    if ("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
-        find_library(LIBUNWINDNATIVE_LIBRARY
-            NAMES unwind-x86_64
-            PATHS ${LIBUNWIND_PKG_LIBRARY_DIRS}
-        )
-    ELSE ()
-        find_library(LIBUNWINDNATIVE_LIBRARY
-            NAMES unwind-x86
-            PATHS ${LIBUNWIND_PKG_LIBRARY_DIRS}
-        )
-    endif()
-
-    if (NOT APPLE)
-        option(HAVE_LIBUNWIND "libunwind support" ON)
-        set(LIBUNWIND_LIBRARIES ${LIBUNWIND_LIBRARY})
-        # insert native library before generic library to avoid linker errors
-        if (LIBUNWINDARM_LIBRARY)
-            list(INSERT LIBUNWIND_LIBRARIES 0 ${LIBUNWINDARM_LIBRARY})
-        endif ()
-        if (LIBUNWINDNATIVE_LIBRARY)
-            list(INSERT LIBUNWIND_LIBRARIES 0 ${LIBUNWINDNATIVE_LIBRARY})
-        endif ()
-    endif ()
+if (TARGET Libunwind::Libunwind)
+    set(HAVE_LIBUNWIND TRUE)
 endif ()
 
 SET (UTILS_SOURCES
@@ -126,11 +89,16 @@ target_include_directories(utils PUBLIC
 
 target_include_directories(utils SYSTEM PRIVATE
     ${XDGBASEDIR_INCLUDE_DIR}
-    ${LIBUNWIND_INCLUDE_DIR}
 )
 
 find_package(Threads)
-target_link_libraries(utils fmt::fmt ${BFD_LIBRARIES} ${XDGBASEDIR_LIBRARY} ${LIBUNWIND_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(utils
+    fmt::fmt
+    $<$<BOOL:${Libunwund_FOUND}>:Libunwind::Libunwind>
+    ${BFD_LIBRARIES}
+    ${XDGBASEDIR_LIBRARY}
+    ${CMAKE_THREAD_LIBS_INIT}
+)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/utilsconfig.h.in ${CMAKE_BINARY_DIR}/utilsconfig.h)
 
