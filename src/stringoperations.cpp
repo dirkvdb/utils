@@ -52,43 +52,127 @@ std::string urlEncode(const std::string& aString)
     return result.str();
 }
 
-std::vector<std::string> tokenize(const std::string_view str, char delimiter)
+std::vector<std::string_view> splitted_view(std::string_view str, char delimiter)
 {
-    std::vector<std::string> tokens;
-    size_t                   pos   = 0;
-    size_t                   index = 0;
+    std::vector<std::string_view> tokens;
 
-    while ((pos = str.find(delimiter, index)) != std::string::npos)
+    size_t      length = 0;
+    const char* start  = str.data();
+    for (size_t i = 0; i < str.size(); ++i)
     {
-        tokens.emplace_back(str.substr(index, pos - index));
-        index = pos + 1;
+        if (str[i] == delimiter)
+        {
+            tokens.emplace_back(start, length);
+            length = 0;
+
+            if (i + 1 < str.size())
+            {
+                start = &str[i + 1];
+            }
+        }
+        else
+        {
+            ++length;
+        }
     }
 
-    if (index < str.size())
+    if (length > 0)
     {
-        tokens.emplace_back(str.substr(index));
+        tokens.emplace_back(start, length);
+    }
+
+    if (*start == delimiter)
+    {
+        tokens.push_back(std::string_view());
+    }
+
+    if (tokens.empty())
+    {
+        tokens.push_back(str);
     }
 
     return tokens;
 }
 
-std::vector<std::string> tokenize(const std::string_view str, const std::string& delimiter)
+std::vector<std::string_view> splitted_view(std::string_view str, std::string_view delimiter)
 {
+    std::vector<std::string_view> tokens;
+
+    size_t      length      = 0;
+    size_t      matchLength = 0;
+    const char* start       = str.data();
+
+    for (size_t i = 0; i < str.size(); ++i)
+    {
+        if (str[i] == delimiter[matchLength])
+        {
+            ++matchLength;
+
+            if (matchLength == delimiter.size())
+            {
+                tokens.emplace_back(start, length);
+                length      = 0;
+                matchLength = 0;
+
+                if (i + 1 < str.size())
+                {
+                    start = &str[i + 1];
+                }
+
+                continue;
+            }
+        }
+        else
+        {
+            length += matchLength;
+            ++length;
+            matchLength = 0;
+        }
+    }
+
+    if (matchLength == delimiter.size())
+    {
+        tokens.push_back(std::string_view());
+    }
+    else if (length + matchLength > 0)
+    {
+        tokens.emplace_back(start, length);
+    }
+
+    if (length == 0 && matchLength == 0)
+    {
+        tokens.push_back(std::string_view());
+    }
+
+    if (tokens.empty())
+    {
+        tokens.push_back(str);
+    }
+
+    return tokens;
+}
+
+std::vector<std::string> split(std::string_view str, char delimiter)
+{
+    auto splitted = splitted_view(str, delimiter);
+
     std::vector<std::string> tokens;
-    size_t                   pos   = 0;
-    size_t                   index = 0;
+    tokens.reserve(splitted.size());
+    std::transform(begin(splitted), end(splitted), std::back_inserter(tokens), [](const auto& sv) {
+        return std::string(begin(sv), end(sv));
+    });
+    return tokens;
+}
 
-    while ((pos = str.find(delimiter, index)) != std::string::npos)
-    {
-        tokens.emplace_back(str.substr(index, pos - index));
-        index = pos + delimiter.size();
-    }
+std::vector<std::string> split(std::string_view str, const std::string& delimiter)
+{
+    auto splitted = splitted_view(str, delimiter);
 
-    if (index < str.size())
-    {
-        tokens.emplace_back(str.substr(index));
-    }
-
+    std::vector<std::string> tokens;
+    tokens.reserve(splitted.size());
+    std::transform(begin(splitted), end(splitted), std::back_inserter(tokens), [](const auto& sv) {
+        return std::string(begin(sv), end(sv));
+    });
     return tokens;
 }
 

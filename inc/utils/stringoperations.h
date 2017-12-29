@@ -151,8 +151,11 @@ inline void dos2unix(std::string& aString)
 
 std::string urlEncode(const std::string& aString);
 
-std::vector<std::string> tokenize(const std::string_view str, char delimiter);
-std::vector<std::string> tokenize(const std::string_view str, const std::string& delimiter);
+std::vector<std::string> split(std::string_view str, char delimiter);
+std::vector<std::string> split(std::string_view str, const std::string& delimiter);
+
+std::vector<std::string_view> splitted_view(std::string_view str, char delimiter);
+std::vector<std::string_view> splitted_view(std::string_view str, std::string_view delimiter);
 
 template <typename T>
 inline T toNumeric(const std::string& aString)
