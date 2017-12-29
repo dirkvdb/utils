@@ -11,6 +11,7 @@ option(COLORED_OUTPUT "Colored output" ON)
 option(STANDALONE "Not used as a submodule of another project" OFF)
 option(COVERAGE "Enable code coverage" OFF)
 option(PERF_TRACE "Enable time doctor performance traces" OFF)
+option(UTILS_ENABLE_BENCHMARKS "Enable performance benchmarks" OFF)
 
 if (STANDALONE)
     set(CMAKE_CXX_STANDARD 17)
@@ -48,7 +49,7 @@ if (TARGET Libunwind::Libunwind)
     set(HAVE_LIBUNWIND TRUE)
 endif ()
 
-SET (UTILS_SOURCES
+ADD_LIBRARY(utils STATIC
     inc/utils/bufferedreader.h      src/bufferedreader.cpp
     inc/utils/fileoperations.h      src/fileoperations.cpp
     inc/utils/filereader.h          src/filereader.cpp
@@ -60,7 +61,7 @@ SET (UTILS_SOURCES
     inc/utils/readerfactory.h       src/readerfactory.cpp
     inc/utils/signal.h
     inc/utils/simplesubscriber.h
-    inc/utils/stringoperations.h
+    inc/utils/stringoperations.h    src/stringoperations.cpp
     inc/utils/subscriber.h
     inc/utils/timeoperations.h
     inc/utils/timerthread.h
@@ -68,10 +69,6 @@ SET (UTILS_SOURCES
     inc/utils/trace.h               src/trace.cpp
     inc/utils/workerthread.h        src/workerthread.cpp
     inc/utils/backtrace.h           src/backtrace.cpp
-)
-
-ADD_LIBRARY(utils STATIC
-    ${UTILS_SOURCES}
 )
 
 if (COVERAGE)
@@ -104,4 +101,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/utilsconfig.h.in ${CMAKE_BINARY_DIR}/
 
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test" AND ENABLE_TESTS)
     add_subdirectory(test)
+endif ()
+
+if (UTILS_ENABLE_BENCHMARKS)
+    add_subdirectory(bench)
 endif ()

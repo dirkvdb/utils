@@ -15,16 +15,12 @@
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <gtest/gtest.h>
-#include <clocale>
+#include <locale>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-	if (!std::setlocale(LC_CTYPE, ""))
-    {
-        std::cerr << "Locale not specified. Check LANG, LC_CTYPE, LC_ALL" << std::endl;
-        return 1;
-    }
+    std::locale::global(std::locale(""));
 
-  	testing::InitGoogleTest(&argc, argv);
-  	return RUN_ALL_TESTS();
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

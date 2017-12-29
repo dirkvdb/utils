@@ -14,18 +14,19 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
-#include "gtest/gtest.h"
 #include "utils/stringoperations.h"
+#include "gtest/gtest.h"
 
 using std::string;
-using std::wstring;
 using std::vector;
+using std::wstring;
 
 using namespace utils::stringops;
+using namespace std::string_literals;
 
 TEST(StringOperationsTest, LowerCase)
 {
@@ -97,7 +98,7 @@ TEST(StringOperationsTest, Replace)
 
 TEST(StringOperationsTest, Tokenize)
 {
-    string testString = "A-B-C";
+    string         testString = "A-B-C";
     vector<string> tokenized;
     tokenized = tokenize(testString, "-");
     EXPECT_EQ(3u, tokenized.size());
@@ -106,14 +107,14 @@ TEST(StringOperationsTest, Tokenize)
     EXPECT_STREQ("C", tokenized[2].c_str());
 
     testString = "A_*_B_*_C";
-    tokenized = tokenize(testString, "_*_");
+    tokenized  = tokenize(testString, "_*_");
     EXPECT_EQ(3u, tokenized.size());
     EXPECT_STREQ("A", tokenized[0].c_str());
     EXPECT_STREQ("B", tokenized[1].c_str());
     EXPECT_STREQ("C", tokenized[2].c_str());
 
     testString = "A_*_B_*_C";
-    tokenized = tokenize(testString, "_**_");
+    tokenized  = tokenize(testString, "_**_");
     EXPECT_EQ(1u, tokenized.size());
     EXPECT_STREQ("A_*_B_*_C", tokenized[0].c_str());
 }
@@ -142,18 +143,6 @@ TEST(StringOperationsTest, ToNumeric)
     EXPECT_FLOAT_EQ(-42.0001f, toNumeric<float>("-42.0001"));
 }
 
-TEST(StringOperationsTest, ConvertToUtf8)
-{
-    EXPECT_EQ(string("Teststring"), wideCharToUtf8(L"Teststring"));
-    EXPECT_EQ(string("Trentemøller"), wideCharToUtf8(L"Trentemøller"));
-}
-
-TEST(StringOperationsTest, ConvertToWidechar)
-{
-    EXPECT_EQ(wstring(L"Teststring"), utf8ToWideChar("Teststring"));
-    EXPECT_EQ(wstring(L"Trentemøller"), utf8ToWideChar("Trentemøller"));
-}
-
 TEST(StringOperationsTest, UrlEncode)
 {
     EXPECT_EQ("!%40%23%24%25%5e%26*()fsdkjh+", urlEncode("!@#$%^&*()fsdkjh "));
@@ -162,28 +151,30 @@ TEST(StringOperationsTest, UrlEncode)
 
 TEST(StringOperationsTest, Trim)
 {
-    string s = "  a a  a ";
-    trim(s);
-    EXPECT_EQ("a a  a", s);
-    EXPECT_EQ(std::string("a a  a"), trim("  a a  a "));
+    EXPECT_EQ("astring"s, trim("astring"));
+    EXPECT_EQ("a"s, trim("a "));
+    EXPECT_EQ("a"s, trim(" a"));
+    EXPECT_EQ("a a  a"s, trim("  a a  a "));
+    EXPECT_EQ("a \r\t\n a  a"s, trim("  \r \n\t\r\n a \r\t\n a  a \t\t\t"));
+    EXPECT_EQ("", trim(""));
+    EXPECT_EQ("", trim(" \r\n\t"));
+}
 
-    s = "  \r \n\t\r\n a \r\t\n a  a \t\t\t";
-    trim(s);
-    EXPECT_EQ("a \r\t\n a  a", s);
+TEST(StringOperationsTest, TrimInPlace)
+{
+    std::string str(" please trim me    .  ");
+    trim_in_place(str);
+    EXPECT_EQ("please trim me    ."s, str);
 
-    s = "";
-    trim(s);
-    EXPECT_EQ("", s);
-
-    s = " \r\n\t";
-    trim(s);
-    EXPECT_EQ("", s);
+    str = std::string("please trim me.");
+    trim_in_place(str);
+    EXPECT_EQ("please trim me."s, str);
 }
 
 TEST(StringOperationsTest, Join)
 {
-    EXPECT_EQ("one,two,three", join<std::vector<string>>({ "one", "two", "three" }, ","));
-    EXPECT_EQ("one", join<std::vector<string>>({ "one" }, ","));
+    EXPECT_EQ("one,two,three", join<std::vector<string>>({"one", "two", "three"}, ","));
+    EXPECT_EQ("one", join<std::vector<string>>({"one"}, ","));
 }
 
 TEST(StringOperationsTest, StartsWith)
@@ -217,4 +208,3 @@ TEST(StringOperationsTest, EndsWith)
 
     EXPECT_FALSE(endsWith("", "."));
 }
-
