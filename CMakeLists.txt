@@ -67,6 +67,7 @@ ADD_LIBRARY(utils STATIC
     inc/utils/timerthread.h
     inc/utils/threadpool.h          src/threadpool.cpp
     inc/utils/trace.h               src/trace.cpp
+    inc/utils/traits.h
     inc/utils/workerthread.h        src/workerthread.cpp
     inc/utils/backtrace.h           src/backtrace.cpp
 )

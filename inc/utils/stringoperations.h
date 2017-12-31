@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "utils/traits.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cctype>
@@ -108,22 +110,6 @@ inline void replace(std::string& aString, const std::string& toSearch, const std
     }
 }
 
-template <typename Iterable>
-inline std::string join(const Iterable& items, const std::string& joinString)
-{
-    std::ostringstream ss;
-    for (auto iter = items.cbegin(); iter != items.cend(); ++iter)
-    {
-        ss << *iter;
-        if (iter + 1 != items.cend())
-        {
-            ss << joinString;
-        }
-    }
-
-    return ss.str();
-}
-
 inline bool startsWith(std::string_view aString, const std::string& search)
 {
     return aString.compare(0, search.size(), search) == 0;
@@ -150,6 +136,58 @@ inline void dos2unix(std::string& aString)
 }
 
 std::string urlEncode(const std::string& aString);
+
+// Join implementation for objects that have a streaming operator implemented
+template <typename Container, typename = std::enable_if_t<is_streamable_v<typename Container::value_type> && !can_cast_to_string_view_v<typename Container::value_type>>>
+std::string join(const Container& items, const std::string& joinString)
+{
+    std::ostringstream ss;
+    for (auto iter = items.cbegin(); iter != items.cend(); ++iter)
+    {
+        ss << *iter;
+        if (iter + 1 != items.cend())
+        {
+            ss << joinString;
+        }
+    }
+
+    return ss.str();
+}
+
+// Join implementation for objects that implement: std::basic_string::operator basic_string_view
+// This implementation is roughly 10 times faster the ostream version for strings
+// e.g.: join(std::vector<std::string>({"one", "two"}), ", ") == "one, two"
+template <typename Container, typename = std::enable_if_t<can_cast_to_string_view_v<typename Container::value_type>>>
+std::string join(const Container& items, std::string_view joinString)
+{
+    std::string result;
+
+    if (items.empty())
+    {
+        return result;
+    }
+
+    size_t inputSize = 0;
+    for (auto& item : items)
+    {
+        inputSize += static_cast<std::string_view>(item).size();
+    }
+
+    size_t resultSize = inputSize + ((items.size() - 1) * joinString.size());
+    result.reserve(resultSize);
+
+    for (auto& item : items)
+    {
+        result += static_cast<std::string_view>(item);
+
+        if (result.size() < resultSize)
+        {
+            result += joinString;
+        }
+    }
+
+    return result;
+}
 
 std::vector<std::string> split(std::string_view str, char delimiter);
 std::vector<std::string> split(std::string_view str, const std::string& delimiter);

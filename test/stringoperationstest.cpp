@@ -262,9 +262,40 @@ TEST(StringOperationsTest, TrimInPlace)
     EXPECT_EQ("please trim me."s, str);
 }
 
-TEST(StringOperationsTest, Join)
+TEST(StringOperationsTest, JoinStrings)
 {
     EXPECT_EQ("one,two,three", join<std::vector<string>>({"one", "two", "three"}, ","));
+    EXPECT_EQ("one", join<std::vector<string>>({"one"}, ","));
+}
+
+TEST(StringOperationsTest, JoinStringViews)
+{
+    struct StringViewable
+    {
+        operator std::string_view() const noexcept
+        {
+            return std::string_view(value);
+        }
+
+        std::string value;
+    };
+
+    EXPECT_EQ("one,two,three", join<std::vector<StringViewable>>({{"one"}, {"two"}, {"three"}}, ","));
+}
+
+struct Streamable
+{
+    int value;
+};
+
+std::ostream& operator<<(std::ostream& os, const Streamable& s)
+{
+    return os << s.value;
+}
+
+TEST(StringOperationsTest, JoinStreamables)
+{
+    EXPECT_EQ("1, 2, 3", join<std::vector<Streamable>>({{1}, {2}, {3}}, ", "));
     EXPECT_EQ("one", join<std::vector<string>>({"one"}, ","));
 }
 
