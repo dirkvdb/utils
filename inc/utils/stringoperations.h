@@ -31,7 +31,7 @@
 
 namespace utils
 {
-namespace stringops
+namespace str
 {
 
 void lowercase_in_place(std::string& aString);
@@ -187,5 +187,5 @@ inline std::wstring toWstring(T numeric)
     ss << numeric;
     return ss.str();
 }
-} // namespace stringops
+} // namespace str
 } // namespace utils

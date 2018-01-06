@@ -18,7 +18,7 @@
 
 namespace utils
 {
-namespace stringops
+namespace str
 {
 
 void lowercase_in_place(std::string& aString)
@@ -240,5 +240,5 @@ std::vector<std::string> split(std::string_view str, const std::string& delimite
     return tokens;
 }
 
-} // namespace stringops
+} // namespace str
 } // namespace utils

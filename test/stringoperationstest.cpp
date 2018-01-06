@@ -26,7 +26,7 @@ using std::string_view;
 using std::vector;
 using std::wstring;
 
-using namespace utils::stringops;
+using namespace utils::str;
 using namespace std::string_literals;
 
 TEST(StringOperationsTest, LowerCase)

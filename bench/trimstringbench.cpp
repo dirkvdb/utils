@@ -4,7 +4,7 @@
 #include <iostream>
 #include <numeric>
 
-using namespace utils::stringops;
+using namespace utils::str;
 
 static void trimInPlaceCreateNew(benchmark::State& state)
 {
