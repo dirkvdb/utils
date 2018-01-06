@@ -29,6 +29,8 @@
 #include <string_view>
 #include <vector>
 
+#include <iostream>
+
 namespace utils
 {
 namespace str
@@ -69,7 +71,8 @@ inline bool endsWith(const std::string& aString, std::string_view search)
         return false;
     }
 
-    return aString.rfind(search) == (aString.size() - search.size());
+    //return aString.rfind(search) == (aString.size() - search.size()); // Fails on llvm < 5.0.1
+    return aString.rfind(search.data(), std::string::npos, search.size()) == (aString.size() - search.size());
 }
 
 inline void dos2unix(std::string& aString)
