@@ -30,7 +30,7 @@ matrix:
             - libxdg-basedir-dev
             - lcov
       env:
-        - COMPILER=4.0 LLVM_VERSION=4.0.0 BUILD_TYPE=Debug
+        - COMPILER=4.0 LLVM_VERSION=4.0.1 BUILD_TYPE=Debug
     - compiler: clang
       addons:
         apt:
@@ -40,7 +40,7 @@ matrix:
             - libxdg-basedir-dev
             - lcov
       env:
-        - COMPILER=4.0 LLVM_VERSION=4.0.0 BUILD_TYPE=Release
+        - COMPILER=4.0 LLVM_VERSION=4.0.1 BUILD_TYPE=Release
     # - compiler: gcc
     #   addons:
     #     apt:
