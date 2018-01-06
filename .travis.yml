@@ -10,7 +10,7 @@ matrix:
             - libxdg-basedir-dev
             - lcov
       env:
-        - COMPILER=5.0 LLVM_VERSION=5.0.0 BUILD_TYPE=Debug
+        - COMPILER=5.0 LLVM_VERSION=5.0.1 BUILD_TYPE=Debug
     - compiler: clang
       addons:
         apt:
@@ -20,7 +20,7 @@ matrix:
             - libxdg-basedir-dev
             - lcov
       env:
-        - COMPILER=5.0 LLVM_VERSION=5.0.0 BUILD_TYPE=Release
+        - COMPILER=5.0 LLVM_VERSION=5.0.1 BUILD_TYPE=Release
     - compiler: clang
       addons:
         apt:
