@@ -21,6 +21,70 @@ namespace utils
 namespace stringops
 {
 
+void lowercase_in_place(std::string& aString)
+{
+    std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return std::tolower(c); });
+}
+
+std::string lowercase(std::string_view aString)
+{
+    std::string lower(aString.begin(), aString.end());
+    lowercase_in_place(lower);
+    return lower;
+}
+
+void uppercase_in_place(std::string& aString)
+{
+    std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return std::toupper(c); });
+}
+
+std::string uppercase(const std::string& aString)
+{
+    std::string upper(aString.begin(), aString.end());
+    uppercase_in_place(upper);
+    return upper;
+}
+
+std::string_view trimmed_view(std::string_view str)
+{
+    if (str.empty())
+    {
+        return str;
+    }
+
+    auto begin = str.find_first_not_of(" \t\r\n");
+    auto end   = str.find_last_not_of(" \t\r\n");
+
+    if (begin == std::string_view::npos && end == std::string_view::npos)
+    {
+        return std::string_view();
+    }
+
+    assert(begin != std::string_view::npos);
+    assert(end != std::string_view::npos);
+    assert(begin <= end);
+
+    return std::string_view(&str[begin], (end + 1) - begin);
+}
+
+std::string trim(std::string_view str)
+{
+    auto trimmed = trimmed_view(str);
+    return std::string(trimmed.begin(), trimmed.end());
+}
+
+void trim_in_place(std::string& str)
+{
+    auto trimmed = trimmed_view(str);
+    if (trimmed.data() == str.data() && trimmed.size() == str.size())
+    {
+        // no trimming was needed
+        return;
+    }
+
+    str.assign(trimmed.begin(), trimmed.end());
+}
+
 std::string urlEncode(const std::string& aString)
 {
     std::stringstream result;

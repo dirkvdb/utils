@@ -32,19 +32,19 @@ using namespace std::string_literals;
 TEST(StringOperationsTest, LowerCase)
 {
     string testString = "TESTSTRING";
-    lowercase(testString);
+    lowercase_in_place(testString);
     EXPECT_EQ("teststring", testString);
 
     testString = "teststring";
-    lowercase(testString);
+    lowercase_in_place(testString);
     EXPECT_EQ("teststring", testString);
 
     testString = "~!@#$%^&*()_1234567890-";
-    lowercase(testString);
+    lowercase_in_place(testString);
     EXPECT_EQ("~!@#$%^&*()_1234567890-", testString);
 
     testString = "H_ell_O";
-    lowercase(testString);
+    lowercase_in_place(testString);
     EXPECT_EQ("h_ell_o", testString);
 
     EXPECT_EQ(std::string("hello"), lowercase("HeLLo"));
@@ -53,19 +53,19 @@ TEST(StringOperationsTest, LowerCase)
 TEST(StringOperationsTest, UpperCase)
 {
     string testString = "teststring";
-    uppercase(testString);
+    uppercase_in_place(testString);
     EXPECT_EQ("TESTSTRING", testString);
 
     testString = "teststring";
-    uppercase(testString);
+    uppercase_in_place(testString);
     EXPECT_EQ("TESTSTRING", testString);
 
     testString = "~!@#$%^&*()_1234567890-";
-    uppercase(testString);
+    uppercase_in_place(testString);
     EXPECT_EQ("~!@#$%^&*()_1234567890-", testString);
 
     testString = "H_ell_O";
-    uppercase(testString);
+    uppercase_in_place(testString);
     EXPECT_EQ("H_ELL_O", testString);
 
     EXPECT_EQ(std::string("HELLO"), uppercase("HeLLo"));

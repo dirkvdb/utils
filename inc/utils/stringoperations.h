@@ -34,71 +34,18 @@ namespace utils
 namespace stringops
 {
 
-inline void lowercase(std::string& aString)
-{
-    std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return std::tolower(c); });
-}
+void lowercase_in_place(std::string& aString);
+void uppercase_in_place(std::string& aString);
 
-inline std::string lowercase(const std::string& aString)
-{
-    std::string lower = aString;
-    lowercase(lower);
-    return lower;
-}
+[[nodiscard]] std::string lowercase(std::string_view aString);
+[[nodiscard]] std::string uppercase(const std::string& aString);
 
-inline void uppercase(std::string& aString)
-{
-    std::transform(aString.begin(), aString.end(), aString.begin(), [](char c) { return std::toupper(c); });
-}
+std::string_view trimmed_view(std::string_view str);
+void             trim_in_place(std::string& str);
 
-inline std::string uppercase(const std::string& aString)
-{
-    std::string lower = aString;
-    uppercase(lower);
-    return lower;
-}
+[[nodiscard]] std::string trim(std::string_view str);
 
-[[nodiscard]] inline std::string_view trimmed_view(std::string_view str)
-{
-    if (str.empty())
-    {
-        return str;
-    }
-
-    auto begin = str.find_first_not_of(" \t\r\n");
-    auto end   = str.find_last_not_of(" \t\r\n");
-
-    if (begin == std::string_view::npos && end == std::string_view::npos)
-    {
-        return std::string_view();
-    }
-
-    assert(begin != std::string_view::npos);
-    assert(end != std::string_view::npos);
-    assert(begin <= end);
-
-    return std::string_view(&str[begin], (end + 1) - begin);
-}
-
-[[nodiscard]] inline std::string trim(std::string_view str)
-{
-    auto trimmed = trimmed_view(str);
-    return std::string(trimmed.begin(), trimmed.end());
-}
-
-inline void trim_in_place(std::string& str)
-{
-    auto trimmed = trimmed_view(str);
-    if (trimmed.data() == str.data() && trimmed.size() == str.size())
-    {
-        // no trimming was needed
-        return;
-    }
-
-    str.assign(trimmed.begin(), trimmed.end());
-}
-
-inline void replace(std::string& aString, const std::string& toSearch, const std::string& toReplace)
+inline void replace(std::string& aString, std::string_view toSearch, std::string_view toReplace)
 {
     size_t startPos = 0;
     size_t foundPos;
@@ -110,17 +57,12 @@ inline void replace(std::string& aString, const std::string& toSearch, const std
     }
 }
 
-inline bool startsWith(std::string_view aString, const std::string& search)
+inline bool startsWith(std::string_view aString, std::string_view search)
 {
     return aString.compare(0, search.size(), search) == 0;
 }
 
-inline bool startsWith(std::string_view aString, const char* search)
-{
-    return aString.compare(0, strlen(search), search) == 0;
-}
-
-inline bool endsWith(const std::string& aString, const std::string& search)
+inline bool endsWith(const std::string& aString, std::string_view search)
 {
     if (search.size() > aString.size())
     {
@@ -137,29 +79,15 @@ inline void dos2unix(std::string& aString)
 
 std::string urlEncode(const std::string& aString);
 
-// Join implementation for objects that have a streaming operator implemented
-template <typename Container, typename = std::enable_if_t<is_streamable_v<typename Container::value_type> && !can_cast_to_string_view_v<typename Container::value_type>>>
-std::string join(const Container& items, const std::string& joinString)
-{
-    std::ostringstream ss;
-    for (auto iter = items.cbegin(); iter != items.cend(); ++iter)
-    {
-        ss << *iter;
-        if (iter + 1 != items.cend())
-        {
-            ss << joinString;
-        }
-    }
-
-    return ss.str();
-}
-
-// Join implementation for objects that implement: std::basic_string::operator basic_string_view
-// This implementation is roughly 10 times faster the ostream version for strings
+// Join items in the container with the provided join string
 // e.g.: join(std::vector<std::string>({"one", "two"}), ", ") == "one, two"
-template <typename Container, typename = std::enable_if_t<can_cast_to_string_view_v<typename Container::value_type>>>
+template <typename Container>
 std::string join(const Container& items, std::string_view joinString)
 {
+    using ValueType = typename Container::value_type;
+    static_assert(can_cast_to_string_view_v<ValueType> || is_streamable_v<ValueType>,
+        "Items to join should be streamable or convertible to string_view");
+
     std::string result;
 
     if (items.empty())
@@ -167,26 +95,64 @@ std::string join(const Container& items, std::string_view joinString)
         return result;
     }
 
-    size_t inputSize = 0;
-    for (auto& item : items)
+    if constexpr (can_cast_to_string_view_v<ValueType>)
     {
-        inputSize += static_cast<std::string_view>(item).size();
-    }
+        // Join implementation for objects that implement: std::basic_string::operator basic_string_view
+        // This implementation is roughly 10 times faster the ostream version for strings
 
-    size_t resultSize = inputSize + ((items.size() - 1) * joinString.size());
-    result.reserve(resultSize);
-
-    for (auto& item : items)
-    {
-        result += static_cast<std::string_view>(item);
-
-        if (result.size() < resultSize)
+        size_t inputSize = 0;
+        for (auto& item : items)
         {
-            result += joinString;
+            inputSize += static_cast<std::string_view>(item).size();
         }
+
+        size_t resultSize = inputSize + ((items.size() - 1) * joinString.size());
+        result.reserve(resultSize);
+
+        for (auto& item : items)
+        {
+            result += static_cast<std::string_view>(item);
+
+            if (result.size() < resultSize)
+            {
+                result += joinString;
+            }
+        }
+    }
+    else if constexpr (is_streamable_v<ValueType>)
+    {
+        // Join implementation for objects that have a streaming operator implemented
+        std::ostringstream ss;
+        for (auto iter = items.cbegin(); iter != items.cend(); ++iter)
+        {
+            ss << *iter;
+            if (iter + 1 != items.cend())
+            {
+                ss << joinString;
+            }
+        }
+
+        result = ss.str();
     }
 
     return result;
+}
+
+// Join implementation for objects where the tostring implementation is provided as a callable
+template <typename Container, typename ToStringCb>
+std::string join(const Container& items, const std::string& joinString, ToStringCb&& cb)
+{
+    std::ostringstream ss;
+    for (auto iter = begin(items); iter != end(items); ++iter)
+    {
+        ss << cb(*iter);
+        if (iter + 1 != end(items))
+        {
+            ss << joinString;
+        }
+    }
+
+    return ss.str();
 }
 
 std::vector<std::string> split(std::string_view str, char delimiter);
