@@ -116,7 +116,20 @@ std::string urlEncode(const std::string& aString)
     return result.str();
 }
 
-std::vector<std::string_view> splitted_view(std::string_view str, char delimiter)
+static void applySplitOptions(std::string_view sv, flags<split_opt> opt, std::vector<std::string_view>& tokens)
+{
+    if (opt.is_set(split_opt::trim))
+    {
+        sv = trimmed_view(sv);
+    }
+
+    if (!opt.is_set(split_opt::no_empty) || !sv.empty())
+    {
+        tokens.emplace_back(sv);
+    }
+}
+
+std::vector<std::string_view> splitted_view(std::string_view str, char delimiter, flags<split_opt> opt)
 {
     std::vector<std::string_view> tokens;
 
@@ -126,7 +139,7 @@ std::vector<std::string_view> splitted_view(std::string_view str, char delimiter
     {
         if (str[i] == delimiter)
         {
-            tokens.emplace_back(start, length);
+            applySplitOptions(std::string_view(start, length), opt, tokens);
             length = 0;
 
             if (i + 1 < str.size())
@@ -142,23 +155,23 @@ std::vector<std::string_view> splitted_view(std::string_view str, char delimiter
 
     if (length > 0)
     {
-        tokens.emplace_back(start, length);
+        applySplitOptions(std::string_view(start, length), opt, tokens);
     }
 
     if (*start == delimiter)
     {
-        tokens.push_back(std::string_view());
+        applySplitOptions(std::string_view(), opt, tokens);
     }
 
     if (tokens.empty())
     {
-        tokens.push_back(str);
+        applySplitOptions(str, opt, tokens);
     }
 
     return tokens;
 }
 
-std::vector<std::string_view> splitted_view(std::string_view str, std::string_view delimiter)
+std::vector<std::string_view> splitted_view(std::string_view str, std::string_view delimiter, flags<split_opt> opt)
 {
     std::vector<std::string_view> tokens;
 
@@ -174,7 +187,7 @@ std::vector<std::string_view> splitted_view(std::string_view str, std::string_vi
 
             if (matchLength == delimiter.size())
             {
-                tokens.emplace_back(start, length);
+                applySplitOptions(std::string_view(start, length), opt, tokens);
                 length      = 0;
                 matchLength = 0;
 
@@ -196,47 +209,51 @@ std::vector<std::string_view> splitted_view(std::string_view str, std::string_vi
 
     if (matchLength == delimiter.size())
     {
-        tokens.push_back(std::string_view());
+        applySplitOptions(std::string_view(), opt, tokens);
     }
     else if (length + matchLength > 0)
     {
-        tokens.emplace_back(start, length);
+        applySplitOptions(std::string_view(start, length), opt, tokens);
     }
 
     if (length == 0 && matchLength == 0)
     {
-        tokens.push_back(std::string_view());
+        applySplitOptions(std::string_view(), opt, tokens);
     }
 
     if (tokens.empty())
     {
-        tokens.push_back(str);
+        applySplitOptions(std::string_view(start, length), opt, tokens);
     }
 
     return tokens;
 }
 
-std::vector<std::string> split(std::string_view str, char delimiter)
+std::vector<std::string> split(std::string_view str, char delimiter, flags<split_opt> opt)
 {
-    auto splitted = splitted_view(str, delimiter);
+    auto splitted = splitted_view(str, delimiter, opt);
 
     std::vector<std::string> tokens;
     tokens.reserve(splitted.size());
-    std::transform(begin(splitted), end(splitted), std::back_inserter(tokens), [](const auto& sv) {
-        return std::string(begin(sv), end(sv));
-    });
+    for (auto& v : splitted)
+    {
+        tokens.emplace_back(begin(v), end(v));
+    }
+
     return tokens;
 }
 
-std::vector<std::string> split(std::string_view str, const std::string& delimiter)
+std::vector<std::string> split(std::string_view str, const std::string& delimiter, flags<split_opt> opt)
 {
-    auto splitted = splitted_view(str, delimiter);
+    auto splitted = splitted_view(str, delimiter, opt);
 
     std::vector<std::string> tokens;
     tokens.reserve(splitted.size());
-    std::transform(begin(splitted), end(splitted), std::back_inserter(tokens), [](const auto& sv) {
-        return std::string(begin(sv), end(sv));
-    });
+    tokens.reserve(splitted.size());
+    for (auto& v : splitted)
+    {
+        tokens.emplace_back(begin(v), end(v));
+    }
     return tokens;
 }
 

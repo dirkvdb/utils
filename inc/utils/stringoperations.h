@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "utils/enumflags.h"
 #include "utils/traits.h"
 
 #include <algorithm>
@@ -158,11 +159,22 @@ std::string join(const Container& items, const std::string& joinString, ToString
     return ss.str();
 }
 
-std::vector<std::string> split(std::string_view str, char delimiter);
-std::vector<std::string> split(std::string_view str, const std::string& delimiter);
+enum class split_opt
+{
+    no_empty = 1 << 0,
+    trim     = 1 << 1
+};
 
-std::vector<std::string_view> splitted_view(std::string_view str, char delimiter);
-std::vector<std::string_view> splitted_view(std::string_view str, std::string_view delimiter);
+std::vector<std::string> split(std::string_view str, char delimiter, flags<split_opt> opt = flags<split_opt>());
+std::vector<std::string> split(std::string_view str, const std::string& delimiter, flags<split_opt> opt = flags<split_opt>());
+
+std::vector<std::string_view> splitted_view(std::string_view str, char delimiter, flags<split_opt> opt = flags<split_opt>());
+std::vector<std::string_view> splitted_view(std::string_view str, std::string_view delimiter, flags<split_opt> opt = flags<split_opt>());
+
+inline constexpr flags<split_opt> operator|(split_opt lhs, split_opt rhs) noexcept
+{
+    return flags<split_opt>() | lhs | rhs;
+}
 
 template <typename T>
 inline T toNumeric(const std::string& aString)

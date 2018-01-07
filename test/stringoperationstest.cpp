@@ -151,6 +151,49 @@ TEST(StringOperationsTest, Split)
     tokenized  = split(testString, ';');
     ASSERT_EQ(1u, tokenized.size());
     EXPECT_EQ(""s, tokenized[0]);
+
+    testString = "A,,C";
+    tokenized  = split(testString, ",");
+    ASSERT_EQ(3u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ(""s, tokenized[1]);
+    EXPECT_EQ("C"s, tokenized[2]);
+}
+
+TEST(StringOperationsTest, SplitAndTrim)
+{
+    string         testString = "A - B - C";
+    vector<string> tokenized;
+    tokenized = split(testString, "-", split_opt::trim);
+    ASSERT_EQ(3u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ("B"s, tokenized[1]);
+    EXPECT_EQ("C"s, tokenized[2]);
+}
+
+TEST(StringOperationsTest, SplitNoEmpty)
+{
+    string         testString = "A,,C";
+    vector<string> tokenized;
+    tokenized = split(testString, ",", split_opt::no_empty);
+    ASSERT_EQ(2u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ("C"s, tokenized[1]);
+}
+
+TEST(StringOperationsTest, SplitAndTrimNoEmpty)
+{
+    string         testString = " A,  ,C  ";
+    vector<string> tokenized  = split(testString, ',', split_opt::trim | split_opt::no_empty);
+    ASSERT_EQ(2u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ("C"s, tokenized[1]);
+
+    testString = " A , , ,  C  ";
+    tokenized  = split(testString, ", ", split_opt::trim | split_opt::no_empty);
+    ASSERT_EQ(2u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ("C"s, tokenized[1]);
 }
 
 TEST(StringOperationsTest, SplittedView)

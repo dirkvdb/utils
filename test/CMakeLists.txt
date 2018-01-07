@@ -1,17 +1,18 @@
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 INCLUDE_DIRECTORIES(
-	${XDGBASEDIR_INCLUDE_DIRS}
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${XDGBASEDIR_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
 LINK_DIRECTORIES(
-	${XDGBASEDIR_LIBRARY_DIRS}
+    ${XDGBASEDIR_LIBRARY_DIRS}
 )
 
 ADD_EXECUTABLE(utilstest
     bufferedreadertest.cpp
+    enumflagstest.cpp
     fileoperationstest.cpp
     gmock-gtest-all.cpp
     main.cpp
@@ -27,7 +28,7 @@ IF (COVERAGE)
 ENDIF ()
 
 TARGET_LINK_LIBRARIES(utilstest
-	utils
+    utils
     ${COVERAGE_LIBRARY}
 )
 
