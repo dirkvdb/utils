@@ -115,7 +115,7 @@ before_install:
         export CXXFLAGS="${CXXFLAGS} -stdlib=libc++"
       fi
 
-      export CXX="clang-${COMPILER}" CC="clang-${COMPILER}"
+      export CXX="clang++" CC="clang"
       ${CXX} -v
     fi
 
