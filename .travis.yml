@@ -1,5 +1,6 @@
 dist: trusty
 language: cpp
+group: travis_latest
 
 matrix:
   include:
@@ -8,7 +9,6 @@ matrix:
         apt:
           packages:
             - libxdg-basedir-dev
-            - lcov
       env:
         - COMPILER=5.0 LLVM_VERSION=5.0.1 BUILD_TYPE=Debug
     - compiler: clang
@@ -18,7 +18,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - libxdg-basedir-dev
-            - lcov
       env:
         - COMPILER=5.0 LLVM_VERSION=5.0.1 BUILD_TYPE=Release
     - compiler: clang
@@ -28,7 +27,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - libxdg-basedir-dev
-            - lcov
       env:
         - COMPILER=4.0 LLVM_VERSION=4.0.0 BUILD_TYPE=Debug
     - compiler: clang
@@ -38,7 +36,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - libxdg-basedir-dev
-            - lcov
       env:
         - COMPILER=4.0 LLVM_VERSION=4.0.0 BUILD_TYPE=Release
     # - compiler: gcc
@@ -49,7 +46,6 @@ matrix:
     #       packages:
     #         - g++-6
     #         - libxdg-basedir-dev
-    #         - lcov
     #   env:
     #     - COMPILER=6 BUILD_TYPE=Debug
     # - compiler: gcc
@@ -60,7 +56,6 @@ matrix:
     #       packages:
     #         - g++-6
     #         - libxdg-basedir-dev
-    #         - lcov
     #   env:
     #     - COMPILER=6 BUILD_TYPE=Release
     - compiler: gcc
@@ -71,7 +66,6 @@ matrix:
           packages:
             - g++-7
             - libxdg-basedir-dev
-            - lcov
       env:
         - COMPILER=7 BUILD_TYPE=Debug
     - compiler: gcc
@@ -82,7 +76,6 @@ matrix:
           packages:
             - g++-7
             - libxdg-basedir-dev
-            - lcov
       env:
         - COMPILER=7 BUILD_TYPE=Release
     - compiler: clang
@@ -115,14 +108,13 @@ before_install:
     if [[ "${TRAVIS_OS_NAME}" == "linux" && "${CXX}" == "clang++" ]]; then
       if [[ "$COMPILER" == "4.0" ]]; then
         travis_retry wget --quiet -O - http://llvm.org/releases/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz | tar --strip-components=1 ${TAR_FLAGS} -xJ -C ${DEPS_DIR}/local
+        export PATH=${DEPS_DIR}/local/bin:${PATH}
+        export CXXFLAGS="${CXXFLAGS} -isystem ${DEPS_DIR}/local/include/c++/v1 -stdlib=libc++"
       else
         travis_retry wget --quiet -O - http://releases.llvm.org/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz | tar --strip-components=1 ${TAR_FLAGS} -xJ -C ${DEPS_DIR}/local
+        export CXXFLAGS="${CXXFLAGS} -stdlib=libc++"
       fi
 
-
-      export PATH=${DEPS_DIR}/local/bin:${PATH}
-      export LDFLAGS="${LDFLAGS} -lc++ -lc++abi -lm"
-      export CXXFLAGS="${CXXFLAGS} -isystem ${DEPS_DIR}/local/include/c++/v1 -stdlib=libc++"
       export CXX="clang-${COMPILER}" CC="clang-${COMPILER}"
       ${CXX} -v
     fi
@@ -136,25 +128,12 @@ before_install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-${COMPILER}" CC="gcc-${COMPILER}"; fi
 
 install:
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      gem install coveralls-lcov
-    fi
   - cd ${TRAVIS_BUILD_DIR}
 
 script:
-  - |
-    if [ "${TRAVIS_OS_NAME}" == "linux"] && ["${CXX}" != "clang++" ]; then
-      cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCOVERAGE=ON -DGCOV_PATH=/usr/bin/gcov-6 -DCMAKE_PREFIX_PATH=${DEPS_DIR}/local .
-    else
-      cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCMAKE_PREFIX_PATH=${DEPS_DIR}/local .
-    fi
+  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTANDALONE=ON -DCMAKE_PREFIX_PATH=${DEPS_DIR}/local .
   - make -j4
   - CTEST_OUTPUT_ON_FAILURE=1 make test
-
-after_success:
-  - lcov -v
-  - if [ "$BUILD_TYPE" = "Debug" ] && [ "$CXX" = "g++-6" ]; then make utils_coverage && coveralls-lcov --repo-token X6q6ZWshmjbZ8jKMVfwkeDdbA1v8vd7UX coverage.info; fi
 
 after_failure:
   - cat Testing/Temporary/LastTest.log
